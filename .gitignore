@@ -1,0 +1,32 @@
+# ===== Segredos — NUNCA versionar =====
+server-config.json
+.env
+**/.env
+
+# ===== Node empacotado (106 MB) e dependências =====
+tools/node/
+node_modules/
+
+# ===== Sistema separado (não faz parte do site atual) =====
+plataforma/
+
+# ===== Backups e experimentos =====
+_backups/
+hero-fog.html
+
+# ===== Tooling local (editor / assistentes) =====
+.claude/
+.agents/
+.impeccable/
+skills-lock.json
+testsprite_tests/
+
+# ===== Dados de runtime (gerados pelo servidor; podem conter dados de clientes) =====
+data/orders.json
+data/payment-attempts.json
+data/payment-errors.json
+data/reseller-leads.json
+
+# ===== Sistema operacional =====
+Thumbs.db
+.DS_Store

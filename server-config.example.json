@@ -1,0 +1,9 @@
+{
+  "_ATENCAO": "Copie este arquivo para 'server-config.json' e preencha com suas credenciais reais. NUNCA versione o server-config.json.",
+  "mpAccessToken": "SEU_MERCADO_PAGO_ACCESS_TOKEN",
+  "mpPublicKey": "SUA_MERCADO_PAGO_PUBLIC_KEY",
+  "adminUser": "defina-um-usuario",
+  "adminPassword": "defina-uma-senha-forte",
+  "shippingFlat": 0,
+  "port": 8321
+}

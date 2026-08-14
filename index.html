@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="img/favicon.png">
+    <title>Bolladinho | A primeira piteira de fibras naturais do mercado!</title>
+    <meta name="description" content="Direto da Natureza para Você. A primeira piteira de fibras naturais do mercado. Biodescartáveis e Reutilizáveis, feitas de bambu selecionado. Sustentabilidade, estilo e exclusividade.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.cdnfonts.com/css/gt-america-trial">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Folhas de bambu caindo (CSS/JS) -->
+    <div id="particles-container"></div>
+
+    <!-- Bambus decorativos no fundo -->
+    <div class="bamboo-decor" aria-hidden="true">
+        <svg class="bamboo-left" viewBox="0 0 120 800" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMid slice">
+            <g stroke="currentColor" fill="none" stroke-width="2">
+                <rect x="20" y="0" width="16" height="800" rx="8" fill="currentColor" opacity="0.5" stroke="none"/>
+                <line x1="20" y1="120" x2="36" y2="120"/><line x1="20" y1="280" x2="36" y2="280"/>
+                <line x1="20" y1="440" x2="36" y2="440"/><line x1="20" y1="600" x2="36" y2="600"/>
+                <rect x="70" y="0" width="12" height="800" rx="6" fill="currentColor" opacity="0.35" stroke="none"/>
+                <line x1="70" y1="180" x2="82" y2="180"/><line x1="70" y1="360" x2="82" y2="360"/><line x1="70" y1="540" x2="82" y2="540"/>
+                <path d="M36 130 Q70 100 105 112 Q72 138 36 130 Z" fill="currentColor" opacity="0.4" stroke="none"/>
+                <path d="M36 450 Q75 425 110 440 Q74 462 36 450 Z" fill="currentColor" opacity="0.3" stroke="none"/>
+                <path d="M82 370 Q108 340 120 350 Q105 375 82 370 Z" fill="currentColor" opacity="0.35" stroke="none"/>
+            </g>
+        </svg>
+        <svg class="bamboo-right" viewBox="0 0 120 800" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMaxYMid slice">
+            <g stroke="currentColor" fill="none" stroke-width="2">
+                <rect x="84" y="0" width="16" height="800" rx="8" fill="currentColor" opacity="0.5" stroke="none"/>
+                <line x1="84" y1="160" x2="100" y2="160"/><line x1="84" y1="320" x2="100" y2="320"/>
+                <line x1="84" y1="480" x2="100" y2="480"/><line x1="84" y1="640" x2="100" y2="640"/>
+                <rect x="38" y="0" width="12" height="800" rx="6" fill="currentColor" opacity="0.35" stroke="none"/>
+                <line x1="38" y1="220" x2="50" y2="220"/><line x1="38" y1="400" x2="50" y2="400"/><line x1="38" y1="580" x2="50" y2="580"/>
+                <path d="M84 170 Q50 140 15 152 Q48 178 84 170 Z" fill="currentColor" opacity="0.4" stroke="none"/>
+                <path d="M84 490 Q45 465 10 480 Q46 502 84 490 Z" fill="currentColor" opacity="0.3" stroke="none"/>
+                <path d="M38 230 Q12 200 0 210 Q15 235 38 230 Z" fill="currentColor" opacity="0.35" stroke="none"/>
+            </g>
+        </svg>
+    </div>
+
+    <header class="navbar" id="navbar">
+        <div class="container nav-content">
+            <a href="#" class="logo">
+                <i class="fa-solid fa-leaf"></i> Bolladinho
+            </a>
+            <ul class="nav-links" data-lenis-prevent>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="index.html#beneficios">Benefícios</a></li>
+                <li><a href="index.html#detalhes">Detalhes</a></li>
+                <li><a href="index.html#depoimentos">Depoimentos</a></li>
+                <li><a href="revendedor.html">Revendedor</a></li>
+            </ul>
+            <div class="nav-actions">
+                <div class="social-icons">
+                    <a href="https://www.instagram.com/soubolladinho" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#" id="cart-icon-btn" aria-label="Carrinho" class="cart-icon-wrapper">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                        <span class="cart-count" id="cart-count" style="display:none;">0</span>
+                    </a>
+                </div>
+                <button id="menu-toggle" class="menu-toggle" aria-label="Abrir menu"><i class="fa-solid fa-bars"></i></button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Ironhill: névoa em movimento + efeito mouse 3D sway/tilt + dissolve (Three.js) + parallax galhos -->
+        <section class="hero" id="home">
+            <div class="hero__twigs" data-sway="16">
+                <img class="hero__twig hero__twig--left" src="img/mask-1.webp" alt="">
+                <img class="hero__twig hero__twig--right" src="img/mask-2.webp" alt="">
+            </div>
+
+            <div class="hero__vignette"></div>
+
+            <div class="hero__row">
+                <img class="hero__bg" src="img/hero-bg.webp" alt="" data-sway="14" />
+                <canvas class="hero-canvas"></canvas>
+                <div class="hero__conteiner">
+                    <div class="hero__top" data-sway="14">
+                        <p class="intro-eyebrow">SUBA NO</p>
+                        <h1>BOLLADINHO</h1>
+                        <p class="intro-description">CONHECIDO POR ALGUNS, DESCOBERTO POR POUCOS.</p>
+                    </div>
+                    <div class="hero__content" id="beneficios">
+                        <div class="container">
+                            <div class="section-title reveal">
+                                <span class="eyebrow"><i class="fa-solid fa-seedling"></i> A Matéria-Prima</span>
+                                <h2>Por que escolher o Bambu?</h2>
+                                <p>O material perfeito, moldado pela natureza. Um toque orgânico que faz toda a diferença.</p>
+                            </div>
+                            <div class="benefits-grid">
+                                <div class="benefit-card glass reveal">
+                                    <div class="icon"><i class="fa-solid fa-tree"></i></div>
+                                    <h3>Ecológico</h3>
+                                    <p>Planta de crescimento ultrarrápido, o bambu é totalmente renovável e 100% biodegradável. Respeito pelo ciclo natural.</p>
+                                </div>
+                                <div class="benefit-card glass reveal delay-1">
+                                    <div class="icon"><i class="fa-solid fa-shield-halved"></i></div>
+                                    <h3>Resistente</h3>
+                                    <p>Fibra incrivelmente forte que não amassa e não quebra com facilidade. Feito para durar muito mais.</p>
+                                </div>
+                                <div class="benefit-card glass reveal delay-2">
+                                    <div class="icon"><i class="fa-solid fa-droplet"></i></div>
+                                    <h3>Reutilizável</h3>
+                                    <p>Pode ser limpa e reutilizada inúmeras vezes. Uma escolha econômica, inteligente e amiga do meio ambiente.</p>
+                                </div>
+                            </div>
+                            <div class="diferenciais-banner reveal">
+                                <div class="dif-item"><i class="fa-solid fa-leaf"></i> 100% Natural</div>
+                                <div class="dif-item"><i class="fa-solid fa-recycle"></i> Biodescartável</div>
+                                <div class="dif-item"><i class="fa-solid fa-droplet"></i> Reutilizável</div>
+                                <div class="dif-item"><i class="fa-solid fa-check"></i> Exclusivo</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hero__scroll-indicator">
+                        <span>Deslize para explorar</span>
+                        <div class="line"><div class="line-inner"></div></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="visual-demo" id="detalhes">
+            <div class="sfx" aria-hidden="true"><span class="sfx-blob g tr"></span><span class="sfx-blob d bl"></span></div>
+            <div class="container">
+                <div class="demo-grid">
+                    <div class="demo-image-wrapper reveal">
+                        <div class="image-frame">
+                            <img src="img/img detail.jpg" alt="Detalhe da textura do bambu" class="demo-img parallax-img">
+                        </div>
+                    </div>
+                    <div class="demo-content reveal delay-1">
+                        <span class="eyebrow"><i class="fa-solid fa-fingerprint"></i> Feita pela Natureza</span>
+                        <h2>Cada Peça é Única.</h2>
+                        <p>Como uma impressão digital, as ranhuras e os tons da madeira variam de piteira para piteira. Você não está apenas comprando um acessório, mas uma obra de arte natural exclusiva.</p>
+                        <ul class="feature-list">
+                            <li><i class="fa-brands fa-envira"></i> <strong>Polimento Premium:</strong> Toque extremamente liso e agradável.</li>
+                            <li><i class="fa-brands fa-envira"></i> <strong>Formato Ergonômico:</strong> Encaixe perfeito.</li>
+                            <li><i class="fa-brands fa-envira"></i> <strong>Experiência Pura:</strong> Não altera o sabor, esfria a fumaça de forma natural.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <section class="final-cta" id="comprar">
+            <div class="sfx" aria-hidden="true"><span class="sfx-blob gold tr"></span><span class="sfx-blob g bl"></span></div>
+            <div class="container cta-content reveal">
+                <span class="eyebrow"><i class="fa-solid fa-leaf"></i> Escolha o seu ritual</span>
+                <h2>Sinta a Natureza em Suas Mãos.</h2>
+                <p>Eleve a sua experiência selecionando o tamanho ideal para o seu ritual.</p>
+                
+                <div class="pricing-grid">
+                    <div class="pricing-card glass reveal" data-product-id="pequena">
+                        <h3>Caixa Pequena</h3>
+                        <p class="pricing-desc">Ideal para quem quer experimentar a diferença.</p>
+                        <div class="price-amount">
+                            <span class="currency">R$</span>5<span class="cents">,00</span>
+                        </div>
+                        <a href="#" class="btn btn-outline add-to-cart-btn" data-name="Caixa Pequena" data-price="5.00"><i class="fa-solid fa-cart-shopping"></i> Comprar Agora</a>
+                        <small class="stock-note"></small>
+                    </div>
+
+                    <div class="pricing-card popular glass reveal delay-1" data-product-id="media">
+                        <div class="popular-badge">Mais Vendida</div>
+                        <h3>Caixa Média</h3>
+                        <p class="pricing-desc">O tamanho perfeito para o seu ritual diário.</p>
+                        <div class="price-amount">
+                            <span class="currency">R$</span>9<span class="cents">,90</span>
+                        </div>
+                        <a href="#" class="btn btn-primary add-to-cart-btn" data-name="Caixa Média" data-price="9.90"><i class="fa-solid fa-cart-shopping"></i> Comprar Agora</a>
+                        <small class="stock-note"></small>
+                    </div>
+
+                    <div class="pricing-card glass reveal delay-2" data-product-id="grande">
+                        <h3>Caixa Grande</h3>
+                        <p class="pricing-desc">Maior custo-benefício. Para uso prolongado.</p>
+                        <div class="price-amount">
+                            <span class="currency">R$</span>20<span class="cents">,00</span>
+                        </div>
+                        <a href="#" class="btn btn-outline add-to-cart-btn" data-name="Caixa Grande" data-price="20.00"><i class="fa-solid fa-cart-shopping"></i> Comprar Agora</a>
+                        <small class="stock-note"></small>
+                    </div>
+                </div>
+
+                <p class="secure-text"><i class="fa-solid fa-lock"></i> Compra 100% Segura • Frete para todo o Brasil</p>
+                <div class="payment-methods-strip reveal">
+                    <span class="pm-label">Pague com:</span>
+                    <i class="fa-brands fa-pix" title="PIX"></i>
+                    <i class="fa-brands fa-cc-visa" title="Visa"></i>
+                    <i class="fa-brands fa-cc-mastercard" title="Mastercard"></i>
+                    <i class="fa-brands fa-whatsapp" title="Pedido via WhatsApp"></i>
+                </div>
+            </div>
+        </section>
+
+        <section class="social-proof" id="depoimentos">
+            <div class="sfx" aria-hidden="true"><span class="sfx-blob d tl"></span><span class="sfx-blob g br"></span></div>
+            <div class="container">
+                <div class="section-title reveal">
+                    <span class="eyebrow"><i class="fa-solid fa-star"></i> Depoimentos Reais</span>
+                    <h2>Quem Usa, Aprova.</h2>
+                    <p>A experiência de quem já elevou o próprio ritual com a Bolladinho.</p>
+                </div>
+                <div class="testimonials-grid" id="testimonials-grid">
+                    <!-- Avaliações aprovadas são carregadas do servidor -->
+                </div>
+
+                <div class="review-cta reveal">
+                    <button class="btn btn-outline" id="review-toggle"><i class="fa-solid fa-pen"></i> Deixe sua Avaliação</button>
+                    <div class="review-form glass" id="review-form">
+                        <h3>Conte como foi sua experiência</h3>
+                        <div class="star-picker" id="star-picker" aria-label="Sua nota">
+                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="review-name">Seu nome <span class="req">*</span></label>
+                                <input type="text" id="review-name" placeholder="Como quer ser identificado" maxlength="60" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="review-city">Cidade - UF</label>
+                                <input type="text" id="review-city" placeholder="Ex: Brasília - DF" maxlength="60">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="review-text">Sua avaliação <span class="req">*</span></label>
+                            <textarea id="review-text" rows="4" placeholder="Mínimo de 10 caracteres" maxlength="500" required></textarea>
+                        </div>
+                        <button class="btn btn-primary btn-block" id="review-submit"><i class="fa-solid fa-paper-plane"></i> Enviar Avaliação</button>
+                        <p class="review-feedback" id="review-feedback"></p>
+                        <small class="review-note">Sua avaliação passa por moderação antes de aparecer no site.</small>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer-content">
+            <div class="footer-brand">
+                <a href="#" class="logo"><i class="fa-solid fa-leaf"></i> Bolladinho</a>
+                <p><span class="hide-mobile">Uma maneira natural de fumar. </span>A primeira piteira de fibras naturais do mercado.</p>
+            </div>
+            <div class="footer-links">
+                <h4>Navegação</h4>
+                <ul>
+                    <li><a href="index.html#beneficios">Benefícios</a></li>
+                    <li><a href="index.html#detalhes">Detalhes</a></li>
+                    <li><a href="index.html#comprar">Comprar</a></li>
+                </ul>
+            </div>
+            <div class="footer-contact">
+                <h4>Contato</h4>
+                <p><i class="fa-brands fa-whatsapp"></i> +55 61 99563-6229</p>
+                <p><i class="fa-solid fa-envelope"></i> <a href="mailto:bolladinhosmoking@gmail.com?subject=Contato%20Bolladinho&body=Ol%C3%A1!%20Gostaria%20de%20saber%20mais%20sobre%20as%20piteiras%20Bolladinho.">bolladinhosmoking@gmail.com</a></p>
+            </div>
+            <div class="footer-social">
+                <h4>Siga-nos</h4>
+                <div class="social-icons">
+                    <a href="https://www.instagram.com/soubolladinho" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Bolladinho. Todos os direitos reservados. Uma maneira natural de fumar.</p>
+            <button type="button" id="admin-access" class="admin-access" aria-label="Área administrativa" title="Área administrativa"><i class="fa-solid fa-leaf"></i></button>
+        </div>
+    </footer>
+
+    <!-- Cart Modal -->
+    <div class="cart-overlay" id="cart-overlay">
+        <div class="cart-modal" data-lenis-prevent>
+            <div class="cart-header">
+                <h2>Seu Carrinho</h2>
+                <button id="close-cart" class="close-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="cart-items" id="cart-items">
+                <!-- Items will be injected here -->
+            </div>
+            <div class="cart-footer">
+                <div class="cart-total">
+                    <span>Total:</span>
+                    <span id="cart-total-price">R$ 0,00</span>
+                </div>
+                <button id="checkout-btn" class="btn btn-primary btn-large" style="width: 100%;">Finalizar Compra</button>
+                <p class="cart-secure-note"><i class="fa-solid fa-lock"></i> Pagamento seguro via PIX ou Cartão</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Checkout Modal -->
+    <div class="checkout-overlay" id="checkout-overlay">
+        <div class="checkout-modal" data-lenis-prevent>
+            <div class="checkout-header">
+                <div class="checkout-title">
+                    <h2><i class="fa-solid fa-lock"></i> Pagamento Seguro</h2>
+                    <p>Complete seus dados abaixo para finalizar sua compra.</p>
+                </div>
+                <button id="close-checkout" class="close-btn" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="checkout-columns">
+                <div class="checkout-form">
+                    <h3 class="co-section"><i class="fa-solid fa-address-card"></i> 1. Dados Pessoais</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="cust-nome">Nome Completo <span class="req">*</span></label>
+                            <input type="text" id="cust-nome" placeholder="Ex: João da Silva" autocomplete="name">
+                        </div>
+                        <div class="form-group">
+                            <label for="cust-cpf">CPF <span class="req">*</span></label>
+                            <input type="tel" id="cust-cpf" placeholder="000.000.000-00" maxlength="14" inputmode="numeric">
+                            <small class="field-hint">Obrigatório — usado para emitir e rastrear seu pedido.</small>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="cust-email">E-mail <span class="req">*</span></label>
+                            <input type="email" id="cust-email" placeholder="joao@email.com" autocomplete="email">
+                        </div>
+                        <div class="form-group">
+                            <label for="cust-whatsapp">Telefone / WhatsApp <span class="req">*</span></label>
+                            <input type="tel" id="cust-whatsapp" placeholder="(11) 99999-9999" maxlength="15" autocomplete="tel">
+                        </div>
+                    </div>
+
+                    <h3 class="co-section"><i class="fa-solid fa-truck-fast"></i> 2. Endereço de Entrega</h3>
+                    <div class="form-row">
+                        <div class="form-group" style="flex:1;">
+                            <label for="cust-cep">CEP <span class="req">*</span></label>
+                            <input type="tel" id="cust-cep" placeholder="00000-000" maxlength="9" inputmode="numeric" autocomplete="postal-code">
+                            <small id="cep-status" class="cep-status">Preencha para liberar as formas de entrega.</small>
+                        </div>
+                        <div class="form-group" style="flex:2;">
+                            <label for="cust-rua">Endereço <span class="req">*</span></label>
+                            <input type="text" id="cust-rua" placeholder="Rua, Avenida...">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group" style="flex:1;">
+                            <label for="cust-numero">Número <span class="req">*</span></label>
+                            <input type="text" id="cust-numero" placeholder="123">
+                        </div>
+                        <div class="form-group" style="flex:2;">
+                            <label for="cust-complemento">Complemento <small class="label-opt">(opcional)</small></label>
+                            <input type="text" id="cust-complemento" placeholder="Apto, Sala, Bloco...">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="cust-bairro">Bairro <span class="req">*</span></label>
+                            <input type="text" id="cust-bairro" placeholder="Bairro">
+                        </div>
+                        <div class="form-group">
+                            <label for="cust-cidade">Cidade / UF <span class="req">*</span></label>
+                            <div class="city-uf">
+                                <input type="text" id="cust-cidade" placeholder="São Paulo">
+                                <input type="text" id="cust-uf" placeholder="SP" maxlength="2">
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 class="co-section"><i class="fa-solid fa-box-open"></i> 2.1. Forma de Entrega <span class="req">*</span></h3>
+                    <div class="shipping-hint" id="shipping-hint">
+                        <i class="fa-solid fa-location-dot"></i>
+                        Preencha o <strong>CEP</strong> acima para ver as formas de entrega e escolher uma.
+                    </div>
+                    <div class="shipping-options" id="shipping-options" hidden>
+                        <label class="option-card selected">
+                            <input type="radio" name="shipping" value="padrao" checked>
+                            <i class="fa-solid fa-truck-fast"></i>
+                            <span class="option-info">
+                                <strong>Envio Padrão</strong>
+                                <small>Correios — envio para todo o Brasil</small>
+                            </span>
+                            <span class="option-price" id="shipping-price">Grátis</span>
+                        </label>
+                    </div>
+
+                    <h3 class="co-section"><i class="fa-solid fa-credit-card"></i> 3. Forma de Pagamento</h3>
+                    <div class="pay-methods">
+                        <label class="option-card pay-method selected" data-method="pix">
+                            <input type="radio" name="pay-method" value="pix" checked>
+                            <i class="fa-brands fa-pix"></i>
+                            <span class="option-info"><strong>PIX</strong></span>
+                        </label>
+                        <label class="option-card pay-method" data-method="cartao">
+                            <input type="radio" name="pay-method" value="cartao">
+                            <i class="fa-solid fa-credit-card"></i>
+                            <span class="option-info"><strong>Cartão <small>(em até 12x)</small></strong></span>
+                        </label>
+                    </div>
+                    <div class="pay-method-note" id="pay-method-note">
+                        <i class="fa-brands fa-pix"></i>
+                        <p>Ao finalizar a compra, você será direcionado ao ambiente seguro do Mercado Pago, onde um QR Code e um código "Copia e Cola" serão gerados para o pagamento pelo aplicativo do banco.</p>
+                    </div>
+
+                    <!-- Cartão de crédito: preenchimento no próprio site (checkout transparente) -->
+                    <div id="credit-card-form" hidden>
+                        <div class="card-preview-wrap">
+                            <div class="animated-card" id="animatedCreditCard">
+                                <div class="card-face card-front">
+                                    <span class="card-issuer" id="cardIssuer"></span>
+                                    <div class="card-top">
+                                        <span class="card-chip"></span>
+                                        <span class="card-brand" id="cardBrandLogo"><i class="fa-solid fa-credit-card"></i></span>
+                                    </div>
+                                    <div class="card-number" id="cardNumDisplay">•••• •••• •••• ••••</div>
+                                    <div class="card-bottom">
+                                        <div class="card-field">
+                                            <span class="card-field-label">Titular</span>
+                                            <span class="card-field-value" id="cardNameDisplay">NOME IMPRESSO</span>
+                                        </div>
+                                        <div class="card-field">
+                                            <span class="card-field-label">Validade</span>
+                                            <span class="card-field-value" id="cardExpDisplay">MM/AA</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-face card-back">
+                                    <div class="card-stripe"></div>
+                                    <div class="card-cvv-row">
+                                        <span class="card-field-label">CVV</span>
+                                        <span class="card-cvv" id="cardCscDisplay">•••</span>
+                                    </div>
+                                    <div class="card-back-brand">Bolladinho · Compra Segura</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="cc-number">Número do Cartão</label>
+                            <input type="tel" id="cc-number" inputmode="numeric" autocomplete="cc-number" placeholder="0000 0000 0000 0000" maxlength="19">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group" style="flex:2;">
+                                <label for="cc-name">Nome no Cartão</label>
+                                <input type="text" id="cc-name" autocomplete="cc-name" placeholder="Como impresso no cartão">
+                            </div>
+                            <div class="form-group" style="flex:1;">
+                                <label for="cc-exp">Validade</label>
+                                <input type="tel" id="cc-exp" inputmode="numeric" autocomplete="cc-exp" placeholder="MM/AA" maxlength="5">
+                            </div>
+                            <div class="form-group" style="flex:1;">
+                                <label for="cc-csc">CVV</label>
+                                <input type="tel" id="cc-csc" inputmode="numeric" autocomplete="cc-csc" placeholder="123" maxlength="4">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="installmentsSelect">Parcelamento</label>
+                            <select id="installmentsSelect">
+                                <option value="1">1x à vista</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <aside class="checkout-summary">
+                    <h3>Resumo do Pedido</h3>
+                    <div id="order-summary"></div>
+                    <button class="btn btn-success btn-block" id="pay-mp">
+                        <i class="fa-solid fa-check"></i> Finalizar Compra
+                    </button>
+                    <p class="summary-secure"><i class="fa-solid fa-lock"></i> Pagamento 100% seguro e criptografado</p>
+                    <div class="summary-badges" aria-hidden="true">
+                        <i class="fa-brands fa-cc-visa"></i>
+                        <i class="fa-brands fa-cc-mastercard"></i>
+                        <i class="fa-brands fa-pix"></i>
+                        <i class="fa-solid fa-barcode"></i>
+                    </div>
+                    <div class="summary-trust">
+                        <span><i class="fa-solid fa-shield-halved"></i> Compra protegida</span>
+                        <span><i class="fa-solid fa-handshake"></i> Mercado Pago</span>
+                        <span><i class="fa-solid fa-rotate-left"></i> 7 dias para troca</span>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </div>
+
+    <!-- Libs do hero Ironhill (dissolve + reveal + parallax) -->
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/SplitText.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+    <script src="script.js"></script>
+
+    <div id="admin-login-overlay" role="dialog" aria-modal="true" aria-label="Login administrativo">
+        <div class="admin-login-card">
+            <div class="al-ico"><i class="fa-solid fa-lock"></i></div>
+            <h3>Área administrativa</h3>
+            <p>Entre para acessar o painel Bolladinho.</p>
+            <input type="text" id="al-user" placeholder="E-mail / usuário" autocomplete="username">
+            <input type="password" id="al-pass" placeholder="Senha" autocomplete="current-password">
+            <div class="al-err" id="al-err"></div>
+            <button type="button" class="al-btn" id="al-submit"><i class="fa-solid fa-arrow-right-to-bracket"></i> Entrar no painel</button>
+            <div><button type="button" class="al-cancel" id="al-cancel">Cancelar</button></div>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            const btn = document.getElementById('admin-access');
+            const ov = document.getElementById('admin-login-overlay');
+            const err = document.getElementById('al-err');
+            const uEl = document.getElementById('al-user'), pEl = document.getElementById('al-pass');
+            const submitBtn = document.getElementById('al-submit');
+            function open() { err.textContent = ''; uEl.value = ''; pEl.value = ''; submitBtn.disabled = false; ov.classList.add('show'); setTimeout(() => uEl.focus(), 60); }
+            function close() { ov.classList.remove('show'); }
+            if (btn) btn.addEventListener('dblclick', open); // exige clique duplo
+            document.getElementById('al-cancel').addEventListener('click', close);
+            ov.addEventListener('click', e => { if (e.target === ov) close(); });
+            document.addEventListener('keydown', e => { if (ov.classList.contains('show') && e.key === 'Escape') close(); });
+            async function submit() {
+                err.textContent = ''; submitBtn.disabled = true;
+                try {
+                    const res = await fetch('/api/admin/login', {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ user: uEl.value.trim(), password: pEl.value })
+                    });
+                    const data = await res.json();
+                    if (!res.ok) {
+                        let msg = data.msg || 'Credenciais incorretas.';
+                        if (typeof data.remaining === 'number') msg += ` (${data.remaining} tentativa${data.remaining === 1 ? '' : 's'} restante${data.remaining === 1 ? '' : 's'})`;
+                        err.textContent = msg; submitBtn.disabled = false; return;
+                    }
+                    sessionStorage.setItem('bolla_admin_token', data.token);
+                    window.location.href = '/admin';
+                } catch (e) { err.textContent = 'Servidor indisponível.'; submitBtn.disabled = false; }
+            }
+            submitBtn.addEventListener('click', submit);
+            pEl.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
+            uEl.addEventListener('keydown', e => { if (e.key === 'Enter') pEl.focus(); });
+        })();
+    </script>
+
+    <!-- Realce: tilt 3D nos cards + parallax dos blobs de ambiente -->
+    <script>
+        (function () {
+            const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+            function bindTilt(card) {
+                if (card._tilt) return; card._tilt = true;
+                card.addEventListener('pointermove', e => {
+                    if (reduce.matches || e.pointerType === 'touch') return;
+                    const r = card.getBoundingClientRect();
+                    const px = (e.clientX - r.left) / r.width - 0.5, py = (e.clientY - r.top) / r.height - 0.5;
+                    card.style.transform = `perspective(900px) rotateX(${(-py * 6).toFixed(2)}deg) rotateY(${(px * 6).toFixed(2)}deg) translateY(-6px)`;
+                });
+                card.addEventListener('pointerleave', () => { card.style.transform = ''; });
+            }
+            function initTilt() { document.querySelectorAll('.benefit-card, .pricing-card, .testimonial-card').forEach(bindTilt); }
+            initTilt();
+            const tg = document.getElementById('testimonials-grid');
+            if (tg) new MutationObserver(initTilt).observe(tg, { childList: true });
+
+            const blobs = [...document.querySelectorAll('.sfx-blob')];
+            if (blobs.length && !reduce.matches) {
+                let ticking = false;
+                const upd = () => {
+                    const y = window.scrollY || window.pageYOffset;
+                    blobs.forEach((b, i) => { const dir = (i % 2 ? -1 : 1), sp = 0.05 + (i % 3) * 0.02; b.style.translate = '0 ' + (y * dir * sp).toFixed(1) + 'px'; });
+                    ticking = false;
+                };
+                window.addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(upd); } }, { passive: true });
+                upd();
+            }
+        })();
+    </script>
+</body>
+</html>

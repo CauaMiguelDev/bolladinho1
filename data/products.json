@@ -1,0 +1,29 @@
+[
+  {
+    "id": "pequena",
+    "name": "Caixa Pequena",
+    "desc": "Ideal para quem quer experimentar a diferença.",
+    "price": 5,
+    "stock": 100,
+    "active": true,
+    "popular": false
+  },
+  {
+    "id": "media",
+    "name": "Caixa Média",
+    "desc": "O tamanho perfeito para o seu ritual diário.",
+    "price": 9.9,
+    "stock": 100,
+    "active": true,
+    "popular": true
+  },
+  {
+    "id": "grande",
+    "name": "Caixa Grande",
+    "desc": "Maior custo-benefício. Para uso prolongado.",
+    "price": 20,
+    "stock": 100,
+    "active": true,
+    "popular": false
+  }
+]

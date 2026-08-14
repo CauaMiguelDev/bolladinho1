@@ -1,0 +1,38 @@
+[
+  {
+    "id": "seed-1",
+    "name": "Lucas M.",
+    "city": "Brasília - DF",
+    "rating": 5,
+    "text": "O acabamento é impecável e o toque do bambu é muito melhor que qualquer piteira de vidro que já usei. Virou item fixo do meu ritual.",
+    "date": "2026-06-15T12:00:00.000Z",
+    "approved": true
+  },
+  {
+    "id": "seed-2",
+    "name": "Ana P.",
+    "city": "Goiânia - GO",
+    "rating": 5,
+    "text": "Além de linda, é sustentável. A fumaça fica mais fresca e não altera o sabor em nada. Recomendo demais a caixa média.",
+    "date": "2026-06-20T12:00:00.000Z",
+    "approved": true
+  },
+  {
+    "id": "seed-3",
+    "name": "Rafael S.",
+    "city": "São Paulo - SP",
+    "rating": 5,
+    "text": "Chegou super rápido e bem embalado. Cada peça realmente é única, a minha tem um tom de madeira lindo. Compra que valeu cada centavo.",
+    "date": "2026-06-25T12:00:00.000Z",
+    "approved": true
+  },
+  {
+    "id": "seed-4",
+    "name": "Juliana R.",
+    "city": "Belo Horizonte - MG",
+    "rating": 5,
+    "text": "Comprei a caixa grande para dividir com os amigos e todo mundo amou. O cheiro do bambu é uma experiência à parte, muito superior às piteiras comuns.",
+    "date": "2026-06-27T12:00:00.000Z",
+    "approved": true
+  }
+]

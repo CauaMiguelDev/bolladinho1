@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="img/favicon.png">
+    <title>Seja um Revendedor | Bolladinho - A piteira de bambu nº 1 do Brasil</title>
+    <meta name="description"
+        content="Torne-se um parceiro Bolladinho. Leve a natureza para o seu balcão, ofereça alta margem de lucro, produto sustentável e exclusivo para sua tabacaria ou loja.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.cdnfonts.com/css/gt-america-trial">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div id="particles-container"></div>
+
+    <header class="navbar" id="navbar">
+        <div class="container nav-content">
+            <a href="index.html" class="logo">
+                <i class="fa-solid fa-leaf"></i> Bolladinho
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="index.html#beneficios">Benefícios</a></li>
+                <li><a href="index.html#detalhes">Detalhes</a></li>
+                <li><a href="#vantagens">Vantagens</a></li>
+                <li><a href="#cadastro">Cadastro</a></li>
+            </ul>
+            <div class="nav-actions">
+                <div class="social-icons">
+                    <a href="https://www.instagram.com/soubolladinho" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="index.html#comprar" aria-label="Comprar"><i class="fa-solid fa-cart-shopping"></i></a>
+                </div>
+                <button id="menu-toggle" class="menu-toggle" aria-label="Abrir menu"><i class="fa-solid fa-bars"></i></button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Ironhill (mesmo da home) com as informações de revenda na parte clara -->
+        <section class="hero" id="home">
+            <div class="hero__twigs">
+                <img class="hero__twig hero__twig--left" src="img/mask-1.webp" alt="">
+                <img class="hero__twig hero__twig--right" src="img/mask-2.webp" alt="">
+            </div>
+            <div class="hero__row">
+                <img class="hero__bg" src="img/hero-bg.webp" alt="" />
+                <canvas class="hero-canvas"></canvas>
+                <div class="hero__conteiner">
+                    <div class="hero__top">
+                        <h1>BOLLADINHO</h1>
+                        <p>Seja um parceiro oficial</p>
+                    </div>
+                    <div class="hero__content hero__content--offer">
+                        <div class="reseller-offer">
+                            <h2>O que Oferecemos para sua Loja?</h2>
+                            <p class="reseller-offer__sub">Muito além do produto. Somos parceiros de verdade no crescimento do seu negócio.</p>
+                            <div class="offer-grid">
+                                <div class="offer-item">
+                                    <div class="check-icon"><i class="fa-solid fa-check"></i></div>
+                                    <div>
+                                        <h4>Fotos Profissionais</h4>
+                                        <p>Disponibilizamos um drive com fotos e vídeos exclusivos para você usar no Instagram da sua loja.</p>
+                                    </div>
+                                </div>
+                                <div class="offer-item">
+                                    <div class="check-icon"><i class="fa-solid fa-check"></i></div>
+                                    <div>
+                                        <h4>Material de PDV</h4>
+                                        <p>Displays de balcão e flyers para destacar o produto e aumentar as vendas no ponto de venda.</p>
+                                    </div>
+                                </div>
+                                <div class="offer-item">
+                                    <div class="check-icon"><i class="fa-solid fa-check"></i></div>
+                                    <div>
+                                        <h4>Divulgação nas Redes</h4>
+                                        <p>Marcamos sua loja em nosso Instagram <strong>@soubolladinho</strong> como ponto de venda oficial.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção Editorial: Por Que Revender -->
+        <section class="vantagens" id="vantagens">
+            <div class="vantagens__glow" aria-hidden="true"></div>
+
+            <div class="container">
+                <div class="vantagens-editorial">
+
+                    <div class="textual-content reveal">
+                        <span class="eyebrow"><i class="fa-solid fa-arrow-trend-up"></i> Oportunidade de Negócio</span>
+                        <h2>Por Que Revender<br><span>Bolladinho?</span></h2>
+
+                        <p class="vantagens__lead">
+                            Ao revender Bolladinho, você não está apenas adicionando um produto à vitrine. Você está
+                            oferecendo uma <strong>experiência premium e consciente</strong> que seus clientes já
+                            procuram. Nosso foco é garantir um <span class="destaque">giro rápido</span> e
+                            rentabilidade real para a sua loja.
+                        </p>
+
+                        <div class="numbered-benefits">
+                            <div class="numbered-item">
+                                <div class="num">01</div>
+                                <div>
+                                    <h4>Sustentabilidade que Vende</h4>
+                                    <p>Produto 100% natural, reutilizável e com forte apelo para o público atual que
+                                        busca redução de danos.</p>
+                                </div>
+                            </div>
+
+                            <div class="numbered-item">
+                                <div class="num">02</div>
+                                <div>
+                                    <h4>Grade Inteligente &amp; Lucro</h4>
+                                    <p>Curadoria de tamanhos (P, M, G) desenhada para todos os gostos, com condições
+                                        comerciais altamente competitivas.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <blockquote class="vantagens__quote">
+                            Transformando o ritual de centenas de clientes, do DF para todo o Brasil.
+                        </blockquote>
+                    </div>
+
+                    <div class="image-content reveal delay-1">
+                        <div class="vantagens__media">
+                            <img src="img/bolladinho revenda.PNG"
+                                alt="Caixa de piteiras de bambu Bolladinho apoiada no balcão de uma loja parceira">
+                            <p class="vantagens__caption">A escolha certa para modernizar o seu balcão.</p>
+                        </div>
+
+                        <div class="glass vantagens__badge">
+                            <div class="vantagens__badge-icon">
+                                <i class="fa-solid fa-arrow-trend-up"></i>
+                            </div>
+                            <div>
+                                <div class="vantagens__badge-title">Alta Demanda</div>
+                                <div class="vantagens__badge-sub">Giro rápido garantido</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ -->
+        <section class="faq" id="faq">
+            <div class="container">
+                <div class="section-title reveal">
+                    <span class="eyebrow"><i class="fa-solid fa-circle-question"></i> Antes de fechar</span>
+                    <h2>Perguntas Frequentes</h2>
+                    <p>Informações diretas para você fechar negócio conosco.</p>
+                </div>
+
+                <div class="faq-grid reveal">
+
+                    <div class="faq-card glass">
+                        <div class="icon"><i class="fa-solid fa-box-open"></i></div>
+                        <h4>Qual o número de pedidos mínimo?</h4>
+                        <p>Revendemos a partir de <strong>50 unidades por pedido</strong>. Essa quantidade foi pensada
+                            para garantir que você tenha um estoque ideal para testar a ótima saída do produto.</p>
+                    </div>
+
+                    <div class="faq-card glass">
+                        <div class="icon"><i class="fa-solid fa-truck-fast"></i></div>
+                        <h4>Enviamos para onde?</h4>
+                        <p>Enviamos para <strong>todo o Brasil</strong>. Você tem total flexibilidade para escolher a
+                            opção de envio que melhor atende a sua região, seja via Correios ou Transportadora
+                            parceira.</p>
+                    </div>
+
+                    <div class="faq-card glass">
+                        <div class="icon"><i class="fa-solid fa-credit-card"></i></div>
+                        <h4>Quais as formas de pagamento?</h4>
+                        <p>Para facilitar a sua reposição, aceitamos pagamentos via <strong>Pix (com condições
+                                especiais)</strong>, Boleto Bancário ou parcelamento no Cartão de Crédito.</p>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA + Formulário -->
+        <section class="cta-form-section" id="cadastro">
+            <div class="container">
+                <div class="cta-form-grid">
+                    <div class="cta-form-text reveal">
+                        <h2>Diferencie sua vitrine e <strong>aumente seu ticket médio.</strong></h2>
+                        <p>Preencha os dados ao lado para receber nosso catálogo exclusivo de atacado e comece a
+                            revender a piteira de bambu nº 1 do DF.</p>
+                        <ul class="cta-form-perks">
+                            <li><i class="fa-solid fa-leaf"></i> Produto único no mercado nacional.</li>
+                            <li><i class="fa-solid fa-truck-fast"></i> Entrega para todo o Brasil.</li>
+                            <li><i class="fa-solid fa-headset"></i> Suporte comercial dedicado.</li>
+                        </ul>
+                        <a href="https://wa.me/5561995636229?text=Olá!%20Tenho%20interesse%20em%20revender%20as%20piteiras%20Bolladinho."
+                            target="_blank" rel="noopener noreferrer" class="btn btn-whatsapp">
+                            <i class="fa-brands fa-whatsapp"></i> Falar no WhatsApp Comercial
+                        </a>
+                    </div>
+                    <div class="contact-form reveal delay-1">
+                        <form action="https://formsubmit.co/bolladinhosmoking@gmail.com" method="POST">
+                            <input type="hidden" name="_captcha" value="false">
+                            <input type="hidden" name="_subject" value="Novo Contato - Revendedor Bolladinho">
+                            <div class="form-group">
+                                <label for="nome">Nome Completo *</label>
+                                <input type="text" name="nome" id="nome" required placeholder="Seu nome">
+                            </div>
+                            <div class="form-group">
+                                <label for="empresa">Nome da Empresa *</label>
+                                <input type="text" name="empresa" id="empresa" required placeholder="Nome do seu negócio">
+                            </div>
+                            <div class="form-group">
+                                <label for="endereco">Endereço *</label>
+                                <input type="text" name="endereco" id="endereco" required placeholder="Cidade / Estado">
+                            </div>
+                            <div class="form-group">
+                                <label for="telefone">Telefone *</label>
+                                <input type="tel" name="telefone" id="telefone" required placeholder="(00) 00000-0000">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Enviar
+                                <i class="fa-solid fa-paper-plane"></i></button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container footer-content">
+            <div class="footer-brand">
+                <a href="index.html" class="logo"><i class="fa-solid fa-leaf"></i> Bolladinho</a>
+                <p><span class="hide-mobile">Uma maneira natural de fumar. </span>A primeira piteira de fibras naturais
+                    do mercado.</p>
+            </div>
+            <div class="footer-links">
+                <h4>Navegação</h4>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="index.html#beneficios">Benefícios</a></li>
+                    <li><a href="index.html#detalhes">Detalhes</a></li>
+                    <li><a href="index.html#comprar">Comprar</a></li>
+                </ul>
+            </div>
+            <div class="footer-contact">
+                <h4>Contato</h4>
+                <p><i class="fa-brands fa-whatsapp"></i> +55 61 99563-6229</p>
+                <p><i class="fa-solid fa-envelope"></i> <a href="mailto:bolladinhosmoking@gmail.com?subject=Contato%20Bolladinho&body=Ol%C3%A1!%20Gostaria%20de%20saber%20mais%20sobre%20as%20piteiras%20Bolladinho.">bolladinhosmoking@gmail.com</a></p>
+            </div>
+            <div class="footer-social">
+                <h4>Siga-nos</h4>
+                <div class="social-icons">
+                    <a href="https://www.instagram.com/soubolladinho" target="_blank" rel="noopener noreferrer"><i
+                            class="fa-brands fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Bolladinho. Todos os direitos reservados. Uma maneira natural de fumar.</p>
+            <button type="button" class="admin-access" id="admin-access" aria-label="Acesso administrativo" title="Acesso admin"><i class="fa-solid fa-lock"></i></button>
+        </div>
+    </footer>
+
+    <!-- Rolagem + hero Ironhill -->
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/SplitText.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+    <script src="script.js"></script>
+    <script>
+        function toggleFaq(id) {
+            const item = document.getElementById(id);
+            const isOpen = item.classList.contains('open');
+            document.querySelectorAll('.faq-item').forEach(el => el.classList.remove('open'));
+            if (!isOpen) item.classList.add('open');
+        }
+
+        // Interceptar envio do formulário para não sair da página (via AJAX)
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.querySelector('form[action^="https://formsubmit.co"]');
+            if (form) {
+                form.addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    
+                    const btn = form.querySelector('button[type="submit"]');
+                    const originalText = btn.innerHTML;
+                    
+                    // Estado de carregamento com animação
+                    btn.innerHTML = 'Enviando... <i class="fa-solid fa-spinner fa-spin"></i>';
+                    btn.disabled = true;
+                    btn.style.opacity = '0.8';
+
+                    const formData = new FormData(form);
+
+                    // Salva o lead no painel admin (fire-and-forget)
+                    fetch('/api/reseller-lead', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            nome: formData.get('nome'),
+                            empresa: formData.get('empresa'),
+                            endereco: formData.get('endereco'),
+                            telefone: formData.get('telefone')
+                        })
+                    }).catch(() => {});
+
+                    // Converter a URL de action normal para a de AJAX do FormSubmit
+                    const actionUrl = form.action.replace('formsubmit.co/', 'formsubmit.co/ajax/');
+                    
+                    fetch(actionUrl, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Estado de sucesso
+                        btn.innerHTML = 'Mensagem Enviada! <i class="fa-solid fa-check"></i>';
+                        btn.style.backgroundColor = '#25D366'; // Verde
+                        btn.style.borderColor = '#25D366';
+                        btn.style.color = '#fff';
+                        btn.style.opacity = '1';
+                        
+                        form.reset();
+                        
+                        // Retornar o botão ao normal após 3 segundos
+                        setTimeout(() => {
+                            btn.innerHTML = originalText;
+                            btn.disabled = false;
+                            btn.style.backgroundColor = '';
+                            btn.style.borderColor = '';
+                            btn.style.color = '';
+                        }, 3000);
+                    })
+                    .catch(error => {
+                        console.error('Erro ao enviar o formulário:', error);
+                        // Estado de erro
+                        btn.innerHTML = 'Erro ao enviar <i class="fa-solid fa-xmark"></i>';
+                        btn.style.backgroundColor = '#e74c3c'; // Vermelho
+                        btn.style.borderColor = '#e74c3c';
+                        btn.style.color = '#fff';
+                        btn.style.opacity = '1';
+                        
+                        setTimeout(() => {
+                            btn.innerHTML = originalText;
+                            btn.disabled = false;
+                            btn.style.backgroundColor = '';
+                            btn.style.borderColor = '';
+                            btn.style.color = '';
+                        }, 3000);
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>
