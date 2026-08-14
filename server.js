@@ -12,7 +12,20 @@ const crypto = require('crypto');
 
 const ROOT = __dirname;
 const DATA_DIR = path.join(ROOT, 'data');
-const CONFIG = JSON.parse(fs.readFileSync(path.join(ROOT, 'server-config.json'), 'utf8'));
+/* Config: usa server-config.json em dev; no host (arquivo ausente) lê variáveis de ambiente */
+function loadConfig() {
+    const file = path.join(ROOT, 'server-config.json');
+    if (fs.existsSync(file)) return JSON.parse(fs.readFileSync(file, 'utf8'));
+    return {
+        mpAccessToken: process.env.MP_ACCESS_TOKEN || '',
+        mpPublicKey: process.env.MP_PUBLIC_KEY || '',
+        adminUser: process.env.ADMIN_USER || '',
+        adminPassword: process.env.ADMIN_PASSWORD || '',
+        notifyEmail: process.env.NOTIFY_EMAIL || '',
+        shippingFlat: Number(process.env.SHIPPING_FLAT) || 0,
+    };
+}
+const CONFIG = loadConfig();
 const PORT = process.env.PORT || CONFIG.port || 8321;
 
 /* ---------------- Armazenamento em JSON ---------------- */

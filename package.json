@@ -1,0 +1,12 @@
+{
+  "name": "bolladinho",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Site e loja da Bolladinho — piteiras de fibras naturais (bambu).",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
