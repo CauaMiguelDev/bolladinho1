@@ -134,6 +134,23 @@
         .confirm-msg { color: #fff; font-size: 1rem; margin-bottom: 1.4rem; line-height: 1.5; }
         .confirm-actions { display: flex; gap: .7rem; justify-content: center; }
 
+        /* Modal de detalhes do pedido */
+        tbody tr.order-row { cursor: pointer; }
+        .order-modal .order-box { width: 100%; max-width: 560px; text-align: left; position: relative; background: var(--glass-bg-2); border: 1px solid var(--glass-border); border-radius: 18px; padding: 1.8rem; box-shadow: var(--shadow-card); transform: translateY(16px) scale(.96); transition: transform .3s var(--ease-lux); max-height: 88vh; overflow-y: auto; }
+        .order-modal.show .order-box { transform: none; }
+        .order-close { position: absolute; top: 14px; right: 14px; width: 34px; height: 34px; border-radius: 10px; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-secondary); cursor: pointer; }
+        .order-close:hover { color: #fff; }
+        .om-h { font-size: 1.15rem; color: #fff; font-weight: 700; margin: 0 0 2px; }
+        .om-sub { color: var(--text-secondary); font-size: .8rem; margin-bottom: 1.2rem; }
+        .om-sec { border-top: 1px solid var(--glass-border); padding: 1rem 0; }
+        .om-sec:first-of-type { border-top: none; padding-top: 0; }
+        .om-sec h4 { font-size: .78rem; text-transform: uppercase; letter-spacing: .05em; color: var(--accent); margin: 0 0 .6rem; }
+        .om-row { color: var(--text-secondary); font-size: .9rem; line-height: 1.7; }
+        .om-row b { color: #fff; font-weight: 600; }
+        .om-item { display: flex; justify-content: space-between; color: #fff; font-size: .9rem; padding: .35rem 0; }
+        .om-total { display: flex; justify-content: space-between; font-weight: 700; color: #fff; border-top: 1px solid var(--glass-border); margin-top: .5rem; padding-top: .6rem; }
+        .om-status-btns { display: flex; gap: .5rem; flex-wrap: wrap; }
+
         @media (max-width: 860px) {
             .admin-layout-wrapper { flex-direction: column; }
             .admin-sidebar.ag-sidebar { position: static; height: auto; width: 100% !important; }
@@ -366,6 +383,14 @@
                 <button class="btn ghost small" id="confirm-cancel">Cancelar</button>
                 <button class="btn danger small" id="confirm-ok"><i class="fa-solid fa-check"></i> Confirmar</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Detalhes do pedido (abre ao clicar numa linha) -->
+    <div class="confirm-overlay order-modal" id="order-modal">
+        <div class="order-box">
+            <button class="order-close" id="order-close" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
+            <div id="order-modal-content"></div>
         </div>
     </div>
 
@@ -699,21 +724,14 @@
     });
 
     /* ---- Pedidos ---- */
+    let ordersCache = [];
     async function loadOrders() {
-        const orders = await api('GET', '/api/admin/orders');
-        $('orders-body').innerHTML = orders.length ? orders.map(o => `
-            <tr>
+        ordersCache = await api('GET', '/api/admin/orders');
+        $('orders-body').innerHTML = ordersCache.length ? ordersCache.map(o => `
+            <tr class="order-row" data-oid="${o.id}">
                 <td>${fmtDate(o.createdAt)}</td>
                 <td>${esc(o.customer.nome)}<br><span class="muted">${esc(o.customer.whatsapp)}</span></td>
-                <td>
-                    <details class="order-det"><summary>${o.items.map(i => `${i.qty}x ${esc(i.name)}`).join(', ')}</summary>
-                    <div>
-                    <i class="fa-solid fa-envelope"></i> ${esc(o.customer.email || '—')}<br>
-                    <i class="fa-solid fa-id-card"></i> CPF ${esc(o.customer.cpf || '—')}<br>
-                    <i class="fa-solid fa-location-dot"></i> ${esc(o.customer.rua)}, ${esc(o.customer.numero)} ${esc(o.customer.complemento || '')} — ${esc(o.customer.bairro)}, ${esc(o.customer.cidade)}/${esc(o.customer.uf)} — CEP ${esc(o.customer.cep)}<br>
-                    <i class="fa-solid fa-credit-card"></i> Pagamento: <strong>${PAY_LABEL[o.paymentMethod] || 'Mercado Pago'}</strong>${o.paymentId ? ` · id ${esc(o.paymentId)}` : ''}<br>
-                    <i class="fa-solid fa-hashtag"></i> Pedido: <code style="font-size:0.75rem;">${o.id}</code></div></details>
-                </td>
+                <td><span style="color:var(--accent)">&#9656;</span> ${o.items.map(i => `${i.qty}x ${esc(i.name)}`).join(', ')}</td>
                 <td>${fmtBRL(o.total)}</td>
                 <td>
                     <select data-oid="${o.id}" class="order-status">
@@ -722,12 +740,80 @@
                 </td>
             </tr>`).join('') : '<tr><td colspan="5" class="muted">Nenhum pedido ainda.</td></tr>';
 
+        document.querySelectorAll('#orders-body .order-row').forEach(tr => {
+            tr.addEventListener('click', () => {
+                const o = ordersCache.find(x => x.id === tr.dataset.oid);
+                if (o) openOrderModal(o);
+            });
+        });
         document.querySelectorAll('.order-status').forEach(sel => {
+            sel.addEventListener('click', e => e.stopPropagation()); // não abre o modal ao mexer no status
             sel.addEventListener('change', async () => {
                 await api('PUT', '/api/admin/orders', { id: sel.dataset.oid, status: sel.value });
                 toast('Status do pedido atualizado'); loadDash();
             });
         });
+    }
+
+    /* ---- Modal de detalhes do pedido ---- */
+    const orderModal = $('order-modal');
+    function closeOrderModal() { orderModal.classList.remove('show'); }
+    $('order-close').addEventListener('click', closeOrderModal);
+    orderModal.addEventListener('click', e => { if (e.target === orderModal) closeOrderModal(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && orderModal.classList.contains('show')) closeOrderModal(); });
+
+    function openOrderModal(o) {
+        const c = o.customer || {};
+        const paidTxt = o.paidAt ? ` · pago em ${fmtDate(o.paidAt)}` : '';
+        $('order-modal-content').innerHTML = `
+            <div class="om-h">Pedido <code style="font-size:.85rem;">#${esc(String(o.id).slice(0, 8))}</code></div>
+            <div class="om-sub">Realizado em ${fmtDate(o.createdAt)}</div>
+
+            <div class="om-sec">
+                <h4><i class="fa-solid fa-user"></i> Dados do cliente</h4>
+                <div class="om-row">
+                    <b>${esc(c.nome)}</b><br>
+                    CPF: ${esc(c.cpf || '—')}<br>
+                    WhatsApp: ${esc(c.whatsapp || '—')}<br>
+                    Email: ${esc(c.email || '—')}
+                </div>
+            </div>
+
+            <div class="om-sec">
+                <h4><i class="fa-solid fa-location-dot"></i> Endereço de entrega</h4>
+                <div class="om-row">${esc(c.rua || '')}, ${esc(c.numero || '')} ${esc(c.complemento || '')}<br>${esc(c.bairro || '')} — ${esc(c.cidade || '')}/${esc(c.uf || '')}<br>CEP ${esc(c.cep || '—')}</div>
+            </div>
+
+            <div class="om-sec">
+                <h4><i class="fa-solid fa-credit-card"></i> Pagamento</h4>
+                <div class="om-row">
+                    Método: <b>${PAY_LABEL[o.paymentMethod] || 'Mercado Pago'}</b><br>
+                    Situação: <b>${STATUS_LABEL[o.status] || o.status}</b>${paidTxt}<br>
+                    ${o.paymentId ? `ID Mercado Pago: ${esc(o.paymentId)}<br>` : ''}
+                    Valor: <b>${fmtBRL(o.total)}</b>
+                </div>
+            </div>
+
+            <div class="om-sec">
+                <h4><i class="fa-solid fa-box"></i> Itens do pedido</h4>
+                ${o.items.map(i => `<div class="om-item"><span>${i.qty}× ${esc(i.name)}</span><span>${fmtBRL(i.price * i.qty)}</span></div>`).join('')}
+                <div class="om-total"><span>Total</span><span>${fmtBRL(o.total)}</span></div>
+            </div>
+
+            <div class="om-sec">
+                <h4><i class="fa-solid fa-gear"></i> Alterar status</h4>
+                <div class="om-status-btns">
+                    ${Object.entries(STATUS_LABEL).filter(([v]) => v !== 'recusado').map(([v, l]) => `<button class="btn small ${v === o.status ? '' : 'ghost'} om-status" data-oid="${o.id}" data-status="${v}">${l}</button>`).join('')}
+                </div>
+            </div>`;
+
+        orderModal.querySelectorAll('.om-status').forEach(b => {
+            b.addEventListener('click', async () => {
+                await api('PUT', '/api/admin/orders', { id: b.dataset.oid, status: b.dataset.status });
+                toast('Status atualizado'); closeOrderModal(); loadOrders(); loadDash();
+            });
+        });
+        orderModal.classList.add('show');
     }
     $('refresh-orders').addEventListener('click', () => loadOrders().then(() => toast('Pedidos atualizados')));
 
