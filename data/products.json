@@ -13,7 +13,7 @@
     "name": "Caixa Média",
     "desc": "O tamanho perfeito para o seu ritual diário.",
     "price": 9.9,
-    "stock": 100,
+    "stock": 99,
     "active": true,
     "popular": true
   },
@@ -22,7 +22,7 @@
     "name": "Caixa Grande",
     "desc": "Maior custo-benefício. Para uso prolongado.",
     "price": 20,
-    "stock": 100,
+    "stock": 98,
     "active": true,
     "popular": false
   }

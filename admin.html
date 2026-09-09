@@ -9,6 +9,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <!-- Sistema de design (glassmorphism premium) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="admin-design.css">
     <style>
         /* ===== Complementos: adapta o painel Bolladinho ao design system ===== */
@@ -27,7 +30,7 @@
         /* Login */
         .login-view { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1rem; position: relative; z-index: 1; }
         .login-card { width: 100%; max-width: 390px; text-align: center; padding: 2.6rem 2.2rem; border-radius: var(--radius-lg); background: var(--glass-bg-2); border: 1px solid var(--glass-border); box-shadow: var(--shadow-card); backdrop-filter: blur(var(--glass-blur)); animation: slideUp .5s var(--ease-lux) both; }
-        .login-card .logo-i { width: 60px; height: 60px; margin: 0 auto 1.1rem; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; color: #000; background: var(--accent-grad); box-shadow: 0 8px 24px rgba(201,162,90,0.25); }
+        .login-card .logo-i { width: 60px; height: 60px; margin: 0 auto 1.1rem; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; color: #000; background: var(--accent-grad); box-shadow: 0 8px 24px rgba(254,200,29,0.25); }
         .login-card h1 { font-family: var(--serif); font-size: 1.5rem; color: #fff; margin-bottom: .4rem; }
         .login-card p { color: var(--text-secondary); font-size: .9rem; margin-bottom: 1.5rem; }
         .login-card input { width: 100%; margin-bottom: 1rem; height: 46px; }
@@ -59,9 +62,9 @@
         tbody tr:hover { background: rgba(255,255,255,.03); }
 
         /* Inputs */
-        input, textarea, select { font-family: 'Plus Jakarta Sans', sans-serif; background: rgba(255,255,255,.035); color: #fff; border: 1px solid var(--glass-border); border-radius: 8px; padding: .55rem .7rem; font-size: .88rem; }
+        input, textarea, select { font-family: 'Outfit', sans-serif; background: rgba(255,255,255,.035); color: #fff; border: 1px solid var(--glass-border); border-radius: 8px; padding: .55rem .7rem; font-size: .88rem; }
         input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent); }
-        option { background: #121212; color: #fff; }
+        option { background: #0c2e17; color: #fff; }
         .prod-table input[type=number] { width: 90px; }
         .prod-table input[type=text] { width: 100%; min-width: 150px; }
 
@@ -71,26 +74,26 @@
         .btn.small { padding: .45rem .9rem; font-size: .8rem; border-radius: 9px; }
         .btn.ghost { background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-secondary); }
         .btn.ghost:hover { background: rgba(255,255,255,.08); color: #fff; filter: none; }
-        .btn.danger { background: rgba(255,23,68,.14); border: 1px solid rgba(255,23,68,.4); color: var(--danger); }
-        .btn.danger:hover { filter: none; background: rgba(255,23,68,.22); }
-        .btn.okbtn { background: rgba(0,230,118,.14); border: 1px solid rgba(0,230,118,.4); color: var(--success); }
-        .btn.okbtn:hover { filter: none; background: rgba(0,230,118,.22); }
+        .btn.danger { background: rgba(228,112,94,.14); border: 1px solid rgba(228,112,94,.4); color: var(--danger); }
+        .btn.danger:hover { filter: none; background: rgba(228,112,94,.22); }
+        .btn.okbtn { background: rgba(121,185,140,.14); border: 1px solid rgba(121,185,140,.4); color: var(--success); }
+        .btn.okbtn:hover { filter: none; background: rgba(121,185,140,.22); }
         .btn:disabled { opacity: .5; cursor: default; transform: none; filter: none; }
 
         /* Badges de status */
         .badge { display: inline-block; padding: .28rem .7rem; border-radius: 20px; font-size: .72rem; font-weight: 700; letter-spacing: .3px; }
-        .b-pago { background: rgba(0,230,118,.14); color: var(--success); }
-        .b-aguardando_pagamento { background: rgba(255,214,0,.14); color: var(--warning); }
-        .b-enviado { background: rgba(110,168,254,.16); color: #9fc2ff; }
-        .b-entregue { background: rgba(160,160,255,.16); color: #c8c8ff; }
-        .b-cancelado, .b-recusado { background: rgba(255,23,68,.14); color: var(--danger); }
-        select.b-novo { color: var(--warning); } select.b-contatado { color: #6ea8fe; }
+        .b-pago { background: rgba(121,185,140,.14); color: var(--success); }
+        .b-aguardando_pagamento { background: rgba(254,200,29,.14); color: var(--warning); }
+        .b-enviado { background: rgba(212,195,163,.16); color: #D4C3A3; }
+        .b-entregue { background: rgba(168,216,185,.16); color: #A8D8B9; }
+        .b-cancelado, .b-recusado { background: rgba(228,112,94,.14); color: var(--danger); }
+        select.b-novo { color: var(--warning); } select.b-contatado { color: #D4C3A3; }
         select.b-fechado { color: var(--success); } select.b-descartado { color: var(--text-muted); }
 
         /* Filtros da aba Pagamentos */
         .pay-chip { background: rgba(255,255,255,.03); border: 1px solid var(--glass-border); color: var(--text-secondary); font-weight: 600; font-size: 12px; padding: 7px 14px; border-radius: 20px; cursor: pointer; transition: all .2s; }
         .pay-chip:hover { background: rgba(255,255,255,.07); color: #fff; }
-        .pay-chip.active { background: rgba(201,162,90,.15); border-color: var(--accent); color: var(--accent); }
+        .pay-chip.active { background: rgba(254,200,29,.15); border-color: var(--accent); color: var(--accent); }
 
         /* Estoque: steppers e toggles */
         .stock-stepper { display: inline-flex; align-items: center; gap: 6px; }
@@ -98,8 +101,8 @@
         .stock-stepper button:hover { background: rgba(255,255,255,.10); border-color: var(--accent); }
         .stock-stepper input { width: 58px; text-align: center; padding: .4rem; }
         .prod-toggle { width: 44px; height: 24px; border-radius: 20px; border: 1px solid var(--glass-border); background: rgba(255,255,255,.06); position: relative; cursor: pointer; transition: all .2s; flex-shrink: 0; }
-        .prod-toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%; background: #9aa3b5; transition: all .2s; }
-        .prod-toggle.on { background: rgba(0,230,118,.25); border-color: var(--success); }
+        .prod-toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%; background: #8fa397; transition: all .2s; }
+        .prod-toggle.on { background: rgba(121,185,140,.25); border-color: var(--success); }
         .prod-toggle.on::after { left: 22px; background: var(--success); }
         .stock-badge { display: inline-block; padding: .22rem .6rem; border-radius: 20px; font-size: .68rem; font-weight: 700; }
 
@@ -107,11 +110,11 @@
         .dot { display: inline-flex; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--danger); color: #fff; font-size: .66rem; align-items: center; justify-content: center; font-weight: 800; }
 
         .muted { color: var(--text-secondary); font-size: .82rem; }
-        .alert-low { background: rgba(255,214,0,.08); border: 1px solid rgba(255,214,0,.28); color: var(--warning); border-radius: 12px; padding: .85rem 1.2rem; font-size: .88rem; margin-bottom: 1.4rem; display: flex; align-items: center; gap: .6rem; }
+        .alert-low { background: rgba(254,200,29,.08); border: 1px solid rgba(254,200,29,.28); color: var(--warning); border-radius: 12px; padding: .85rem 1.2rem; font-size: .88rem; margin-bottom: 1.4rem; display: flex; align-items: center; gap: .6rem; }
 
         /* Comentários */
         .comment-card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 14px; padding: 1.1rem 1.3rem; margin-bottom: 1rem; backdrop-filter: blur(var(--glass-blur)); }
-        .comment-card.pending { border-color: rgba(255,214,0,.4); }
+        .comment-card.pending { border-color: rgba(254,200,29,.4); }
         .comment-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: .5rem; margin-bottom: .6rem; }
         .comment-head .who { font-weight: 700; color: #fff; }
         .comment-head .stars { color: var(--warning); font-size: .8rem; }
@@ -122,7 +125,7 @@
         details.order-det div { padding: .6rem 0 .2rem; color: var(--text-secondary); font-size: .85rem; line-height: 1.6; }
 
         /* Toast */
-        .toastmsg { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 300; background: var(--bg-elevated); border: 1px solid rgba(0,230,118,.5); color: var(--success); padding: .9rem 1.4rem; border-radius: 12px; font-size: .9rem; opacity: 0; transform: translateY(10px); transition: all .3s ease; pointer-events: none; box-shadow: var(--shadow-card); }
+        .toastmsg { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 300; background: var(--bg-elevated); border: 1px solid rgba(121,185,140,.5); color: var(--success); padding: .9rem 1.4rem; border-radius: 12px; font-size: .9rem; opacity: 0; transform: translateY(10px); transition: all .3s ease; pointer-events: none; box-shadow: var(--shadow-card); }
         .toastmsg.show { opacity: 1; transform: translateY(0); }
 
         /* Confirmação */
@@ -157,6 +160,251 @@
         }
         @media (prefers-reduced-motion: reduce) {
             .bg-glow-spot-1, .bg-glow-spot-2, .bg-glow-spot-3, .tab-panel, .kpi-card, .login-card { animation: none !important; }
+        }
+
+        /* ===================================================================
+           SKIN BOLLADINHO — o painel passa a falar a língua da vitrine.
+           Mesmos tokens do style.css (bambuzal verde + ouro da marca),
+           mesma curva de transição e o mesmo gesto de varredura nos botões.
+           Este bloco vem depois de admin-design.css, então vence na cascata.
+           =================================================================== */
+        :root {
+            /* Fundos: o verde do bambuzal no lugar do preto/platina */
+            --bg-deep:        #09180f;
+            --bg-base:        #0c2e17;
+            --bg-elevated:    #133d1f;
+
+            /* Vidro da marca (idêntico ao --glass-bg da vitrine) */
+            --glass-bg:       linear-gradient(155deg, rgba(46, 78, 54, 0.30), rgba(15, 40, 23, 0.42));
+            --glass-bg-2:     rgba(9, 24, 15, 0.82);
+            --glass-border:   rgba(212, 195, 163, 0.14);
+            --glass-border-hover: rgba(212, 195, 163, 0.34);
+            --hairline:       rgba(212, 195, 163, 0.10);
+
+            /* Acento: o ouro do hero, não mais platina */
+            --accent:         #fec81d;
+            --accent-soft:    #D4C3A3;
+            --accent-glow:    #ffe08a;
+            --accent-grad:    linear-gradient(135deg, #fec81d 0%, #ffe08a 100%);
+            --accent-line:    rgba(254, 200, 29, 0.55);
+
+            /* Verde de ação (o .btn-primary da vitrine) */
+            --leaf:           #345e43;
+            --leaf-light:     #4A7A5B;
+            --bamboo:         #D4C3A3;
+
+            /* Estados: a paleta de retorno da vitrine, sem neon */
+            --success:        #79B98C;
+            --warning:        #fec81d;
+            --danger:         #E4705E;
+
+            --text-primary:   #E8F0EA;
+            --text-secondary: #A3B5AA;
+            --text-muted:     #7f9587;
+
+            --serif:          'Playfair Display', Georgia, serif;
+            --shadow-card:    0 8px 32px rgba(0, 0, 0, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+            --glow-accent:    0 0 24px rgba(254, 200, 29, 0.18);
+
+            /* Movimento: a mesma curva do --transition da vitrine */
+            --transition:     all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            --ease-lux:       cubic-bezier(0.16, 1, 0.3, 1);
+            --focus-ring:     0 0 0 3px rgba(74, 122, 91, 0.55), 0 0 0 5px rgba(254, 200, 29, 0.35);
+        }
+
+        /* ---- Fundo e tipografia da vitrine ---- */
+        body {
+            font-family: 'Outfit', sans-serif !important;
+            background:
+                radial-gradient(at 18% 0%, #133d1f 0%, transparent 55%),
+                radial-gradient(at 82% 100%, #09180f 0%, transparent 50%),
+                var(--bg-base) !important;
+            background-attachment: fixed !important;
+            color: var(--text-primary) !important;
+        }
+        h1, h2, h3, .section-h h2, .card h3, .login-card h1, .om-h {
+            font-family: 'Playfair Display', Georgia, serif !important;
+            letter-spacing: 0.2px;
+        }
+        .kpi-card .num, .ag-brand-name, .btn, .premium-btn, .badge, th {
+            font-family: 'Outfit', sans-serif !important;
+        }
+
+        /* ---- Manchas de luz: folha e ouro, não branco ---- */
+        .bg-glow-spot-1 { background: radial-gradient(circle, rgba(74, 122, 91, 0.20) 0%, rgba(74, 122, 91, 0) 70%) !important; }
+        .bg-glow-spot-2 { background: radial-gradient(circle, rgba(254, 200, 29, 0.07) 0%, rgba(254, 200, 29, 0) 70%) !important; }
+        .bg-glow-spot-3 { background: radial-gradient(circle, rgba(212, 195, 163, 0.06) 0%, rgba(212, 195, 163, 0) 70%) !important; }
+        .admin-main-container {
+            background:
+                radial-gradient(1200px 820px at 12% -8%,  rgba(254, 200, 29, 0.10) 0%, transparent 56%),
+                radial-gradient(1000px 760px at 90% 112%, rgba(74, 122, 91, 0.30) 0%, transparent 55%),
+                radial-gradient(820px 600px at 108% 12%,  rgba(212, 195, 163, 0.06) 0%, transparent 58%),
+                linear-gradient(180deg, #0e3419 0%, #09180f 55%, #0c2e17 100%) !important;
+            background-attachment: fixed !important;
+            background-color: #0c2e17 !important;
+        }
+        /* A aurora continua girando, mas agora em folha e ouro */
+        .admin-main-container::before {
+            background:
+                radial-gradient(38% 30% at 26% 30%, rgba(74, 122, 91, 0.34), transparent 70%),
+                radial-gradient(34% 28% at 74% 62%, rgba(254, 200, 29, 0.10), transparent 70%),
+                radial-gradient(30% 26% at 55% 16%, rgba(212, 195, 163, 0.08), transparent 72%) !important;
+        }
+        /* Vinheta verde-escura, sem o grão do tema antigo */
+        .admin-main-container::after {
+            background-image:
+                radial-gradient(75% 38% at 50% -8%, rgba(254, 200, 29, 0.09), transparent 72%),
+                radial-gradient(120% 95% at 50% 50%, transparent 55%, rgba(4, 16, 9, 0.55) 100%) !important;
+        }
+
+        /* ---- Cascas: topbar, sidebar e barra de rolagem ---- */
+        .ag-topbar { background: rgba(9, 24, 15, 0.62) !important; border-bottom: 1px solid var(--glass-border) !important; }
+        .admin-sidebar.ag-sidebar { background: rgba(9, 24, 15, 0.42) !important; border-right: 1px solid var(--glass-border); }
+        ::-webkit-scrollbar-track { background: var(--bg-deep) !important; }
+        ::-webkit-scrollbar-thumb { background: rgba(212, 195, 163, 0.20) !important; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent) !important; }
+        option { background: #0c2e17; color: var(--text-primary); }
+
+        /* ---- Cartões: mesma respiração do vidro da vitrine ---- */
+        .card, .kpi-card, .glass-card, .table-wrap, .comment-card {
+            background: var(--glass-bg) !important;
+            border: 1px solid var(--glass-border) !important;
+            box-shadow: var(--shadow-card) !important;
+            transition: var(--transition);
+        }
+        .card:hover, .kpi-card:hover, .glass-card:hover, .comment-card:hover {
+            border-color: var(--glass-border-hover) !important;
+            transform: translateY(-3px);
+            box-shadow: 0 26px 60px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+        }
+
+        /* ---- Botões: o gesto da vitrine (varredura + subida de 3px) ---- */
+        .btn, .premium-btn, .premium-btn-gold, .premium-btn-red,
+        .premium-btn-green, .premium-btn-cancel, .pay-chip, .metric-btn {
+            position: relative;
+            overflow: hidden;
+            border-radius: var(--radius-pill) !important;
+            transition: var(--transition) !important;
+        }
+        .btn::before, .premium-btn::before, .premium-btn-red::before,
+        .premium-btn-green::before, .premium-btn-cancel::before {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 150%; height: 150%;
+            background: rgba(255, 255, 255, 0.10);
+            transform: translate(-50%, -50%) rotate(45deg) translateY(100%);
+            transition: transform 0.6s ease;
+            pointer-events: none;
+        }
+        .btn:hover::before, .premium-btn:hover::before, .premium-btn-red:hover::before,
+        .premium-btn-green:hover::before, .premium-btn-cancel:hover::before {
+            transform: translate(-50%, -50%) rotate(45deg) translateY(0);
+        }
+        .btn { background: var(--leaf); color: var(--text-primary); }
+        .btn:hover { background: var(--leaf-light); filter: none; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(52, 94, 67, 0.40); }
+        .btn.small { padding: .45rem 1.1rem; }
+        .btn.ghost { background: transparent; border: 1px solid var(--bamboo); color: var(--bamboo); }
+        .btn.ghost:hover { background: var(--bamboo); color: var(--bg-base); box-shadow: 0 10px 20px rgba(212, 195, 163, 0.25); }
+        .btn.danger { background: rgba(228, 112, 94, .12); border: 1px solid rgba(228, 112, 94, .40); color: var(--danger); }
+        .btn.danger:hover { background: var(--danger); color: var(--bg-base); transform: translateY(-3px); }
+        .btn.okbtn { background: rgba(121, 185, 140, .12); border: 1px solid rgba(121, 185, 140, .40); color: var(--success); }
+        .btn.okbtn:hover { background: var(--success); color: var(--bg-base); transform: translateY(-3px); }
+        .btn:disabled { opacity: .45; transform: none; box-shadow: none; }
+        .btn:disabled::before { display: none; }
+
+        /* O botão dourado é o CTA do hero: ouro sobre verde, texto escuro */
+        .premium-btn-gold { color: #123420 !important; box-shadow: 0 8px 22px rgba(254, 200, 29, 0.28) !important; }
+        .premium-btn-gold:hover {
+            background: linear-gradient(135deg, #ffd84d 0%, #ffe9a6 100%) !important;
+            color: #123420 !important;
+            transform: translateY(-3px) !important;
+            box-shadow: 0 14px 34px rgba(254, 200, 29, 0.40) !important;
+        }
+        .premium-btn-green:hover, .premium-btn-red:hover { color: var(--bg-base) !important; transform: translateY(-3px) !important; }
+        .premium-btn-cancel { color: var(--text-secondary) !important; }
+        .premium-btn-cancel:hover { border-color: var(--glass-border-hover) !important; color: var(--text-primary) !important; transform: translateY(-3px) !important; }
+
+        /* ---- Foco de teclado: o anel duplo verde+ouro da vitrine ---- */
+        a:focus-visible, button:focus-visible, input:focus-visible,
+        select:focus-visible, textarea:focus-visible, [tabindex]:focus-visible,
+        .admin-main-container button:focus-visible, .premium-input:focus-visible {
+            outline: 2px solid transparent !important;
+            outline-offset: 2px;
+            box-shadow: var(--focus-ring) !important;
+        }
+
+        /* ---- Campos ---- */
+        input, textarea, select, .premium-input {
+            background: rgba(212, 195, 163, 0.05) !important;
+            border: 1px solid var(--glass-border) !important;
+            color: var(--text-primary) !important;
+            border-radius: 12px !important;
+            transition: var(--transition);
+        }
+        input:focus, textarea:focus, select:focus, .premium-input:focus { border-color: var(--accent) !important; }
+        ::placeholder { color: var(--text-muted) !important; }
+
+        /* ---- Navegação lateral: o ouro marca a seção viva ---- */
+        .nav-item { transition: var(--transition); border-radius: 12px; }
+        .nav-item:hover { background: rgba(212, 195, 163, 0.07) !important; transform: translateX(3px); }
+        .nav-item.active-nav { background: rgba(254, 200, 29, 0.10) !important; color: var(--accent) !important; }
+
+        /* ---- Título de seção: o mesmo filete de bambu da vitrine ---- */
+        .section-h h2 { color: var(--bamboo) !important; position: relative; padding-bottom: 16px; }
+        .section-h h2::after {
+            content: '';
+            position: absolute;
+            left: 0; bottom: 0;
+            width: 148px; height: 6px;
+            background:
+                radial-gradient(circle at 50% 50%, var(--accent) 0 2px, transparent 2.5px),
+                linear-gradient(90deg, transparent 0%, rgba(212, 195, 163, 0.42) 14%, rgba(212, 195, 163, 0.42) 42%,
+                    transparent 42%, transparent 58%, rgba(212, 195, 163, 0.42) 58%, rgba(212, 195, 163, 0.42) 86%, transparent 100%);
+            background-repeat: no-repeat;
+            background-size: 100% 100%;
+        }
+        .section-h h2 i { color: var(--accent); }
+
+        /* ---- Tabelas ---- */
+        th { color: var(--bamboo); letter-spacing: .16em; }
+        td { border-bottom: 1px solid rgba(212, 195, 163, 0.07); }
+        tbody tr { transition: var(--transition); }
+        tbody tr:hover { background: rgba(212, 195, 163, 0.05); }
+        tbody tr.order-row:hover { box-shadow: inset 3px 0 0 var(--accent); }
+
+        /* ---- Badges e chips ---- */
+        .badge, .stock-badge { border-radius: var(--radius-pill); letter-spacing: .04em; }
+        .b-enviado { background: rgba(212, 195, 163, .16); color: var(--bamboo); }
+        .b-entregue { background: rgba(168, 216, 185, .16); color: #A8D8B9; }
+        .pay-chip { transition: var(--transition); }
+        .pay-chip:hover { background: rgba(212, 195, 163, .08); transform: translateY(-2px); }
+        .pay-chip.active { background: rgba(254, 200, 29, .14); border-color: var(--accent); color: var(--accent); }
+
+        /* ---- Entrada em cascata: cartões chegam escalonados, como na vitrine ---- */
+        @keyframes bl-rise { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+        .tab-panel.active .kpi-card { animation: bl-rise .5s var(--ease-lux) both; }
+        .tab-panel.active .kpi-grid > *:nth-child(1) { animation-delay: .04s; }
+        .tab-panel.active .kpi-grid > *:nth-child(2) { animation-delay: .10s; }
+        .tab-panel.active .kpi-grid > *:nth-child(3) { animation-delay: .16s; }
+        .tab-panel.active .kpi-grid > *:nth-child(4) { animation-delay: .22s; }
+        .tab-panel.active .kpi-grid > *:nth-child(n+5) { animation-delay: .28s; }
+        .tab-panel.active .cards-row > * { animation: bl-rise .55s var(--ease-lux) both .18s; }
+        .tab-panel.active .table-wrap { animation: bl-rise .55s var(--ease-lux) both .24s; }
+
+        /* ---- Toast, confirmação e modal ---- */
+        .toastmsg { background: var(--glass-bg-2); border: 1px solid rgba(121, 185, 140, .45); color: var(--success); border-radius: var(--radius-pill); backdrop-filter: blur(var(--glass-blur)); }
+        .confirm-overlay { background: rgba(9, 24, 15, .78); }
+        .confirm-box, .order-modal .order-box { background: var(--glass-bg-2); border: 1px solid var(--glass-border); backdrop-filter: blur(var(--glass-blur)); }
+        .order-close { border-radius: var(--radius-pill); transition: var(--transition); }
+        .order-close:hover { background: rgba(228, 112, 94, .18); border-color: var(--danger); color: var(--danger); transform: rotate(90deg); }
+        .om-sec h4 { color: var(--accent); letter-spacing: .16em; }
+        .login-card .logo-i { color: #123420; box-shadow: 0 8px 24px rgba(254, 200, 29, .25); }
+        .alert-low { background: rgba(254, 200, 29, .08); border-color: rgba(254, 200, 29, .28); color: var(--accent); border-radius: 16px; }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+            .btn:hover, .card:hover, .kpi-card:hover, .nav-item:hover { transform: none !important; }
         }
     </style>
 </head>
@@ -236,7 +484,7 @@
                     </div>
 
                     <div class="ag-nav-section" style="margin-top:14px;">Loja</div>
-                    <div style="margin:0 12px;background:rgba(0,230,118,0.06);border:1px solid rgba(0,230,118,0.18);border-radius:12px;padding:11px 13px;">
+                    <div style="margin:0 12px;background:rgba(121,185,140,0.06);border:1px solid rgba(121,185,140,0.18);border-radius:12px;padding:11px 13px;">
                         <div style="font-size:11px;color:var(--success);font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:6px;">
                             <span style="width:7px;height:7px;border-radius:50%;background:var(--success);box-shadow:0 0 8px var(--success);"></span> Conectado
                         </div>
@@ -362,7 +610,7 @@
                             <button class="btn danger small" id="clear-payerrors"><i class="fa-solid fa-broom"></i> Limpar tudo</button>
                         </div>
                     </div>
-                    <p class="muted" style="margin:-6px 0 18px;max-width:740px;">Toda tentativa fica registrada aqui, separada por <b style="color:var(--accent)">Cartão</b> e <b style="color:#00d1b2">PIX</b>, com o <b>motivo exato</b> informado pelo Mercado Pago. Quando um cliente disser que não conseguiu pagar, é aqui que você descobre o porquê.</p>
+                    <p class="muted" style="margin:-6px 0 18px;max-width:740px;">Toda tentativa fica registrada aqui, separada por <b style="color:#D4C3A3">Cartão</b> e <b style="color:#79B98C">PIX</b>, com o <b>motivo exato</b> informado pelo Mercado Pago. Quando um cliente disser que não conseguiu pagar, é aqui que você descobre o porquê.</p>
                     <div id="pay-stats" style="display:flex;flex-wrap:wrap;gap:14px;margin-bottom:18px;"></div>
                     <div id="pay-filters" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;"></div>
                     <div id="pay-attempts" style="display:flex;flex-direction:column;gap:12px;"></div>
@@ -533,9 +781,9 @@
     /* ---- Gráficos ---- */
     const charts = {};
     if (typeof Chart !== 'undefined') {
-        Chart.defaults.color = '#8E8E93';
-        Chart.defaults.font.family = 'Plus Jakarta Sans, sans-serif';
-        Chart.defaults.borderColor = 'rgba(255,255,255,0.06)';
+        Chart.defaults.color = '#A3B5AA';
+        Chart.defaults.font.family = 'Outfit, sans-serif';
+        Chart.defaults.borderColor = 'rgba(212,195,163,0.10)';
     }
     function drawCharts(orders, comments) {
         if (typeof Chart === 'undefined') return;
@@ -553,17 +801,17 @@
         paid.forEach(o => { const k = new Date(o.createdAt).toISOString().slice(0, 10); if (k in map) map[k] += o.total; });
         charts.rev = new Chart($('chart-revenue'), {
             type: 'bar',
-            data: { labels, datasets: [{ label: 'Faturamento', data: days.map(k => map[k]), backgroundColor: 'rgba(0,230,118,0.55)', hoverBackgroundColor: '#00E676', borderRadius: 6, maxBarThickness: 26 }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => fmtBRL(c.raw) } } }, scales: { y: { ticks: { callback: v => 'R$' + v }, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false } } } }
+            data: { labels, datasets: [{ label: 'Faturamento', data: days.map(k => map[k]), backgroundColor: 'rgba(121,185,140,0.55)', hoverBackgroundColor: '#79B98C', borderRadius: 6, maxBarThickness: 26 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => fmtBRL(c.raw) } } }, scales: { y: { ticks: { callback: v => 'R$' + v }, grid: { color: 'rgba(212,195,163,0.08)' } }, x: { grid: { display: false } } } }
         });
 
         // Pedidos por status
         const sCount = {}; orders.forEach(o => sCount[o.status] = (sCount[o.status] || 0) + 1);
-        const sColors = { pago: '#00E676', aguardando_pagamento: '#FFD600', enviado: '#9fc2ff', entregue: '#c8c8ff', cancelado: '#FF1744', recusado: '#c0392b' };
+        const sColors = { pago: '#79B98C', aguardando_pagamento: '#fec81d', enviado: '#D4C3A3', entregue: '#A8D8B9', cancelado: '#E4705E', recusado: '#E4705E' };
         const sKeys = Object.keys(sCount);
         charts.status = new Chart($('chart-status'), {
             type: 'doughnut',
-            data: { labels: sKeys.map(k => STATUS_LABEL[k] || k), datasets: [{ data: sKeys.map(k => sCount[k]), backgroundColor: sKeys.map(k => sColors[k] || '#777'), borderColor: 'rgba(0,0,0,0.2)', borderWidth: 2 }] },
+            data: { labels: sKeys.map(k => STATUS_LABEL[k] || k), datasets: [{ data: sKeys.map(k => sCount[k]), backgroundColor: sKeys.map(k => sColors[k] || '#8fa397'), borderColor: 'rgba(0,0,0,0.2)', borderWidth: 2 }] },
             options: { responsive: true, maintainAspectRatio: false, cutout: '62%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 12 } } } }
         });
 
@@ -572,16 +820,16 @@
         const top = Object.entries(prod).sort((a, b) => b[1] - a[1]).slice(0, 5);
         charts.prod = new Chart($('chart-products'), {
             type: 'bar',
-            data: { labels: top.map(t => t[0]), datasets: [{ label: 'Unidades', data: top.map(t => t[1]), backgroundColor: 'rgba(201,162,90,0.8)', hoverBackgroundColor: '#E6C77E', borderRadius: 6, maxBarThickness: 22 }] },
-            options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { precision: 0 } }, y: { grid: { display: false } } } }
+            data: { labels: top.map(t => t[0]), datasets: [{ label: 'Unidades', data: top.map(t => t[1]), backgroundColor: 'rgba(254,200,29,0.8)', hoverBackgroundColor: '#ffe08a', borderRadius: 6, maxBarThickness: 22 }] },
+            options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: 'rgba(212,195,163,0.08)' }, ticks: { precision: 0 } }, y: { grid: { display: false } } } }
         });
 
         // Distribuição de avaliações
         const rate = [0, 0, 0, 0, 0]; (comments || []).forEach(c => { const r = Math.min(5, Math.max(1, c.rating || 5)); rate[r - 1]++; });
         charts.rate = new Chart($('chart-ratings'), {
             type: 'bar',
-            data: { labels: ['1★', '2★', '3★', '4★', '5★'], datasets: [{ label: 'Avaliações', data: rate, backgroundColor: 'rgba(255,214,0,0.6)', hoverBackgroundColor: '#FFD600', borderRadius: 6, maxBarThickness: 34 }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { precision: 0 } }, x: { grid: { display: false } } } }
+            data: { labels: ['1★', '2★', '3★', '4★', '5★'], datasets: [{ label: 'Avaliações', data: rate, backgroundColor: 'rgba(254,200,29,0.6)', hoverBackgroundColor: '#fec81d', borderRadius: 6, maxBarThickness: 34 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: 'rgba(212,195,163,0.08)' }, ticks: { precision: 0 } }, x: { grid: { display: false } } } }
         });
     }
 
@@ -612,7 +860,7 @@
             { ico: 'fa-money-bill-trend-up', variant: 'kpi-gold', c: 'var(--accent)', val: todayRev, money: true, lbl: 'Vendas de hoje' },
             { ico: 'fa-receipt', variant: 'kpi-blue', c: 'var(--accent-soft)', val: orders.length, lbl: 'Pedidos totais', sub: `${d.awaitingPayment} aguardando pgto` },
             { ico: 'fa-tag', variant: 'kpi-blue', c: 'var(--accent-soft)', val: avg, money: true, lbl: 'Ticket médio' },
-            { ico: 'fa-percent', variant: 'kpi-purple', c: '#c8c8ff', val: conv, money: false, lbl: 'Conversão (%)', fixed: 1 },
+            { ico: 'fa-percent', variant: 'kpi-purple', c: '#A8D8B9', val: conv, money: false, lbl: 'Conversão (%)', fixed: 1 },
             { ico: 'fa-boxes-stacked', variant: 'kpi-green', c: 'var(--success)', val: units, lbl: 'Unidades vendidas' },
             { ico: 'fa-handshake', variant: 'kpi-gold', c: 'var(--accent)', val: d.resellerLeads || 0, lbl: 'Leads revendedor', sub: `${d.newLeads || 0} novos` },
             { ico: 'fa-comment-dots', variant: 'kpi-orange', c: 'var(--warning)', val: d.pendingComments || 0, lbl: 'Coment. pendentes' },
@@ -622,7 +870,7 @@
             <div class="kpi-card ${k.variant}">
                 <div class="kpi-bg-symbol" style="position:absolute;top:-10px;right:-6px;font-size:78px;opacity:0.05;pointer-events:none;"><i class="fa-solid ${k.ico}"></i></div>
                 <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;position:relative;z-index:2;">
-                    <div class="kpi-icon-wrapper" style="width:42px;height:42px;border-radius:12px;background:rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:center;font-size:20px;color:${k.c};"><i class="fa-solid ${k.ico}"></i></div>
+                    <div class="kpi-icon-wrapper" style="width:42px;height:42px;border-radius:12px;background:rgba(212,195,163,0.08);display:flex;align-items:center;justify-content:center;font-size:20px;color:${k.c};"><i class="fa-solid ${k.ico}"></i></div>
                     <div class="lbl">${k.lbl}</div>
                 </div>
                 <div class="num" data-val="${k.val}" data-money="${k.money ? 1 : 0}" data-fixed="${k.fixed || 0}" style="position:relative;z-index:2;">0</div>
@@ -657,10 +905,10 @@
     let productsData = [];
     function stockBadge(n) {
         n = parseInt(n) || 0;
-        if (n === 0) return `<span class="stock-badge" style="background:rgba(255,23,68,.16);color:var(--danger);"><i class="fa-solid fa-ban"></i> Esgotado</span>`;
-        if (n <= 5) return `<span class="stock-badge" style="background:rgba(255,23,68,.12);color:#ff8a80;"><i class="fa-solid fa-triangle-exclamation"></i> Crítico (${n})</span>`;
-        if (n <= 10) return `<span class="stock-badge" style="background:rgba(255,214,0,.12);color:var(--warning);"><i class="fa-solid fa-arrow-down"></i> Baixo (${n})</span>`;
-        return `<span class="stock-badge" style="background:rgba(0,230,118,.12);color:var(--success);"><i class="fa-solid fa-check"></i> OK (${n})</span>`;
+        if (n === 0) return `<span class="stock-badge" style="background:rgba(228,112,94,.16);color:var(--danger);"><i class="fa-solid fa-ban"></i> Esgotado</span>`;
+        if (n <= 5) return `<span class="stock-badge" style="background:rgba(228,112,94,.12);color:#E4705E;"><i class="fa-solid fa-triangle-exclamation"></i> Crítico (${n})</span>`;
+        if (n <= 10) return `<span class="stock-badge" style="background:rgba(254,200,29,.12);color:var(--warning);"><i class="fa-solid fa-arrow-down"></i> Baixo (${n})</span>`;
+        return `<span class="stock-badge" style="background:rgba(121,185,140,.12);color:var(--success);"><i class="fa-solid fa-check"></i> OK (${n})</span>`;
     }
     function refreshStockBadge(inp) {
         const b = inp.closest('td').querySelector('.stock-badge');
@@ -765,6 +1013,15 @@
     function openOrderModal(o) {
         const c = o.customer || {};
         const paidTxt = o.paidAt ? ` · pago em ${fmtDate(o.paidAt)}` : '';
+        const totalUnits = (o.items || []).reduce((s, i) => s + (i.qty || 0), 0);
+        // Situação do pagamento: pega a tentativa mais recente do pedido (motivo real do MP)
+        const att = payCache.filter(a => a.orderId === o.id).sort((a, b) => new Date(b.at || 0) - new Date(a.at || 0))[0];
+        const situ = att
+            ? { r: reasonFor(att.status, att.statusDetail), eng: att.status, detail: att.statusDetail || '', pid: att.paymentId || o.paymentId || '' }
+            : o.status === 'pago' ? { r: PAY_REASONS.approved, eng: 'approved', detail: 'accredited', pid: o.paymentId || '' }
+            : o.status === 'aguardando_pagamento' ? { r: PAY_REASONS.pending, eng: 'pending', detail: '', pid: o.paymentId || '' }
+            : { r: { titulo: 'Cancelado', desc: 'Pedido cancelado ou pagamento não concluído.', acao: 'Sem ação necessária.', tom: 'erro' }, eng: 'cancelled', detail: '', pid: o.paymentId || '' };
+        const payColor = tomColor(situ.r.tom);
         $('order-modal-content').innerHTML = `
             <div class="om-h">Pedido <code style="font-size:.85rem;">#${esc(String(o.id).slice(0, 8))}</code></div>
             <div class="om-sub">Realizado em ${fmtDate(o.createdAt)}</div>
@@ -785,12 +1042,15 @@
             </div>
 
             <div class="om-sec">
-                <h4><i class="fa-solid fa-credit-card"></i> Pagamento</h4>
-                <div class="om-row">
-                    Método: <b>${PAY_LABEL[o.paymentMethod] || 'Mercado Pago'}</b><br>
-                    Situação: <b>${STATUS_LABEL[o.status] || o.status}</b>${paidTxt}<br>
-                    ${o.paymentId ? `ID Mercado Pago: ${esc(o.paymentId)}<br>` : ''}
-                    Valor: <b>${fmtBRL(o.total)}</b>
+                <h4><i class="fa-solid fa-credit-card"></i> Situação do pagamento</h4>
+                <div style="border:1px solid ${payColor}55;border-left:3px solid ${payColor};border-radius:12px;padding:.85rem 1rem;background:${payColor}12;">
+                    <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;">
+                        <b style="color:${payColor};">${PAY_LABEL[o.paymentMethod] || 'Mercado Pago'} · ${esc(situ.r.titulo)}</b>
+                        <span class="badge" style="background:${payColor}22;color:${payColor};">${esc(situ.eng)}</span>
+                    </div>
+                    <div style="margin-top:.4rem;color:var(--text-secondary);">${esc(situ.r.desc)}</div>
+                    <div style="margin-top:.3rem;"><b>O que fazer:</b> ${esc(situ.r.acao)}</div>
+                    <div class="muted" style="margin-top:.5rem;font-size:.76rem;">Valor ${fmtBRL(o.total)}${situ.pid ? ` · ID MP ${esc(situ.pid)}` : ''}${situ.detail ? ` · <span style="font-family:monospace;">${esc(situ.detail)}</span>` : ''}${paidTxt}</div>
                 </div>
             </div>
 
@@ -798,6 +1058,13 @@
                 <h4><i class="fa-solid fa-box"></i> Itens do pedido</h4>
                 ${o.items.map(i => `<div class="om-item"><span>${i.qty}× ${esc(i.name)}</span><span>${fmtBRL(i.price * i.qty)}</span></div>`).join('')}
                 <div class="om-total"><span>Total</span><span>${fmtBRL(o.total)}</span></div>
+            </div>
+
+            <div class="om-sec">
+                <h4><i class="fa-solid fa-boxes-stacked"></i> Baixa de estoque</h4>
+                <div class="om-row">${o.stockDecremented
+                    ? `<span style="color:var(--success);font-weight:700;">✓ Concluída</span> — ${totalUnits} un. baixada${totalUnits > 1 ? 's' : ''} do estoque`
+                    : `<span style="color:var(--text-secondary);">Não baixado</span> — o estoque só baixa quando o pagamento é aprovado`}</div>
             </div>
 
             <div class="om-sec">
@@ -867,7 +1134,7 @@
                 <td>${esc(l.nome)}</td>
                 <td>${esc(l.empresa || '—')}</td>
                 <td>${esc(l.endereco || '—')}</td>
-                <td>${esc(l.telefone)} ${wa ? `<a href="https://wa.me/55${wa}" target="_blank" title="Chamar no WhatsApp"><i class="fa-brands fa-whatsapp" style="color:#25D366"></i></a>` : ''}</td>
+                <td>${esc(l.telefone)} ${wa ? `<a href="https://wa.me/55${wa}" target="_blank" title="Chamar no WhatsApp"><i class="fa-brands fa-whatsapp" style="color:#79B98C"></i></a>` : ''}</td>
                 <td><select data-lid="${l.id}" class="lead-status b-${l.status}">${Object.entries(LEAD_STATUS).map(([v, t]) => `<option value="${v}" ${l.status === v ? 'selected' : ''}>${t}</option>`).join('')}</select></td>
                 <td><button class="btn small danger lead-del" data-id="${l.id}"><i class="fa-solid fa-trash"></i></button></td>
             </tr>`;
@@ -941,13 +1208,13 @@
                 </div>
             </div>`;
         $('pay-stats').innerHTML =
-            box('💳', 'Cartão de crédito', '#8ab4f8', [
-                { value: card.length, label: 'Tentativas', color: '#8ab4f8' },
+            box('💳', 'Cartão de crédito', '#D4C3A3', [
+                { value: card.length, label: 'Tentativas', color: '#D4C3A3' },
                 { value: cardApproved, label: 'Aprovados', color: 'var(--success)' },
                 { value: rate + '%', label: 'Aprovação', color: rate >= 70 ? 'var(--success)' : rate >= 40 ? 'var(--warning)' : 'var(--danger)' }
             ]) +
-            box('⚡', 'PIX', '#00d1b2', [
-                { value: pix.length, label: 'Gerados', color: '#00d1b2' },
+            box('⚡', 'PIX', '#79B98C', [
+                { value: pix.length, label: 'Gerados', color: '#79B98C' },
                 { value: pixPaid, label: 'Pagos', color: 'var(--success)' },
                 { value: pixWait, label: 'Aguardando', color: 'var(--warning)' }
             ]);
@@ -969,15 +1236,15 @@
             const wa = (a.whatsapp || '').replace(/\D/g, '');
             return `<div class="glass-card" style="padding:16px 18px;border-left:3px solid ${c};">
                 <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:10px;">
-                    <span style="font-size:11px;font-weight:800;color:${isPix ? '#00d1b2' : '#8ab4f8'};background:${isPix ? 'rgba(0,209,178,.12)' : 'rgba(138,180,248,.12)'};border-radius:6px;padding:3px 9px;">${isPix ? '⚡ PIX' : '💳 CARTÃO'}</span>
+                    <span style="font-size:11px;font-weight:800;color:${isPix ? '#79B98C' : '#D4C3A3'};background:${isPix ? 'rgba(121,185,140,.14)' : 'rgba(212,195,163,.16)'};border-radius:6px;padding:3px 9px;">${isPix ? '⚡ PIX' : '💳 CARTÃO'}</span>
                     <strong style="color:#fff;font-size:14px;">${esc(r.titulo)}</strong>
                     <span style="font-size:11px;font-weight:700;color:${c};background:${c}22;border-radius:20px;padding:3px 10px;">${esc(a.status)}</span>
                     <span style="margin-left:auto;font-size:12px;color:var(--text-muted);">${fmtDate(a.at)}</span>
                 </div>
                 <div style="color:var(--text-primary);font-size:13px;line-height:1.55;">${esc(r.desc)}</div>
-                <div style="color:#8ab4f8;font-size:13px;line-height:1.55;margin-top:6px;"><strong>O que fazer:</strong> ${esc(r.acao)}</div>
+                <div style="color:#D4C3A3;font-size:13px;line-height:1.55;margin-top:6px;"><strong>O que fazer:</strong> ${esc(r.acao)}</div>
                 ${(a.cliente || a.items) ? `<div style="margin-top:10px;padding:8px 10px;background:rgba(255,255,255,.02);border:1px solid var(--glass-border);border-radius:8px;font-size:12px;">
-                    ${a.cliente ? `<div style="color:var(--text-primary);">👤 <strong>${esc(a.cliente)}</strong>${wa ? ` · <a href="https://wa.me/55${wa}" target="_blank" style="color:#25D366;">WhatsApp</a>` : ''}</div>` : ''}
+                    ${a.cliente ? `<div style="color:var(--text-primary);">👤 <strong>${esc(a.cliente)}</strong>${wa ? ` · <a href="https://wa.me/55${wa}" target="_blank" style="color:#79B98C;">WhatsApp</a>` : ''}</div>` : ''}
                     ${a.items ? `<div style="color:var(--text-secondary);margin-top:3px;">🛍️ ${esc(a.items)}</div>` : ''}
                 </div>` : ''}
                 <div style="display:flex;flex-wrap:wrap;gap:14px;margin-top:12px;font-size:11px;color:var(--text-muted);">
