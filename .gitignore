@@ -16,6 +16,7 @@ hero-fog.html
 
 # ===== Tooling local (editor / assistentes) =====
 .claude/
+.codex/
 .agents/
 .impeccable/
 skills-lock.json

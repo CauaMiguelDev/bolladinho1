@@ -1,0 +1,29 @@
+# Blueprint do Render — coloca a Bolladinho no ar.
+# Como usar: no Render, New → Blueprint → conecte este repositório.
+# As variáveis com "sync: false" NÃO ficam no repo: o Render pede o valor na hora do deploy.
+services:
+  - type: web
+    name: bolladinho
+    runtime: node
+    plan: free            # troque para "starter" ($7/mês) para não hibernar e poder anexar disco
+    branch: main
+    buildCommand: ""      # sem dependências externas
+    startCommand: node server.js
+    healthCheckPath: /
+    envVars:
+      - key: MP_ACCESS_TOKEN
+        sync: false
+      - key: MP_PUBLIC_KEY
+        sync: false
+      - key: ADMIN_USER
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: SUPERFRETE_TOKEN
+        sync: false
+      - key: ORIGIN_CEP
+        sync: false
+      - key: NOTIFY_EMAIL
+        sync: false
+      - key: SHIPPING_FLAT
+        value: "0"

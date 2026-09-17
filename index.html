@@ -51,10 +51,10 @@
                 <i class="fa-solid fa-leaf"></i> Bolladinho
             </a>
             <ul class="nav-links" data-lenis-prevent>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="index.html#beneficios">Benefícios</a></li>
-                <li><a href="index.html#detalhes">Detalhes</a></li>
-                <li><a href="index.html#depoimentos">Depoimentos</a></li>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#beneficios">Benefícios</a></li>
+                <li><a href="#detalhes">Detalhes</a></li>
+                <li><a href="#depoimentos">Depoimentos</a></li>
                 <li><a href="revendedor.html">Revendedor</a></li>
             </ul>
             <div class="nav-actions">
@@ -376,17 +376,10 @@
                         <i class="fa-solid fa-location-dot"></i>
                         Preencha o <strong>CEP</strong> acima para ver as formas de entrega e escolher uma.
                     </div>
-                    <div class="shipping-options" id="shipping-options" hidden>
-                        <label class="option-card selected">
-                            <input type="radio" name="shipping" value="padrao" checked>
-                            <i class="fa-solid fa-truck-fast"></i>
-                            <span class="option-info">
-                                <strong>Envio Padrão</strong>
-                                <small>Correios — envio para todo o Brasil</small>
-                            </span>
-                            <span class="option-price" id="shipping-price">Grátis</span>
-                        </label>
+                    <div class="shipping-loading" id="shipping-loading" hidden>
+                        <i class="fa-solid fa-spinner fa-spin"></i> Calculando fretes para o seu CEP...
                     </div>
+                    <div class="shipping-options" id="shipping-options" hidden></div>
 
                     <h3 class="co-section"><i class="fa-solid fa-credit-card"></i> 3. Forma de Pagamento</h3>
                     <div class="pay-methods">
@@ -549,7 +542,7 @@
     <!-- Realce: tilt 3D nos cards + parallax dos blobs de ambiente -->
     <script>
         (function () {
-            const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+            const reduce = { matches: false }; // animações sempre ativas
             function bindTilt(card) {
                 if (card._tilt) return; card._tilt = true;
                 card.addEventListener('pointermove', e => {

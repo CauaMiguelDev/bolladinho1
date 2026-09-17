@@ -1995,6 +1995,128 @@ main, .footer {
     font-size: var(--text-sm);
 }
 
+/* ===== Formas de entrega (SuperFrete + locais) — cards estilo transportadora ===== */
+.shipping-loading {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+}
+.shipping-loading i { color: var(--color-secondary); }
+
+.shipping-options {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.ship-card {
+    --c: var(--color-secondary);
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-4);
+    border: 1px solid rgba(212, 195, 163, 0.15);
+    border-radius: var(--radius-input);
+    background: rgba(255, 255, 255, 0.03);
+    cursor: pointer;
+    transition: var(--transition);
+    animation: step-in 0.35s ease;
+}
+.ship-card:hover {
+    border-color: color-mix(in srgb, var(--c) 55%, transparent);
+    background: rgba(255, 255, 255, 0.05);
+}
+.ship-card.selected {
+    border-color: var(--c);
+    background: color-mix(in srgb, var(--c) 12%, transparent);
+    box-shadow: 0 0 0 1px var(--c), 0 8px 22px -14px var(--c);
+}
+.ship-card input[type="radio"] { display: none; }
+
+.ship-radio {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid rgba(212, 195, 163, 0.4);
+    display: grid;
+    place-items: center;
+    transition: var(--transition);
+}
+.ship-card.selected .ship-radio {
+    border-color: var(--c);
+}
+.ship-card.selected .ship-radio::after {
+    content: "";
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--c);
+}
+
+.ship-ico {
+    flex-shrink: 0;
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    font-size: 1.25rem;
+    color: var(--c);
+    background: color-mix(in srgb, var(--c) 18%, transparent);
+}
+
+.ship-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+    line-height: 1.25;
+}
+.ship-name {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    color: var(--color-text);
+    font-weight: 700;
+    font-size: var(--text-base);
+}
+.ship-badge {
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 999px;
+    color: var(--c);
+    background: color-mix(in srgb, var(--c) 16%, transparent);
+    border: 1px solid color-mix(in srgb, var(--c) 40%, transparent);
+}
+.ship-sub {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+}
+.ship-sub i { font-size: 0.75rem; }
+
+.ship-price {
+    margin-left: auto;
+    padding-left: var(--space-3);
+    text-align: right;
+    font-weight: 800;
+    font-size: var(--text-base);
+    color: var(--color-text);
+    white-space: nowrap;
+}
+.ship-price.free { color: var(--feedback-ok); }
+.ship-price.tbd { color: var(--color-secondary); }
+
 /* alvo de toque: o card inteiro é o rótulo do rádio */
 .option-card {
     min-height: 56px;
@@ -2054,7 +2176,11 @@ main, .footer {
 .card-preview-wrap {
     perspective: 1000px;
     margin-bottom: 1.4rem;
-    /* removido: cardFloat 6s infinite — o cartão flutuava sozinho */
+    /* Flutua no WRAPPER (não no .animated-card) para não conflitar com o flip 3D */
+    animation: cardFloat 5s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+    .card-preview-wrap { animation: none; }
 }
 
 /* Flutuar suave e contínuo do cartão (não interfere no flip do .animated-card) */
@@ -2070,11 +2196,23 @@ main, .footer {
     margin: 0 auto;
     aspect-ratio: 1.586 / 1;
     transform-style: preserve-3d;
-    transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+    transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .animated-card.flipped {
     transform: rotateY(180deg);
+}
+
+/* Reconhecimento da bandeira: brilho varre o cartão + reflexo no chip + glow — uma vez */
+.animated-card.recognized .card-front::after { animation: cardSheenOnce 0.9s ease-out; }
+.animated-card.recognized .card-chip::after { animation: chipShineOnce 0.9s ease-out 0.08s; }
+.animated-card.recognized .card-face { animation: cardGlow 0.9s ease-out; }
+@keyframes cardSheenOnce { 0% { left: -40%; opacity: 0; } 15% { opacity: 0.9; } 100% { left: 130%; opacity: 0; } }
+@keyframes chipShineOnce { 0% { left: -60%; opacity: 0; } 20% { opacity: 1; } 100% { left: 130%; opacity: 0; } }
+@keyframes cardGlow {
+    0%   { box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5); }
+    40%  { box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 255, 255, 0.22); }
+    100% { box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5); }
 }
 
 .card-face {
@@ -2260,6 +2398,8 @@ main, .footer {
 .card-brand .mc span:last-child { background: #f79e1b; margin-left: -11px; mix-blend-mode: screen; }
 .card-brand .elo { font-weight: 800; color: #fff; font-size: 1.1rem; }
 .card-brand .amex { font-weight: 800; color: #4fb6e0; font-size: var(--text-base); }
+.card-brand .hiper { font-weight: 800; color: #fff; font-size: var(--text-base); font-style: italic; }
+.card-brand .diners { font-weight: 800; color: #fff; font-size: var(--text-base); letter-spacing: 0.5px; }
 
 .card-number {
     font-family: 'Outfit', monospace;
@@ -2883,15 +3023,6 @@ main, .footer {
 }
 
 /* --- Acessibilidade: reduzir movimento --- */
-@media (prefers-reduced-motion: reduce) {
-    .kenburns-bg,
-    .demo-img,
-    .pulse,
-    .pulse-strong {
-        animation: none !important;
-    }
-}
-
 /* --- Lenis (smooth scroll) --- */
 html.lenis,
 html.lenis body {
@@ -3165,47 +3296,6 @@ html.lenis body {
 }
 
 /* Acessibilidade: desliga movimento contínuo e garante conteúdo visível */
-@media (prefers-reduced-motion: reduce) {
-    .reveal,
-    .reveal.reveal--right {
-        opacity: 1 !important;
-        transform: none !important;
-        filter: none !important;
-    }
-
-    /* Movimento introduzido no redesign, desligado no mesmo lugar:
-       as elevações de hover dos cards e o sublinhado dourado que
-       cresce nos links do rodapé. */
-    .benefit-card:hover,
-    .testimonial-card:hover,
-    .pricing-card:hover,
-    .social-icons a:hover {
-        transform: none !important;
-    }
-
-    .footer-links a::after,
-    .footer-contact a::after {
-        transition: none !important;
-    }
-
-    /* Avisos: continuam aparecendo e desaparecendo, mas sem deslizar.
-       O banner de pagamento e o toast de compra surgem no lugar. */
-    .payment-banner-inner {
-        animation: none !important;
-    }
-
-    .purchase-toast {
-        transition: opacity 0.3s ease !important;
-        transform: none !important;
-        opacity: 0;
-    }
-
-    .purchase-toast.show {
-        transform: none !important;
-        opacity: 1;
-    }
-}
-
 /* ================= CHECKOUT: meios de pagamento =================
    Escolher entre cartão e PIX é a decisão mais importante da tela, e
    o estado selecionado precisa ser óbvio sem gritar. O ouro marca a
@@ -3363,7 +3453,6 @@ main{ position:relative; }
    borda, raio e padding, mais um hover dourado que contradizia o
    hover branco da outra. Regra única agora, mais acima. */
 
-@media (prefers-reduced-motion:reduce){ .sfx-blob{ animation:none!important; } }
 
 /* ============================================================
    NAV IRONHILL — botão dourado no canto superior + menu deslizante
@@ -3426,10 +3515,22 @@ main{ position:relative; }
     border-left: 1px solid rgba(254, 200, 29, 0.22);
     box-shadow: -30px 0 60px rgba(0, 0, 0, 0.5);
     z-index: 1200;
+    /* A .navbar tem pointer-events:none (p/ não bloquear o hero). O painel PRECISA
+       reativar, senão os cliques atravessam o menu e caem no hero — links não funcionam. */
+    pointer-events: auto;
 }
 
 .nav-content .nav-links.open {
     transform: translateX(0);
+}
+
+/* Menu aberto: o botão X salta para dentro do canto superior direito do painel
+   (antes ficava solto na navbar, ancorado ao container e descolado da barra) */
+.nav-content .nav-links.open ~ .nav-actions .menu-toggle {
+    position: fixed;
+    top: 18px;
+    right: 18px;
+    z-index: 1300;
 }
 
 .nav-content .nav-links li {

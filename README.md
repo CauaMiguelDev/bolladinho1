@@ -50,11 +50,15 @@ Como o back-end é Node, **GitHub Pages não serve** (é só estático). Use um 
 — ex.: **Render** (tem plano grátis). O app já está pronto: a porta usa `process.env.PORT` e
 as credenciais podem vir de **variáveis de ambiente** (quando não há `server-config.json`).
 
-No Render: *New → Web Service → conecte este repo* e defina:
+No Render: *New → Web Service → conecte este repo* (ou use o `render.yaml` já incluído via
+*New → Blueprint*) e defina:
 - **Build Command:** (vazio)
 - **Start Command:** `node server.js`
-- **Environment Variables:** `MP_ACCESS_TOKEN`, `MP_PUBLIC_KEY`, `ADMIN_USER`,
-  `ADMIN_PASSWORD`, `NOTIFY_EMAIL` (opcional), `SHIPPING_FLAT` (opcional).
+- **Environment Variables:**
+  - `MP_ACCESS_TOKEN`, `MP_PUBLIC_KEY` — Mercado Pago (produção)
+  - `ADMIN_USER`, `ADMIN_PASSWORD` — login do painel `/admin`
+  - `SUPERFRETE_TOKEN`, `ORIGIN_CEP` — cálculo de frete (SuperFrete + CEP de origem da loja)
+  - `NOTIFY_EMAIL` (opcional), `SHIPPING_FLAT` (opcional)
 
 > ⚠️ O disco do host é **efêmero**: dados gravados em `data/` (pedidos, avaliações) se perdem
 > a cada redeploy/restart. Para produção de verdade, migrar esses dados para um banco.

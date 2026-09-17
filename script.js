@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
     /* ---------------- Folhas de bambu caindo ---------------- */
     const particleContainer = document.getElementById('particles-container');
     if (particleContainer) {
-        const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const prefersReduced = false; // animações sempre ativas, mesmo com "reduzir movimento" do SO
         const isMobile = window.innerWidth < 768;
         const leafCount = prefersReduced ? 0 : (isMobile ? 8 : 16);
         const leafColors = ['#4A7A5B', '#6B9C58', '#8FBC6F', '#D4C3A3'];
@@ -239,6 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const checkoutOverlay = document.getElementById('checkout-overlay');
     const checkoutBtn = document.getElementById('checkout-btn');
     let cepValidated = false;
+    let shipSel = null; // forma de entrega escolhida (objeto vindo de /api/frete)
 
     function openCheckout() {
         if (!checkoutOverlay) return;
@@ -270,9 +271,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span class="summary-item-price">${formatBRL(i.price * i.qty)}</span>
                 </div>`;
         });
+        const freteCost = shipSel && typeof shipSel.price === 'number' ? shipSel.price : 0;
+        const freteLabel = !shipSel ? 'A calcular'
+            : (shipSel.priceLabel || (shipSel.price > 0 ? formatBRL(shipSel.price) : 'Grátis'));
         html += `<div class="summary-row summary-shipping"><span>Subtotal</span><span>${formatBRL(cartTotal())}</span></div>`;
-        html += `<div class="summary-row summary-shipping"><span><i class="fa-solid fa-truck-fast"></i> Frete</span><span>Grátis</span></div>`;
-        html += `<div class="summary-row summary-total"><span>Total</span><span>${formatBRL(cartTotal())}</span></div>`;
+        html += `<div class="summary-row summary-shipping"><span><i class="fa-solid fa-truck-fast"></i> Frete${shipSel ? ' · ' + shipSel.name : ''}</span><span>${freteLabel}</span></div>`;
+        html += `<div class="summary-row summary-total"><span>Total</span><span>${formatBRL(cartTotal() + freteCost)}</span></div>`;
         box.innerHTML = html;
     }
 
@@ -311,12 +315,83 @@ document.addEventListener('DOMContentLoaded', () => {
             else phoneInput.value = v;
         });
 
-        /* Forma de entrega: liberada quando o CEP é validado */
+        /* Forma de entrega: calculada na SuperFrete quando o CEP é validado */
         const shippingHint = document.getElementById('shipping-hint');
         const shippingOptions = document.getElementById('shipping-options');
+        const shippingLoading = document.getElementById('shipping-loading');
         function setShippingAvailable(ok) {
             if (shippingHint) shippingHint.hidden = ok;
             if (shippingOptions) shippingOptions.hidden = !ok;
+            if (!ok) {
+                shipSel = null;
+                if (shippingLoading) shippingLoading.hidden = true;
+                if (shippingOptions) shippingOptions.innerHTML = '';
+            }
+        }
+
+        // Ícone, cor e selo por transportadora (visual estilo imagem de referência)
+        const SHIP_STYLE = {
+            1:  { icon: 'fa-truck',         color: '#3b82f6', badge: 'Econômico' },
+            2:  { icon: 'fa-truck-fast',    color: '#ef4444', badge: 'Expresso' },
+            3:  { icon: 'fa-boxes-stacked', color: '#f59e0b', badge: 'Transportadora' },
+            17: { icon: 'fa-box',           color: '#14b8a6', badge: 'Compacto' },
+            31: { icon: 'fa-paper-plane',   color: '#8b5cf6', badge: 'Ágil' },
+            motoboy: { icon: 'fa-motorcycle', color: '#22c55e', badge: 'Imediato' },
+            retirar: { icon: 'fa-store',      color: '#eab308', badge: 'Retirada' },
+        };
+        const shipDeadline = o => o.note ? o.note
+            : (!o.days ? 'Prazo sob consulta' : `em até ${o.days} ${o.days === 1 ? 'dia útil' : 'dias úteis'}`);
+        function shipPriceHtml(o) {
+            if (o.priceLabel) return `<span class="ship-price ${o.price === 0 ? 'free' : 'tbd'}">${o.priceLabel}</span>`;
+            if (o.price === 0) return `<span class="ship-price free">Grátis</span>`;
+            return `<span class="ship-price">${formatBRL(o.price)}</span>`;
+        }
+        function renderShipOptions(options) {
+            shippingOptions.innerHTML = options.map(o => {
+                const st = SHIP_STYLE[o.id] || { icon: 'fa-truck', color: 'var(--color-secondary)', badge: o.company || '' };
+                return `
+                <label class="ship-card" data-id="${o.id}" style="--c:${st.color}">
+                    <input type="radio" name="shipping" value="${o.id}">
+                    <span class="ship-radio"></span>
+                    <span class="ship-ico"><i class="fa-solid ${st.icon}"></i></span>
+                    <span class="ship-info">
+                        <span class="ship-name">${o.name}${st.badge ? `<span class="ship-badge">${st.badge}</span>` : ''}</span>
+                        <span class="ship-sub"><i class="fa-regular fa-clock"></i> ${shipDeadline(o)}</span>
+                    </span>
+                    ${shipPriceHtml(o)}
+                </label>`;
+            }).join('');
+            shippingOptions.querySelectorAll('.ship-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    shipSel = options.find(o => String(o.id) === card.dataset.id) || null;
+                    shippingOptions.querySelectorAll('.ship-card').forEach(c => c.classList.remove('selected'));
+                    card.classList.add('selected');
+                    const radio = card.querySelector('input'); if (radio) radio.checked = true;
+                    renderOrderSummary();
+                    refreshInstallments(); // parcelas recalculam sobre o total com frete
+                });
+            });
+        }
+        async function loadShipping(cep) {
+            shipSel = null;
+            if (shippingHint) shippingHint.hidden = true;
+            if (shippingOptions) { shippingOptions.hidden = true; shippingOptions.innerHTML = ''; }
+            if (shippingLoading) shippingLoading.hidden = false;
+            try {
+                const res = await fetch('/api/frete', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ cep })
+                });
+                const data = await res.json();
+                if (!res.ok || data.erro || !Array.isArray(data.options) || !data.options.length) throw new Error();
+                renderShipOptions(data.options);
+                if (shippingLoading) shippingLoading.hidden = true;
+                if (shippingOptions) shippingOptions.hidden = false;
+                renderOrderSummary();
+            } catch (e) {
+                if (shippingLoading) shippingLoading.hidden = true;
+                if (shippingHint) shippingHint.hidden = false;
+            }
         }
 
         /* CEP: busca automática ao digitar 8 dígitos, obrigatório e verificado no ViaCEP */
@@ -348,7 +423,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.getElementById('cust-cidade').value = data.cidade || '';
                 document.getElementById('cust-uf').value = data.uf || '';
                 cepValidated = true;
-                setShippingAvailable(true);
+                loadShipping(cep);
                 cepStatus.textContent = `✓ CEP válido — ${data.cidade}/${data.uf}`;
                 cepStatus.className = 'cep-status cep-ok';
                 document.getElementById('cust-numero').focus();
@@ -426,7 +501,9 @@ document.addEventListener('DOMContentLoaded', () => {
             visa: 'linear-gradient(135deg, #1a1f71, #2e5bd8)',
             master: 'linear-gradient(135deg, #232526, #414345)',
             elo: 'linear-gradient(135deg, #101010, #363636)',
-            amex: 'linear-gradient(135deg, #2e77bb, #153e63)'
+            amex: 'linear-gradient(135deg, #2e77bb, #153e63)',
+            hiper: 'linear-gradient(135deg, #8b1f24, #4a0d10)',
+            diners: 'linear-gradient(135deg, #2e6da4, #14324d)'
         };
         // Emissores por BIN (6 dígitos) — melhor esforço; cor + nome do banco
         const CARD_ISSUERS = [
@@ -442,15 +519,40 @@ document.addEventListener('DOMContentLoaded', () => {
             { name: 'PicPay', grad: 'linear-gradient(135deg, #11c76f, #0a8f4f)', bins: ['507860'] }
         ];
 
+        // Cor + nome por EMISSOR real (nome vem do Mercado Pago = confiável, cobre qualquer banco).
+        // Fonte da verdade; o CARD_ISSUERS acima é só o palpite instantâneo enquanto o MP não responde.
+        const ISSUER_COLORS = [
+            { re: /nu.?bank|nubank/i,   grad: 'linear-gradient(135deg, #a020f0, #6a0dad 55%, #3a0764)', label: 'Nubank' },
+            { re: /picpay/i,            grad: 'linear-gradient(135deg, #21c25e, #0a8f4f)',              label: 'PicPay' },
+            { re: /\bc6\b|c6 ?bank/i,   grad: 'linear-gradient(135deg, #3a3a3a, #0a0a0a)',              label: 'C6 Bank' },
+            { re: /inter/i,             grad: 'linear-gradient(135deg, #ff7a00, #e64a00)',              label: 'Inter' },
+            { re: /ita[uú]/i,           grad: 'linear-gradient(135deg, #ec7000, #003399)',              label: 'Itaú' },
+            { re: /bradesco/i,          grad: 'linear-gradient(135deg, #e11931, #7a0018)',              label: 'Bradesco' },
+            { re: /santander/i,         grad: 'linear-gradient(135deg, #ec0000, #8b0000)',              label: 'Santander' },
+            { re: /brasil|\bbb\b/i,     grad: 'linear-gradient(135deg, #0038a8, #f8d117)',              label: 'Banco do Brasil' },
+            { re: /caixa/i,             grad: 'linear-gradient(135deg, #0070c0, #f39200)',              label: 'Caixa' },
+            { re: /mercado ?pago|mp/i,  grad: 'linear-gradient(135deg, #00b1ea, #0068c9)',              label: 'Mercado Pago' },
+            { re: /neon/i,              grad: 'linear-gradient(135deg, #00e0d0, #0075e0)',              label: 'Neon' },
+            { re: /next/i,              grad: 'linear-gradient(135deg, #00ff5f, #009a3e)',              label: 'Next' },
+            { re: /\bpan\b/i,           grad: 'linear-gradient(135deg, #00a0df, #004b8d)',              label: 'Banco Pan' },
+            { re: /original/i,          grad: 'linear-gradient(135deg, #00a859, #005c30)',              label: 'Original' },
+            { re: /btg/i,               grad: 'linear-gradient(135deg, #1b3a5c, #0a1a2c)',              label: 'BTG' },
+            { re: /digio/i,             grad: 'linear-gradient(135deg, #0a3cff, #0026a8)',              label: 'Digio' },
+            { re: /will/i,              grad: 'linear-gradient(135deg, #ffd400, #e0a800)',              label: 'Will Bank' },
+        ];
+        const issuerColorByName = name => (name ? ISSUER_COLORS.find(x => x.re.test(name)) : null) || null;
+
         function detectBrand(number) {
             const c = number.replace(/\D/g, '');
             const mc = '<span class="mc"><span></span><span></span></span>';
             let brand;
             if (/^(4011|4312|4389|4514|4576|5041|5066|5090|6277|6362|6363|6504|6505|6516|6550)/.test(c))
                 brand = { id: 'elo', logo: '<span class="elo">elo</span>' };
+            else if (/^(606282|3841)/.test(c)) brand = { id: 'hiper', logo: '<span class="hiper">Hipercard</span>' };
             else if (/^4/.test(c)) brand = { id: 'visa', logo: '<span class="visa">VISA</span>' };
             else if (/^5[1-5]/.test(c) || /^2[2-7]/.test(c)) brand = { id: 'master', logo: mc };
             else if (/^3[47]/.test(c)) brand = { id: 'amex', logo: '<span class="amex">AMEX</span>' };
+            else if (/^(30[0-5]|36|38|39)/.test(c)) brand = { id: 'diners', logo: '<span class="diners">Diners</span>' };
             else brand = { id: 'visa', logo: '<i class="fa-solid fa-credit-card"></i>' };
 
             let issuer = '', grad = c.length >= 1 ? (BRAND_GRAD[brand.id] || '') : '';
@@ -481,6 +583,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 cardBrandLogo.classList.remove('brand-pop');
                 void cardBrandLogo.offsetWidth;
                 cardBrandLogo.classList.add('brand-pop');
+                // Brilho+glow varrendo o cartão uma vez quando a bandeira é RECONHECIDA (muda)
+                if (v.length >= 4 && info.id !== ccNum._brand) {
+                    ccNum._brand = info.id;
+                    animatedCard.classList.remove('recognized');
+                    void animatedCard.offsetWidth;
+                    animatedCard.classList.add('recognized');
+                } else if (v.length < 4) {
+                    ccNum._brand = '';
+                }
                 clearTimeout(ccNum._t);
                 ccNum._t = setTimeout(refreshInstallments, 500);
             });
@@ -513,7 +624,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let cardPaymentMethodId = '';
         async function refreshInstallments() {
             if (!installmentsSelect) return;
-            const amount = cartTotal();
+            const amount = cartTotal() + (shipSel && typeof shipSel.price === 'number' ? shipSel.price : 0);
             const bin = ccNum ? ccNum.value.replace(/\D/g, '').slice(0, 6) : '';
             if (!amount) return;
             if (bin.length < 6) {
@@ -526,10 +637,18 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const r = await fetch(`/api/checkout/installments?bin=${bin}&amount=${amount}`);
                 const d = await r.json();
-                if (d && d.ok && Array.isArray(d.installments) && d.installments.length) {
+                if (d && d.ok) {
                     cardPaymentMethodId = d.paymentMethodId || '';
-                    installmentsSelect.innerHTML = d.installments
-                        .map(o => `<option value="${o.installments}">${o.message}</option>`).join('');
+                    if (Array.isArray(d.installments) && d.installments.length) {
+                        installmentsSelect.innerHTML = d.installments
+                            .map(o => `<option value="${o.installments}">${o.message}</option>`).join('');
+                    }
+                    // Emissor real do MP → cor + nome autoritativos (cobre bancos fora da lista local)
+                    const ic = issuerColorByName(d.issuer);
+                    if (ic && animatedCard) {
+                        animatedCard.style.setProperty('--card-bg', ic.grad);
+                        if (cardIssuer) { cardIssuer.textContent = ic.label; cardIssuer.classList.add('show'); }
+                    }
                 }
             } catch (e) { lastInstallmentsKey = ''; }
         }
@@ -569,7 +688,7 @@ document.addEventListener('DOMContentLoaded', () => {
         async function payWithPix(customer, restore) {
             const res = await fetch('/api/orders', {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ customer, items: items() })
+                body: JSON.stringify({ customer, items: items(), shipping: { id: shipSel.id } })
             });
             const data = await res.json();
             if (!res.ok || data.erro) throw new Error(data.msg || 'Falha ao criar o pedido.');
@@ -615,6 +734,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     customer, items: items(),
+                    shipping: { id: shipSel.id },
                     token: tokenData.id,
                     paymentMethodId: cardPaymentMethodId || detectBrand(rawNum).id,
                     installments: parseInt(installmentsSelect.value, 10) || 1
@@ -632,6 +752,7 @@ document.addEventListener('DOMContentLoaded', () => {
         payBtn.addEventListener('click', async () => {
             const customer = collectCustomer();
             if (!customer) return;
+            if (!shipSel) { invalid('Escolha uma forma de entrega para continuar.'); return; }
 
             const original = payBtn.innerHTML;
             const restore = () => { payBtn.disabled = false; payBtn.innerHTML = original; };
@@ -877,7 +998,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!target) return;
         a.addEventListener('click', (e) => {
             e.preventDefault();
-            lenis.scrollTo(target, { offset: -80 });
+            // #beneficios vive dentro do hero e só surge (opacidade) após ~60% do scroll do hero;
+            // rolar para ~72% do hero garante que os cards apareçam, em vez do topo do elemento.
+            // O menu mobile aberto pausa o Lenis (lenis.stop). Ao clicar num link, o menu fecha
+            // e o Lenis é reativado só no próximo tick (via MutationObserver) — tarde demais para
+            // o scrollTo. Reativamos aqui na hora para a rolagem acontecer de fato.
+            lenis.start();
+            if (id === '#beneficios' && target.classList.contains('hero__content')) {
+                const hero = document.querySelector('.hero');
+                if (hero) return lenis.scrollTo((hero.offsetHeight - window.innerHeight) * 0.72, { offset: 0, force: true });
+            }
+            lenis.scrollTo(target, { offset: -110, force: true });
         });
     });
 
@@ -907,6 +1038,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     ScrollTrigger.refresh();
+
+    // Deep-link (#secao ao chegar de outra página, ex.: revendedor → index.html#beneficios):
+    // o pulo nativo do navegador ignora a navbar fixa e o reveal do hero. Reposiciona certo
+    // DEPOIS do load (fontes/imagens mudam a altura) e vencendo o pulo nativo.
+    if (location.hash && location.hash.length > 1) {
+        const goToHash = () => {
+            const target = document.querySelector(location.hash);
+            if (!target) return;
+            if (location.hash === '#beneficios' && target.classList.contains('hero__content')) {
+                const hero = document.querySelector('.hero');
+                if (hero) return lenis.scrollTo((hero.offsetHeight - window.innerHeight) * 0.72, { offset: 0, immediate: true, force: true });
+            }
+            lenis.scrollTo(target, { offset: -110, immediate: true, force: true });
+        };
+        const run = () => setTimeout(goToHash, 300);
+        if (document.readyState === 'complete') run();
+        else window.addEventListener('load', run, { once: true });
+    }
 })();
 
 /* ---------------- Hero Ironhill: dissolve (Three.js) + reveal de texto + parallax dos galhos ---------------- */
@@ -1060,8 +1209,8 @@ document.addEventListener('DOMContentLoaded', () => {
         scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true },
     });
 
-    // Efeito de balanço 3D imersivo ao mover o mouse (Mouse Sway & Tilt)
-    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    // Efeito de balanço 3D imersivo ao mover o mouse (Mouse Sway & Tilt) — sempre ativo
+    if (true) {
         const layers = [...hero.querySelectorAll('[data-sway], [data-tilt]')];
         let tx = 0, ty = 0, cx = 0, cy = 0, raf = null;
 
@@ -1102,21 +1251,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const cards = document.querySelectorAll('.pricing-card');
     if (!cards.length) return;
 
-    // Entrada zoom-in (GSAP) — devolve o controle ao CSS com clearProps para preservar
-    // o scale(1.05) do card central e os hovers de CSS.
-    if (!prefersReduced && typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
-        gsap.registerPlugin(ScrollTrigger);
-        gsap.from(cards, {
-            opacity: 0,
-            scale: 0.8,
-            transformOrigin: '50% 50%',
-            duration: 0.6,
-            ease: 'back.out(1.4)',
-            stagger: { each: 0.12, from: 'center' },
-            scrollTrigger: { trigger: '.pricing-grid', start: 'top 82%', once: true },
-            clearProps: 'opacity,transform',
-        });
-    }
+    // Entrada dos cards fica só com o reveal por CSS (classe .reveal no HTML).
+    // Antes havia TAMBÉM um gsap.from(zoom-in): o revealFunction deixava o card visível
+    // e, logo depois, o gsap.from o escondia para reanimar — causando o "flash" ao carregar.
 
     // Botão magnético — só com ponteiro fino (desktop) e sem reduced-motion
     const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;

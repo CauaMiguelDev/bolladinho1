@@ -23,6 +23,9 @@ function loadConfig() {
         adminPassword: process.env.ADMIN_PASSWORD || '',
         notifyEmail: process.env.NOTIFY_EMAIL || '',
         shippingFlat: Number(process.env.SHIPPING_FLAT) || 0,
+        superFreteToken: process.env.SUPERFRETE_TOKEN || '',
+        originCep: process.env.ORIGIN_CEP || '',
+        shipPackage: { height: 4, width: 12, length: 17, weight: 0.3 },
     };
 }
 const CONFIG = loadConfig();
@@ -125,6 +128,60 @@ async function mpFetch(endpoint, options = {}) {
         throw err;
     }
     return data;
+}
+
+/* ---------------- SuperFrete (cálculo de entrega) ---------------- */
+const SHIP_SERVICES = '1,2,3,17,31'; // PAC, SEDEX, Jadlog, Mini Envios, LOGGI
+
+/* Opções locais fixas — não passam pela SuperFrete (pagas/combinadas fora do site) */
+const LOCAL_SHIPPING = {
+    motoboy: { id: 'motoboy', name: 'Via MotoBoy (a combinar)', price: 0 },
+    retirar: { id: 'retirar', name: 'Retirar na Loja', price: 0 },
+};
+
+/* Cotação na SuperFrete: devolve [] se não configurado ou sem resultado */
+async function superFreteQuote(destCep) {
+    const origin = String(CONFIG.originCep || '').replace(/\D/g, '');
+    const dest = String(destCep || '').replace(/\D/g, '');
+    if (!CONFIG.superFreteToken || origin.length !== 8 || dest.length !== 8) return [];
+    const pkg = CONFIG.shipPackage || { height: 4, width: 12, length: 17, weight: 0.3 };
+    const res = await fetch('https://api.superfrete.com/api/v0/calculator', {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${CONFIG.superFreteToken}`,
+            'User-Agent': `Bolladinho (${CONFIG.notifyEmail || 'contato@bolladinho.com'})`,
+            'accept': 'application/json',
+            'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+            from: { postal_code: origin },
+            to: { postal_code: dest },
+            services: SHIP_SERVICES,
+            options: { own_hand: false, receipt: false, use_insurance_value: false },
+            package: pkg,
+        }),
+    });
+    const data = await res.json().catch(() => []);
+    if (!Array.isArray(data)) return [];
+    return data
+        .filter(s => s && !s.has_error && s.price != null)
+        .map(s => ({
+            id: s.id,
+            name: /jadlog/i.test(s.name) ? 'Jadlog' : s.name,
+            company: s.company && s.company.name,
+            price: Number(s.price),
+            days: s.delivery_time,
+        }));
+}
+
+/* Resolve a opção escolhida pelo cliente com PREÇO DO SERVIDOR (evita adulteração) */
+async function resolveShipping(sel, destCep) {
+    const id = sel && sel.id;
+    if (id === 'motoboy' || id === 'retirar') return LOCAL_SHIPPING[id];
+    const quotes = await superFreteQuote(destCep);
+    const found = quotes.find(q => String(q.id) === String(id));
+    if (!found) return null; // opção inválida ou cotação expirada
+    return { id: found.id, name: found.name, price: found.price };
 }
 
 /* Marca pedido como pago e baixa o estoque (idempotente) */
@@ -302,13 +359,16 @@ async function buildOrderFromRequest(body) {
         orderItems.push({ id: p.id, name: p.name, price: p.price, qty });
     }
     const subtotal = orderItems.reduce((s, i) => s + i.price * i.qty, 0);
-    const shipping = Number(CONFIG.shippingFlat) || 0;
+    const ship = await resolveShipping(body.shipping, cep);
+    if (!ship) return fail(400, 'Escolha uma forma de entrega válida.');
+    const shipping = ship.price;
     const total = subtotal + shipping;
 
     const order = {
         id: crypto.randomUUID(),
         createdAt: new Date().toISOString(),
         status: 'aguardando_pagamento',
+        shippingName: ship.name,
         customer: {
             nome: String(customer.nome).trim().slice(0, 100),
             cpf: cpfDigits,
@@ -334,6 +394,23 @@ const routes = {
         sendJSON(res, 200, { publicKey: CONFIG.mpPublicKey });
     },
 
+    /* Formas de entrega para um CEP: SuperFrete (Correios/transportadoras) + opções locais */
+    'POST /api/frete': async (req, res) => {
+        const body = await readBody(req).catch(() => ({}));
+        const cep = String(body.cep || '').replace(/\D/g, '');
+        if (cep.length !== 8) return sendJSON(res, 400, { erro: true, msg: 'CEP inválido.' });
+        let correios = [];
+        try { correios = await superFreteQuote(cep); }
+        catch (e) { console.error('SuperFrete:', e.message); }
+        // ponytail: motoboy/retirar aparecem sempre com nota "Só Brasília"; sem geo-gate por UF
+        const options = [
+            ...correios.map(c => ({ ...c, kind: 'correios' })),
+            { id: 'motoboy', kind: 'local', name: 'Via MotoBoy', price: null, priceLabel: 'A combinar', note: 'WhatsApp · Só Brasília' },
+            { id: 'retirar', kind: 'local', name: 'Retirar na Loja', price: 0, priceLabel: 'Grátis', note: 'Brasília · a partir de amanhã' },
+        ];
+        sendJSON(res, 200, { ok: true, options });
+    },
+
     /* Parcelas reais do emissor para o BIN digitado (o que aparece = o que o banco cobra) */
     'GET /api/checkout/installments': async (req, res, urlObj) => {
         const bin = (urlObj.searchParams.get('bin') || '').replace(/\D/g, '').slice(0, 8);
@@ -347,6 +424,7 @@ const routes = {
             sendJSON(res, 200, {
                 ok: true,
                 paymentMethodId: first.payment_method_id,
+                issuer: first.issuer ? first.issuer.name : '', // banco emissor real (p/ colorir o cartão)
                 installments: (first.payer_costs || []).map(c => ({
                     installments: c.installments,
                     message: c.recommended_message
@@ -519,7 +597,9 @@ const routes = {
             orderItems.push({ id: p.id, name: p.name, price: p.price, qty });
         }
         const subtotal = orderItems.reduce((s, i) => s + i.price * i.qty, 0);
-        const shipping = Number(CONFIG.shippingFlat) || 0;
+        const ship = await resolveShipping(body.shipping, cep);
+        if (!ship) return sendJSON(res, 400, { erro: true, msg: 'Escolha uma forma de entrega válida.' });
+        const shipping = ship.price;
         const total = subtotal + shipping;
 
         // Cria o pedido
@@ -528,6 +608,7 @@ const routes = {
             id: orderId,
             createdAt: new Date().toISOString(),
             status: 'aguardando_pagamento',
+            shippingName: ship.name,
             customer: {
                 nome: String(customer.nome).trim().slice(0, 100),
                 cpf: cpfDigits,
