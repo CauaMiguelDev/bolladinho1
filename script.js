@@ -4,6 +4,14 @@
    Pagamento: Mercado Pago Checkout Pro (PIX, cartão, boleto).
    ============================================================ */
 
+/* Base da API: vazio = mesmo servidor. No GitHub Pages o config.js pode apontar
+   para o servidor no Render (window.BOLLA_API); sem isso a loja roda em modo
+   vitrine: o checkout funciona igual, mas o pedido é concluído pelo WhatsApp. */
+const API = String(window.BOLLA_API || '').replace(/\/+$/, '');
+const STATIC_HOST = /\.github\.io$/.test(location.hostname);
+const OFFLINE = STATIC_HOST && !API;
+const WHATSAPP = '5561995636229';
+
 document.addEventListener('DOMContentLoaded', () => {
 
     const formatBRL = v => `R$ ${v.toFixed(2).replace('.', ',')}`;
@@ -105,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let productsCache = [];
     const pricingGrid = document.querySelector('.pricing-grid');
     if (pricingGrid) {
-        fetch('/api/products')
+        fetch(API + '/api/products')
             .then(r => r.json())
             .then(products => {
                 productsCache = products;
@@ -249,20 +257,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     function closeCheckout() { if (checkoutOverlay) checkoutOverlay.classList.remove('active'); }
 
-    // Versão estática (GitHub Pages): não há servidor para pagamento/frete,
-    // então o pedido segue pelo WhatsApp da loja com o carrinho já escrito.
-    const STATIC_HOST = /\.github\.io$/.test(location.hostname);
-    if (STATIC_HOST && checkoutBtn) checkoutBtn.innerHTML = '<i class="fa-brands fa-whatsapp"></i> Finalizar pelo WhatsApp';
-    function checkoutViaWhatsApp() {
-        const lines = cart.map(i => `• ${i.qty}x ${i.name} — ${formatBRL(i.price * i.qty)}`);
-        const msg = `Olá! Quero fazer um pedido Bolladinho:\n\n${lines.join('\n')}\n\nTotal: ${formatBRL(cartTotal())} + frete\n\nMeu CEP é: `;
-        window.open(`https://wa.me/5561995636229?text=${encodeURIComponent(msg)}`, '_blank', 'noopener');
-    }
-
     if (checkoutBtn) {
         checkoutBtn.addEventListener('click', () => {
             if (cart.length === 0) { alert('Seu carrinho está vazio!'); return; }
-            if (STATIC_HOST) return checkoutViaWhatsApp();
             openCheckout();
         });
     }
@@ -350,6 +347,7 @@ document.addEventListener('DOMContentLoaded', () => {
             31: { icon: 'fa-paper-plane',   color: '#a9dcb7', badge: 'Ágil' },
             motoboy: { icon: 'fa-motorcycle', color: '#33844f', badge: 'Imediato' },
             retirar: { icon: 'fa-store',      color: '#fec81d', badge: 'Retirada' },
+            combinar: { icon: 'fa-comments', color: '#74c08e', badge: 'Via WhatsApp' },
         };
         const shipDeadline = o => o.note ? o.note
             : (!o.days ? 'Prazo sob consulta' : `em até ${o.days} ${o.days === 1 ? 'dia útil' : 'dias úteis'}`);
@@ -389,8 +387,17 @@ document.addEventListener('DOMContentLoaded', () => {
             if (shippingHint) shippingHint.hidden = true;
             if (shippingOptions) { shippingOptions.hidden = true; shippingOptions.innerHTML = ''; }
             if (shippingLoading) shippingLoading.hidden = false;
+            if (OFFLINE) {
+                // sem servidor não há cotação: o valor do frete é combinado no WhatsApp
+                renderShipOptions([{ id: 'combinar', name: 'Envio para todo o Brasil', priceLabel: 'A combinar', price: 0, note: 'Correios ou transportadora — valor enviado no WhatsApp' }]);
+                if (shippingLoading) shippingLoading.hidden = true;
+                if (shippingOptions) shippingOptions.hidden = false;
+                const first = shippingOptions.querySelector('.ship-card');
+                if (first) first.click();
+                return;
+            }
             try {
-                const res = await fetch('/api/frete', {
+                const res = await fetch(API + '/api/frete', {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ cep })
                 });
@@ -423,8 +430,14 @@ document.addEventListener('DOMContentLoaded', () => {
             cepStatus.textContent = 'Buscando endereço...';
             cepStatus.className = 'cep-status';
             try {
-                const res = await fetch(`/api/cep?cep=${cep}`);
-                const data = await res.json();
+                let data;
+                if (OFFLINE) {
+                    const v = await (await fetch(`https://viacep.com.br/ws/${cep}/json/`)).json();
+                    data = v.erro ? { erro: true } : { rua: v.logradouro, bairro: v.bairro, cidade: v.localidade, uf: v.uf };
+                } else {
+                    const res = await fetch(API + `/api/cep?cep=${cep}`);
+                    data = await res.json();
+                }
                 if (data.erro) {
                     cepStatus.textContent = '✗ ' + (data.msg || 'CEP não encontrado. Verifique o número digitado.');
                     cepStatus.className = 'cep-status cep-error';
@@ -453,6 +466,13 @@ document.addEventListener('DOMContentLoaded', () => {
             cepTimer = setTimeout(lookupCep, 350);
         });
         cepInput.addEventListener('blur', lookupCep);
+
+        if (OFFLINE) {
+            const note = document.querySelector('#pay-method-note p');
+            if (note) note.textContent = 'Ao finalizar, seu pedido vai direto para o nosso WhatsApp e enviamos na hora a chave PIX / QR Code para pagamento.';
+            const cf = document.getElementById('credit-card-form');
+            if (cf && !cf.querySelector('.offline-card-note')) cf.insertAdjacentHTML('afterbegin', '<p class="offline-card-note"><i class="fa-solid fa-shield-halved"></i> Os dados do cartão não saem do seu aparelho. Ao finalizar, enviamos pelo WhatsApp um link de pagamento seguro do Mercado Pago.</p>');
+        }
 
         /* Forma de pagamento: PIX (redireciona) ou Cartão (preenchido aqui mesmo) */
         const payNoteBox = document.getElementById('pay-method-note');
@@ -491,7 +511,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         /* Chave pública do Mercado Pago (para tokenizar o cartão no navegador) */
         let mpPublicKey = '';
-        fetch('/api/config').then(r => r.json()).then(c => { mpPublicKey = c.publicKey || ''; }).catch(() => {});
+        fetch(API + '/api/config').then(r => r.json()).then(c => { mpPublicKey = c.publicKey || ''; }).catch(() => {});
 
         // Algoritmo de Luhn: pega número digitado errado antes de enviar ao banco
         function luhnCheck(num) {
@@ -643,11 +663,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 installmentsSelect.innerHTML = `<option value="1">1x de ${formatBRL(amount)} à vista</option>`;
                 return;
             }
+            if (OFFLINE) return; // parcelas reais vêm do Mercado Pago, via servidor
             const key = bin + '|' + amount.toFixed(2);
             if (key === lastInstallmentsKey) return;
             lastInstallmentsKey = key;
             try {
-                const r = await fetch(`/api/checkout/installments?bin=${bin}&amount=${amount}`);
+                const r = await fetch(API + `/api/checkout/installments?bin=${bin}&amount=${amount}`);
                 const d = await r.json();
                 if (d && d.ok) {
                     cardPaymentMethodId = d.paymentMethodId || '';
@@ -702,7 +723,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const items = () => cart.map(i => ({ id: i.id, qty: i.qty }));
 
         async function payWithPix(customer, restore) {
-            const res = await fetch('/api/orders', {
+            const res = await fetch(API + '/api/orders', {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ customer, items: items(), shipping: { id: shipSel.id } })
             });
@@ -746,7 +767,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error('Não foi possível validar o cartão. Confira número, validade e CVV, ou use outro cartão.');
 
             // 2) Envia o token ao servidor para concluir o pagamento
-            const payRes = await fetch('/api/checkout/pay-card', {
+            const payRes = await fetch(API + '/api/checkout/pay-card', {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     customer, items: items(),
@@ -762,13 +783,29 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('bolla_last_order', payData.orderId);
             cart = []; saveCart(); updateCartUI();
             const kind = payData.status === 'aguardando_pagamento' ? 'pendente' : 'sucesso';
-            window.location.href = `/?pagamento=${kind}&pedido=${payData.orderId}`;
+            window.location.href = `./?pagamento=${kind}&pedido=${payData.orderId}`;
         }
+
+        // Modo vitrine: o pedido completo (dados + endereço + forma de pagamento) segue
+        // para o WhatsApp da loja. Dados do cartão NUNCA entram na mensagem.
+        function finishViaWhatsApp(customer) {
+            const lines = cart.map(i => `• ${i.qty}x ${i.name} — ${formatBRL(i.price * i.qty)}`);
+            const end = `${customer.rua}, ${customer.numero}${customer.complemento ? ' — ' + customer.complemento : ''}, ${customer.bairro}, ${customer.cidade}/${customer.uf} — CEP ${customer.cep}`;
+            const pay = payMethod === 'cartao'
+                ? `Cartão de crédito${installmentsSelect && installmentsSelect.value !== '1' ? ` (${installmentsSelect.value}x)` : ''} — aguardo o link seguro de pagamento`
+                : 'PIX — aguardo a chave/QR Code';
+            const msg = `Olá! Quero finalizar meu pedido Bolladinho 🌿\n\n${lines.join('\n')}\nSubtotal: ${formatBRL(cartTotal())}\nFrete: a combinar\n\n*Pagamento:* ${pay}\n\n*Nome:* ${customer.nome}\n*CPF:* ${customer.cpf}\n*E-mail:* ${customer.email}\n*WhatsApp:* ${customer.whatsapp}\n*Endereço:* ${end}`;
+            [ccNum, ccName, ccExp, ccCsc].forEach(el => { if (el) el.value = ''; });
+            window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`, '_blank', 'noopener');
+        }
+
+        if (OFFLINE) payBtn.innerHTML = '<i class="fa-brands fa-whatsapp"></i> Finalizar pedido';
 
         payBtn.addEventListener('click', async () => {
             const customer = collectCustomer();
             if (!customer) return;
             if (!shipSel) { invalid('Escolha uma forma de entrega para continuar.'); return; }
+            if (OFFLINE) return finishViaWhatsApp(customer);
 
             const original = payBtn.innerHTML;
             const restore = () => { payBtn.disabled = false; payBtn.innerHTML = original; };
@@ -814,7 +851,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (orderId && (kind === 'sucesso' || kind === 'pendente')) {
-            fetch('/api/orders/verify', {
+            fetch(API + '/api/orders/verify', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ orderId, paymentId })
@@ -875,7 +912,7 @@ document.addEventListener('DOMContentLoaded', () => {
             { name: 'Rafael S.', city: 'São Paulo - SP', rating: 5, text: 'Chegou super rápido e bem embalado. Cada peça realmente é única, a minha tem um tom de madeira lindo. Compra que valeu cada centavo.' }
         ];
 
-        fetch('/api/comments')
+        fetch(API + '/api/comments')
             .then(r => r.json())
             .then(comments => {
                 if (comments.length) renderComments(comments);
@@ -917,7 +954,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
                 try {
-                    const res = await fetch('/api/comments', {
+                    const res = await fetch(API + '/api/comments', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ name, city, text, rating: selectedRating })
@@ -939,7 +976,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /* ---------------- Prova social: vendas reais ---------------- */
     if (window.innerWidth >= 480) {
-        fetch('/api/social')
+        fetch(API + '/api/social')
             .then(r => r.json())
             .then(purchases => {
                 if (!purchases.length) return;

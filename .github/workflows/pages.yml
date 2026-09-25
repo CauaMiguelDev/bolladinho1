@@ -23,9 +23,13 @@ jobs:
       - name: Montar site estático
         run: |
           mkdir -p _site
-          cp index.html revendedor.html admin.html style.css enhance.css enhance.js script.js admin-design.css admin-enhance.css _site/
+          cp index.html revendedor.html admin.html config.js style.css enhance.css enhance.js script.js admin-design.css admin-enhance.css _site/
           cp -r img assets _site/
           touch _site/.nojekyll
+          # URL do servidor (Render) vinda da variável do repositório BOLLA_API, se existir
+          if [ -n "${{ vars.BOLLA_API }}" ]; then
+            printf "window.BOLLA_API = '%s';\n" "${{ vars.BOLLA_API }}" > _site/config.js
+          fi
       - name: Publicar na branch gh-pages
         run: |
           cd _site
