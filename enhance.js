@@ -30,7 +30,37 @@
         initCartBump();
         initFooter();
         initCheckout();
+        initMarquee();
     });
+
+    /* ---------------- Depoimentos em carrossel contínuo ----------------
+       Com 4+ avaliações a grade deixava um card órfão na 2ª linha. Os cards
+       passam para uma trilha que desliza sem parar (pausa no hover/foco);
+       a segunda metade é cópia decorativa, escondida de leitores de tela. */
+    function initMarquee() {
+        const grid = $('#testimonials-grid');
+        if (!grid) return;
+        const build = () => {
+            if (grid.classList.contains('is-marquee')) return;
+            const cards = $$(':scope > .testimonial-card', grid);
+            if (cards.length < 4) return;
+            const track = document.createElement('div');
+            track.className = 't-track';
+            cards.forEach(c => { c.classList.add('active'); track.appendChild(c); });
+            cards.forEach(c => {
+                const k = c.cloneNode(true);
+                k.setAttribute('aria-hidden', 'true');
+                k._tilt2 = false;
+                track.appendChild(k);
+            });
+            track.style.setProperty('--t-dur', (cards.length * 11) + 's');
+            grid.classList.add('is-marquee');
+            grid.appendChild(track);
+        };
+        build();
+        new MutationObserver(() => { if (!grid.querySelector('.t-track')) { grid.classList.remove('is-marquee'); build(); } })
+            .observe(grid, { childList: true });
+    }
 
     /* ---------------- Navegação ---------------- */
     function initNav() {
