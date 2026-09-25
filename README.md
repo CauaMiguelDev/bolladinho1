@@ -1,72 +1,108 @@
-# Bolladinho
+<div align="center">
 
-Site institucional e loja da **Bolladinho** — a primeira piteira de fibras naturais (bambu).
-Landing page com hero cinematográfico (dissolve em Three.js), catálogo, carrinho, checkout
-via Mercado Pago (PIX / cartão / boleto), página de revendedor e painel administrativo.
+# 🌿 Bolladinho
 
-## Stack
+**A primeira piteira de fibras naturais do mercado — feita de bambu selecionado.**
+Biodescartável, reutilizável e única como uma impressão digital.
 
-- **Front-end:** HTML + CSS + JavaScript puro (sem framework). GSAP, Lenis e Three.js via CDN.
-- **Back-end:** Node.js puro (sem dependências externas) — `server.js`.
-- **Pagamento:** Mercado Pago Checkout Pro.
-- **Dados:** arquivos JSON em `data/`.
+[![Site no ar](https://img.shields.io/badge/🌐_site_no_ar-cauamigueldev.github.io%2Fbolladinho1-2f8f5b?style=for-the-badge)](https://cauamigueldev.github.io/bolladinho1/)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/CauaMiguelDev/bolladinho1)
 
-## Estrutura
+[![Instagram](https://img.shields.io/badge/Instagram-@soubolladinho-4aa168?logo=instagram&logoColor=white)](https://www.instagram.com/soubolladinho)
+![Node](https://img.shields.io/badge/Node.js-18%2B-33844f?logo=node.js&logoColor=white)
+![Sem dependências](https://img.shields.io/badge/depend%C3%AAncias-zero-74c08e)
+![Mercado Pago](https://img.shields.io/badge/pagamento-Mercado_Pago-266b3f)
+
+### 👉 [**Acessar o site**](https://cauamigueldev.github.io/bolladinho1/) · [**Seja revendedor**](https://cauamigueldev.github.io/bolladinho1/revendedor.html)
+
+</div>
+
+---
+
+## 🌐 Onde o site está no ar
+
+| Versão | Link | O que funciona |
+|---|---|---|
+| **Vitrine** (GitHub Pages) | **https://cauamigueldev.github.io/bolladinho1/** | Site inteiro navegável, produtos, depoimentos, página de revendedor (formulário envia por e-mail). O carrinho **finaliza o pedido pelo WhatsApp** da loja. Atualiza sozinho a cada push na `main`. |
+| **Loja completa** (Render) | clique em **Deploy to Render** acima | Tudo da vitrine **+** checkout com Mercado Pago (PIX e cartão), cálculo de frete (SuperFrete), estoque, avaliações moderadas e o painel admin em `/admin`. |
+
+> O GitHub Pages só hospeda arquivos estáticos, por isso a versão de lá não tem o servidor de
+> pagamento. Para a loja completa, use o Render (plano grátis disponível) — veja [Deploy](#-deploy-loja-completa-no-render).
+
+## ✨ O que tem no site
+
+- **Hero cinematográfico** — névoa em Three.js, dissolve e parallax reativo ao mouse.
+- **Visual "Mata Viva"** — paleta em tons de verde (musgo → jade → menta), fundo animado,
+  navegação em ilha de vidro com scrollspy, botões com hover suave e rodapé com chamada.
+- **Loja** — três caixas (Pequena, Média, Grande), carrinho lateral e checkout transparente
+  com validação ao vivo dos campos (CPF, e-mail, CEP com endereço automático, cartão).
+- **Pagamento** — Mercado Pago: PIX e cartão em até 12x.
+- **Revendedores** — página B2B com FAQ e cadastro de lojas.
+- **Painel admin** (`/admin`) — dashboard com período 7/14/30/90 dias, KPIs com tendência,
+  meta do mês, gráficos, estoque, regiões, avaliações, atividade recente, exportação CSV;
+  além de gestão de produtos, pedidos, comentários, leads e tentativas de pagamento.
+
+## 🧱 Stack
+
+- **Front-end:** HTML + CSS + JavaScript puro (sem framework, sem build). GSAP, Lenis, Three.js e Chart.js via CDN.
+- **Back-end:** Node.js puro, **sem nenhuma dependência** — `server.js`.
+- **Pagamento:** Mercado Pago · **Frete:** SuperFrete · **Dados:** arquivos JSON em `data/`.
+
+## 📁 Estrutura
 
 ```
-index.html          Landing page principal
-revendedor.html     Página de revendedor
-admin.html          Painel administrativo (/admin)
-style.css           Estilos do site
-admin-design.css    Estilos do painel
-script.js           Front-end (carrinho, produtos, hero, etc.)
-server.js           Servidor + API + integração Mercado Pago
-data/               Catálogo e dados (products.json versionado; pedidos/pagamentos ignorados)
-img/  assets/       Imagens e fontes
-DESIGN.md PRODUCT.md Documentação de design e produto
+index.html            Landing page + loja
+revendedor.html       Página de revendedor (B2B)
+admin.html            Painel administrativo (/admin)
+style.css             Estilos base do site
+enhance.css/.js       Camada visual "Mata Viva" (nav, rodapé, botões, checkout)
+admin-design.css      Estilos base do painel
+admin-enhance.css     Paleta verde + dashboard do painel
+script.js             Front-end (carrinho, produtos, hero, checkout)
+server.js             Servidor + API + Mercado Pago + SuperFrete
+render.yaml           Blueprint de deploy no Render
+.github/workflows/    Publicação automática da vitrine no GitHub Pages
+data/                 Catálogo e avaliações (pedidos/leads/pagamentos não são versionados)
+img/  assets/         Imagens e fontes
+DESIGN.md PRODUCT.md  Documentação de design e produto
 ```
 
-## Rodando localmente
+## 💻 Rodando localmente
 
-1. **Configure as credenciais** (não versionadas):
-   ```bash
-   cp server-config.example.json server-config.json
-   ```
-   Edite `server-config.json` com seu Access Token / Public Key do Mercado Pago e defina
-   usuário e senha do admin.
+```bash
+cp server-config.example.json server-config.json   # preencha as credenciais
+node server.js                                      # Node 18+
+```
 
-2. **Suba o servidor** (Node 18+):
-   ```bash
-   node server.js
-   ```
+- Site: http://localhost:8321
+- Admin: http://localhost:8321/admin
 
-3. Acesse:
-   - Site: http://localhost:8321
-   - Admin: http://localhost:8321/admin
+## 🚀 Deploy (loja completa no Render)
 
-## Deploy (colocar no ar)
+1. Clique em [**Deploy to Render**](https://render.com/deploy?repo=https://github.com/CauaMiguelDev/bolladinho1)
+   e faça login (dá para usar a conta do GitHub).
+2. O Render lê o `render.yaml` e pede as variáveis:
+   - `MP_ACCESS_TOKEN`, `MP_PUBLIC_KEY` — Mercado Pago (produção)
+   - `ADMIN_USER`, `ADMIN_PASSWORD` — login do painel `/admin`
+   - `SUPERFRETE_TOKEN`, `ORIGIN_CEP` — frete (SuperFrete + CEP de origem)
+   - `NOTIFY_EMAIL` (opcional)
+3. Em ~1 minuto o site fica no ar em `https://bolladinho.onrender.com` (ou o nome que o Render
+   atribuir). Coloque esse link na tabela lá em cima.
 
-Como o back-end é Node, **GitHub Pages não serve** (é só estático). Use um host que roda Node
-— ex.: **Render** (tem plano grátis). O app já está pronto: a porta usa `process.env.PORT` e
-as credenciais podem vir de **variáveis de ambiente** (quando não há `server-config.json`).
+> ⚠️ O disco do plano grátis é **efêmero**: pedidos e avaliações gravados em `data/` se perdem
+> a cada redeploy/restart, e o serviço hiberna após 15 min sem acesso. Para produção de
+> verdade, use o plano pago com disco ou migre os dados para um banco.
 
-No Render: *New → Web Service → conecte este repo* (ou use o `render.yaml` já incluído via
-*New → Blueprint*) e defina:
-- **Build Command:** (vazio)
-- **Start Command:** `node server.js`
-- **Environment Variables:**
-  - `MP_ACCESS_TOKEN`, `MP_PUBLIC_KEY` — Mercado Pago (produção)
-  - `ADMIN_USER`, `ADMIN_PASSWORD` — login do painel `/admin`
-  - `SUPERFRETE_TOKEN`, `ORIGIN_CEP` — cálculo de frete (SuperFrete + CEP de origem da loja)
-  - `NOTIFY_EMAIL` (opcional), `SHIPPING_FLAT` (opcional)
+## 🔒 Segurança
 
-> ⚠️ O disco do host é **efêmero**: dados gravados em `data/` (pedidos, avaliações) se perdem
-> a cada redeploy/restart. Para produção de verdade, migrar esses dados para um banco.
-
-## Segurança
-
-- `server-config.json` **nunca** vai para o repositório (está no `.gitignore`). Guarda o
-  token do Mercado Pago e a senha do admin.
-- Os arquivos de runtime em `data/` (`orders.json`, `payment-attempts.json`,
+- `server-config.json` **nunca** vai para o repositório (`.gitignore`): guarda o token do
+  Mercado Pago e a senha do admin.
+- Arquivos de runtime em `data/` (`orders.json`, `payment-attempts.json`,
   `payment-errors.json`, `reseller-leads.json`) são ignorados por conterem dados de clientes.
-  O servidor os recria vazios quando ausentes.
+- A versão do GitHub Pages publica só arquivos públicos (HTML, CSS, JS e imagens) — nada do servidor nem do painel.
+
+---
+
+<div align="center">
+Feito com 🌿 no Brasil · <a href="https://www.instagram.com/soubolladinho">@soubolladinho</a>
+</div>

@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.cdnfonts.com/css/gt-america-trial">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="enhance.css">
 </head>
 
 <body>
@@ -38,6 +39,7 @@
                     <a href="https://www.instagram.com/soubolladinho" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-instagram"></i></a>
                     <a href="index.html#comprar" aria-label="Comprar"><i class="fa-solid fa-cart-shopping"></i></a>
                 </div>
+                <a href="#cadastro" class="nav-cta">Seja parceiro <i class="fa-solid fa-arrow-right"></i></a>
                 <button id="menu-toggle" class="menu-toggle" aria-label="Abrir menu"><i class="fa-solid fa-bars"></i></button>
             </div>
         </div>
@@ -241,11 +243,23 @@
     </main>
 
     <footer class="footer">
+        <div class="container">
+            <div class="footer-cta">
+                <div>
+                    <small><i class="fa-solid fa-handshake"></i> Parceria Bolladinho</small>
+                    <h3>Leve a natureza para o seu balcão.</h3>
+                    <p>Cadastre sua loja e receba o material de venda: fotos, displays e flyers.</p>
+                </div>
+                <div class="footer-cta-actions">
+                    <a href="#cadastro" class="btn btn-primary"><i class="fa-solid fa-store"></i> Cadastrar minha loja</a>
+                    <a href="index.html#comprar" class="btn btn-outline"><i class="fa-solid fa-cart-shopping"></i> Comprar</a>
+                </div>
+            </div>
+        </div>
         <div class="container footer-content">
             <div class="footer-brand">
                 <a href="index.html" class="logo"><i class="fa-solid fa-leaf"></i> Bolladinho</a>
-                <p><span class="hide-mobile">Uma maneira natural de fumar. </span>A primeira piteira de fibras naturais
-                    do mercado.</p>
+                <p><span class="hide-mobile">Uma maneira natural de fumar. </span>A primeira piteira de fibras naturais do mercado.</p>
             </div>
             <div class="footer-links">
                 <h4>Navegação</h4>
@@ -254,6 +268,7 @@
                     <li><a href="index.html#beneficios">Benefícios</a></li>
                     <li><a href="index.html#detalhes">Detalhes</a></li>
                     <li><a href="index.html#comprar">Comprar</a></li>
+                    <li><a href="#faq">Dúvidas frequentes</a></li>
                 </ul>
             </div>
             <div class="footer-contact">
@@ -264,14 +279,18 @@
             <div class="footer-social">
                 <h4>Siga-nos</h4>
                 <div class="social-icons">
-                    <a href="https://www.instagram.com/soubolladinho" target="_blank" rel="noopener noreferrer"><i
-                            class="fa-brands fa-instagram"></i></a>
+                    <a href="https://www.instagram.com/soubolladinho" target="_blank" rel="noopener noreferrer" aria-label="Instagram @soubolladinho"><i class="fa-brands fa-instagram"></i></a>
                 </div>
+                <p>@soubolladinho</p>
             </div>
         </div>
+        <div class="footer-wordmark" aria-hidden="true">Bolladinho</div>
         <div class="footer-bottom">
             <p>&copy; 2026 Bolladinho. Todos os direitos reservados. Uma maneira natural de fumar.</p>
-            <button type="button" class="admin-access" id="admin-access" aria-label="Acesso administrativo" title="Acesso admin"><i class="fa-solid fa-lock"></i></button>
+            <div class="footer-bottom-actions">
+                <button type="button" class="back-to-top" id="back-to-top">Voltar ao topo <i class="fa-solid fa-arrow-up"></i></button>
+                <button type="button" class="admin-access" id="admin-access" aria-label="Acesso administrativo" title="Acesso admin"><i class="fa-solid fa-lock"></i></button>
+            </div>
         </div>
     </footer>
 
@@ -282,6 +301,7 @@
     <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
     <script src="script.js"></script>
+    <script src="enhance.js"></script>
     <script>
         function toggleFaq(id) {
             const item = document.getElementById(id);

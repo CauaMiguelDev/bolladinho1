@@ -355,3 +355,15 @@ O elemento mais característico do sistema e o mais caro. Combina imagem de fund
 - **Don't** derivar para **SaaS minimalista**: branco liso, azul corporativo, Inter, cards sem material. Correto demais, sem natureza e sem memória.
 - **Don't** derivar para **eco genérico**: verde-claro de estoque, iconezinho de folha, textura de papel kraft, tipografia manuscrita. É o clichê mais próximo deste projeto e por isso o mais perigoso — a distância entre o Bambuzal à Meia-Noite e um selo de sustentabilidade de banco de imagens é toda a marca.
 - **Don't** replicar padrões de `plataforma/`. Aquele diretório é um sistema de e-commerce separado e não é autoridade visual deste projeto.
+
+## Atualização v2 — Mata Viva (set/2026)
+
+Camada nova carregada por último: `enhance.css` + `enhance.js` (vitrine) e `admin-enhance.css` (painel). **O hero não é tocado** — todo seletor da camada é escopado fora de `.hero`.
+
+- **Paleta em escala de verdes** (`--g-950` … `--g-100`: mata, musgo `#266b3f`, samambaia `#33844f`, jade `#4aa168`, menta `#74c08e`, menta pálida `#a9dcb7`), misturada em gradientes. O verde de ação deixa de ser chapado e vira `--grad-action`. O ouro continua raro.
+- **Fundo personalizado**: malha de luz verde fixa que respira + grão + fibras de bambu; seções translúcidas deixam a malha aparecer; holofote que segue o ponteiro no desktop; barra de progresso de leitura.
+- **Movimento**: uma curva (`--ease-silk: cubic-bezier(0.22,1,0.36,1)`), durações de 0.5–0.9s, só transform/opacity. Botões: gradiente que desliza + luz que segue o cursor + pressão `scale(.98)`. Tilt e botões magnéticos são interpolados (lerp), não saltam.
+- **Navegação**: ilha de vidro flutuante após o hero, links inline no desktop com indicador deslizante e scrollspy, esconde ao descer/volta ao subir.
+- **Rodapé**: faixa de chamada, colunas, assinatura gigante e "voltar ao topo". O acesso admin continua discreto.
+- **Checkout**: ícones nos campos, validação ao vivo com ✓/!, erro inline (sem `alert`), progresso das 3 etapas, total que pisca ao mudar, fretes em tons de verde.
+- **Painel**: a Regra da Fronteira foi revista a pedido do dono — o painel agora vive na mesma mata (verde-noite + escala jade/menta) em vez de preto/platina. Cores de estado seguem com significado próprio e sempre com rótulo. Dashboard novo: período 7/14/30/90 dias, KPIs com tendência vs período anterior e sparkline, meta do mês editável, faturamento com comparação, status em rosca, dia da semana, formas de pagamento, estoque, regiões, avaliações, atividade recente, exportar CSV e atualização automática.

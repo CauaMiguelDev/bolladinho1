@@ -142,6 +142,8 @@
             .bg-glow-spot-1, .bg-glow-spot-2, .bg-glow-spot-3, .tab-panel, .kpi-card, .login-card { animation: none !important; }
         }
     </style>
+    <!-- Camada de realce: paleta verde, botões macios, dashboard novo -->
+    <link rel="stylesheet" href="admin-enhance.css">
 </head>
 <body>
 <div class="admin-main-container">
@@ -241,45 +243,118 @@
             <div class="admin-main-content">
                 <!-- DASHBOARD -->
                 <div class="tab-panel active" id="tab-dash">
-                    <div class="ag-hero">
-                        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
-                            <span class="ag-hero-pill"><span class="live-dot"></span> Loja Online</span>
-                            <span class="ag-hero-date" id="hero-date" style="text-transform:capitalize;"></span>
+                    <!-- Hero: saudação + resumo + meta do mês -->
+                    <div class="ag-hero dash-hero">
+                        <div class="dash-hero-main">
+                            <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+                                <span class="ag-hero-pill"><span class="live-dot"></span> Loja Online</span>
+                                <span class="ag-hero-date" id="hero-date" style="text-transform:capitalize;"></span>
+                            </div>
+                            <h1 id="hero-greeting">Bem-vindo</h1>
+                            <p id="hero-sub">Carregando os dados da sua loja…</p>
+                            <div class="dash-quick">
+                                <button class="premium-btn premium-btn-gold" data-jump="orders"><i class="fa-solid fa-receipt"></i> Ver pedidos</button>
+                                <button class="premium-btn" data-jump="products"><i class="fa-solid fa-box"></i> Estoque</button>
+                                <button class="premium-btn" data-jump="comments"><i class="fa-solid fa-comments"></i> Moderar</button>
+                                <a class="premium-btn" href="/" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Ver site</a>
+                            </div>
                         </div>
-                        <h1 id="hero-greeting">Bem-vindo 👋</h1>
-                        <p id="hero-sub">Carregando os dados da sua loja…</p>
-                        <div style="display:flex;gap:12px;flex-wrap:wrap;">
-                            <button class="premium-btn premium-btn-gold" style="padding:11px 22px;" data-jump="orders"><i class="fa-solid fa-receipt"></i> Ver pedidos</button>
-                            <button class="premium-btn" style="padding:11px 22px;" data-jump="products"><i class="fa-solid fa-box"></i> Gerenciar estoque</button>
+                        <div class="goal-card" id="goal-card">
+                            <div class="goal-ring">
+                                <svg viewBox="0 0 120 120" aria-hidden="true">
+                                    <defs><linearGradient id="goalGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a9dcb7"/><stop offset="1" stop-color="#33844f"/></linearGradient></defs>
+                                    <circle cx="60" cy="60" r="50" class="goal-track"/>
+                                    <circle cx="60" cy="60" r="50" class="goal-bar" id="goal-bar"/>
+                                </svg>
+                                <div class="goal-center"><strong id="goal-pct">0%</strong><span>da meta</span></div>
+                            </div>
+                            <div class="goal-info">
+                                <span class="goal-lbl">Meta de <span id="goal-month"></span></span>
+                                <div class="goal-val"><b id="goal-done">R$ 0,00</b> <span>de</span> <button type="button" class="goal-edit" id="goal-edit" title="Editar meta"><span id="goal-target">R$ 0,00</span> <i class="fa-solid fa-pen"></i></button></div>
+                                <span class="goal-sub" id="goal-sub"></span>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="kpi-grid" id="kpi-grid"></div>
+                    <!-- Barra de controle: período, atualização automática, exportação -->
+                    <div class="dash-toolbar">
+                        <div class="seg" id="period-seg" role="tablist" aria-label="Período">
+                            <span class="seg-thumb" aria-hidden="true"></span>
+                            <button type="button" data-days="7">7 dias</button>
+                            <button type="button" data-days="14">14 dias</button>
+                            <button type="button" data-days="30" class="on">30 dias</button>
+                            <button type="button" data-days="90">90 dias</button>
+                        </div>
+                        <div class="dash-toolbar-right">
+                            <span class="dash-updated" id="dash-updated"><i class="fa-regular fa-clock"></i> —</span>
+                            <label class="auto-toggle" title="Atualiza sozinho a cada 60 s">
+                                <input type="checkbox" id="auto-refresh"><span class="sw"></span> Auto
+                            </label>
+                            <button class="btn ghost small" id="export-csv"><i class="fa-solid fa-file-arrow-down"></i> Exportar CSV</button>
+                            <button class="btn ghost small" id="refresh-dash"><i class="fa-solid fa-rotate"></i> Atualizar</button>
+                        </div>
+                    </div>
+
+                    <!-- KPIs principais (com tendência vs período anterior e sparkline) -->
+                    <div class="kpi-grid kpi-main" id="kpi-grid"></div>
+                    <!-- Indicadores de operação (clicáveis) -->
+                    <div class="ops-strip" id="ops-strip"></div>
                     <div id="low-stock-alert"></div>
 
-                    <div class="cards-row">
-                        <div class="card">
-                            <h3><i class="fa-solid fa-chart-column"></i> Faturamento — últimos 14 dias</h3>
-                            <div class="chart-box"><canvas id="chart-revenue"></canvas></div>
+                    <div class="dash-grid">
+                        <div class="card span-8">
+                            <div class="card-h">
+                                <h3><i class="fa-solid fa-chart-area"></i> Faturamento <span class="card-h-sub" id="rev-sub"></span></h3>
+                                <div class="mini-seg" id="rev-metric">
+                                    <button type="button" data-m="revenue" class="on">R$</button>
+                                    <button type="button" data-m="orders">Pedidos</button>
+                                </div>
+                            </div>
+                            <div class="chart-box tall"><canvas id="chart-revenue" aria-label="Gráfico de faturamento por dia"></canvas></div>
                         </div>
-                        <div class="card">
-                            <h3><i class="fa-solid fa-chart-pie"></i> Pedidos por status</h3>
-                            <div class="chart-box"><canvas id="chart-status"></canvas></div>
+                        <div class="card span-4">
+                            <div class="card-h"><h3><i class="fa-solid fa-chart-pie"></i> Pedidos por status</h3></div>
+                            <div class="donut-wrap">
+                                <div class="chart-box donut"><canvas id="chart-status" aria-label="Pedidos por status"></canvas>
+                                    <div class="donut-center"><strong id="donut-total">0</strong><span>pedidos</span></div>
+                                </div>
+                                <ul class="legend-list" id="status-legend"></ul>
+                            </div>
+                        </div>
+
+                        <div class="card span-4">
+                            <div class="card-h"><h3><i class="fa-solid fa-ranking-star"></i> Produtos mais vendidos</h3></div>
+                            <ul class="rank-list" id="top-products"></ul>
+                        </div>
+                        <div class="card span-4">
+                            <div class="card-h"><h3><i class="fa-solid fa-calendar-week"></i> Vendas por dia da semana</h3></div>
+                            <div class="chart-box"><canvas id="chart-weekday" aria-label="Faturamento por dia da semana"></canvas></div>
+                        </div>
+                        <div class="card span-4">
+                            <div class="card-h"><h3><i class="fa-solid fa-wallet"></i> Formas de pagamento</h3></div>
+                            <div class="pay-split" id="pay-split"></div>
+                        </div>
+
+                        <div class="card span-4">
+                            <div class="card-h"><h3><i class="fa-solid fa-boxes-stacked"></i> Nível de estoque</h3><button class="link-btn" data-jump="products">Gerenciar <i class="fa-solid fa-arrow-right"></i></button></div>
+                            <ul class="stock-meters" id="stock-meters"></ul>
+                        </div>
+                        <div class="card span-4">
+                            <div class="card-h"><h3><i class="fa-solid fa-map-location-dot"></i> Onde estão seus clientes</h3></div>
+                            <ul class="rank-list" id="top-regions"></ul>
+                        </div>
+                        <div class="card span-4">
+                            <div class="card-h"><h3><i class="fa-solid fa-star-half-stroke"></i> Avaliações</h3><button class="link-btn" data-jump="comments">Moderar <i class="fa-solid fa-arrow-right"></i></button></div>
+                            <div class="rating-box" id="rating-box"></div>
+                        </div>
+
+                        <div class="card span-12">
+                            <div class="card-h"><h3><i class="fa-solid fa-wave-square"></i> Atividade recente</h3></div>
+                            <ul class="feed" id="activity-feed"></ul>
                         </div>
                     </div>
 
-                    <div class="cards-row" style="grid-template-columns: 1fr 1fr;">
-                        <div class="card">
-                            <h3><i class="fa-solid fa-ranking-star"></i> Produtos mais vendidos</h3>
-                            <div class="chart-box"><canvas id="chart-products"></canvas></div>
-                        </div>
-                        <div class="card">
-                            <h3><i class="fa-solid fa-star-half-stroke"></i> Avaliações dos clientes</h3>
-                            <div class="chart-box"><canvas id="chart-ratings"></canvas></div>
-                        </div>
-                    </div>
-
-                    <div class="section-h"><h2><i class="fa-solid fa-clock-rotate-left"></i> Últimos Pedidos</h2><button class="btn ghost small" id="refresh-dash"><i class="fa-solid fa-rotate"></i> Atualizar</button></div>
+                    <div class="section-h"><h2><i class="fa-solid fa-clock-rotate-left"></i> Últimos Pedidos</h2><button class="btn ghost small" data-jump="orders">Ver todos <i class="fa-solid fa-arrow-right"></i></button></div>
                     <div class="table-wrap">
                         <table>
                             <thead><tr><th>Data</th><th>Cliente</th><th>Itens</th><th>Total</th><th>Status</th></tr></thead>
@@ -474,7 +549,15 @@
         btn.addEventListener('click', () => goTab(btn.dataset.tab));
     });
     /* Botões de atalho do hero */
-    document.querySelectorAll('[data-jump]').forEach(b => b.addEventListener('click', () => goTab(b.dataset.jump)));
+    // delegado: os atalhos do dashboard são gerados dinamicamente (KPIs, feed, alertas)
+    document.addEventListener('click', e => {
+        const j = e.target.closest('[data-jump]');
+        if (j && !e.target.closest('#goal-edit')) { goTab(j.dataset.jump); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    });
+    document.addEventListener('keydown', e => {
+        const j = e.target.closest && e.target.closest('[data-jump][tabindex]');
+        if (j && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); goTab(j.dataset.jump); }
+    });
 
     /* ---- Busca na seção ativa ---- */
     function applySearch(q) {
@@ -507,113 +590,299 @@
 
     /* ---- Gráficos ---- */
     const charts = {};
+    // Escala verde do painel (mesma da vitrine) + cores de estado com rótulo sempre visível
+    const G = { 100: '#dcf1e2', 200: '#a9dcb7', 300: '#74c08e', 400: '#4aa168', 500: '#33844f', 600: '#266b3f', 700: '#1c5330' };
+    const STATUS_COLOR = { pago: '#74c08e', enviado: '#5fb3a0', entregue: '#2f8f5b', aguardando_pagamento: '#fec81d', cancelado: '#e4705e', recusado: '#e4705e' };
     if (typeof Chart !== 'undefined') {
-        Chart.defaults.color = '#8E8E93';
+        Chart.defaults.color = '#8fa89a';
         Chart.defaults.font.family = 'Plus Jakarta Sans, sans-serif';
-        Chart.defaults.borderColor = 'rgba(255,255,255,0.06)';
-    }
-    function drawCharts(orders, comments) {
-        if (typeof Chart === 'undefined') return;
-        Object.values(charts).forEach(c => c && c.destroy());
-        const paid = orders.filter(o => PAID.has(o.status));
-
-        // Faturamento últimos 14 dias
-        const days = [], labels = [], map = {};
-        for (let i = 13; i >= 0; i--) {
-            const d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() - i);
-            const key = d.toISOString().slice(0, 10);
-            days.push(key); map[key] = 0;
-            labels.push(d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }));
-        }
-        paid.forEach(o => { const k = new Date(o.createdAt).toISOString().slice(0, 10); if (k in map) map[k] += o.total; });
-        charts.rev = new Chart($('chart-revenue'), {
-            type: 'bar',
-            data: { labels, datasets: [{ label: 'Faturamento', data: days.map(k => map[k]), backgroundColor: 'rgba(0,230,118,0.55)', hoverBackgroundColor: '#00E676', borderRadius: 6, maxBarThickness: 26 }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => fmtBRL(c.raw) } } }, scales: { y: { ticks: { callback: v => 'R$' + v }, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false } } } }
+        Chart.defaults.font.size = 11.5;
+        Chart.defaults.borderColor = 'rgba(169,220,183,0.06)';
+        Object.assign(Chart.defaults.plugins.tooltip, {
+            backgroundColor: 'rgba(5,22,12,0.96)', borderColor: 'rgba(169,220,183,0.22)', borderWidth: 1,
+            titleColor: '#dcf1e2', bodyColor: '#cfe6d6', padding: 12, cornerRadius: 12, displayColors: true,
+            boxPadding: 4, usePointStyle: true, titleFont: { weight: '700' }
         });
-
-        // Pedidos por status
-        const sCount = {}; orders.forEach(o => sCount[o.status] = (sCount[o.status] || 0) + 1);
-        const sColors = { pago: '#00E676', aguardando_pagamento: '#FFD600', enviado: '#9fc2ff', entregue: '#c8c8ff', cancelado: '#FF1744', recusado: '#c0392b' };
-        const sKeys = Object.keys(sCount);
-        charts.status = new Chart($('chart-status'), {
-            type: 'doughnut',
-            data: { labels: sKeys.map(k => STATUS_LABEL[k] || k), datasets: [{ data: sKeys.map(k => sCount[k]), backgroundColor: sKeys.map(k => sColors[k] || '#777'), borderColor: 'rgba(0,0,0,0.2)', borderWidth: 2 }] },
-            options: { responsive: true, maintainAspectRatio: false, cutout: '62%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 12 } } } }
-        });
-
-        // Top produtos por unidades
-        const prod = {}; paid.forEach(o => o.items.forEach(i => prod[i.name] = (prod[i.name] || 0) + i.qty));
-        const top = Object.entries(prod).sort((a, b) => b[1] - a[1]).slice(0, 5);
-        charts.prod = new Chart($('chart-products'), {
-            type: 'bar',
-            data: { labels: top.map(t => t[0]), datasets: [{ label: 'Unidades', data: top.map(t => t[1]), backgroundColor: 'rgba(201,162,90,0.8)', hoverBackgroundColor: '#E6C77E', borderRadius: 6, maxBarThickness: 22 }] },
-            options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { precision: 0 } }, y: { grid: { display: false } } } }
-        });
-
-        // Distribuição de avaliações
-        const rate = [0, 0, 0, 0, 0]; (comments || []).forEach(c => { const r = Math.min(5, Math.max(1, c.rating || 5)); rate[r - 1]++; });
-        charts.rate = new Chart($('chart-ratings'), {
-            type: 'bar',
-            data: { labels: ['1★', '2★', '3★', '4★', '5★'], datasets: [{ label: 'Avaliações', data: rate, backgroundColor: 'rgba(255,214,0,0.6)', hoverBackgroundColor: '#FFD600', borderRadius: 6, maxBarThickness: 34 }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { precision: 0 } }, x: { grid: { display: false } } } }
-        });
+        Chart.defaults.animation.duration = 900;
+        Chart.defaults.animation.easing = 'easeOutQuart';
     }
 
-    /* ---- Dashboard ---- */
-    async function loadDash() {
-        const [d, orders, comments] = await Promise.all([
-            api('GET', '/api/admin/overview'),
-            api('GET', '/api/admin/orders'),
-            api('GET', '/api/admin/comments')
-        ]);
-        const paid = orders.filter(o => PAID.has(o.status));
+    const pad2 = n => String(n).padStart(2, '0');
+    const dayKey = dt => { const d = new Date(dt); return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`; };
+    const startOfDay = (offset = 0) => { const d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() + offset); return d; };
+    const relTime = iso => {
+        const s = (Date.now() - new Date(iso).getTime()) / 1000;
+        if (s < 60) return 'agora';
+        if (s < 3600) return `há ${Math.floor(s / 60)} min`;
+        if (s < 86400) return `há ${Math.floor(s / 3600)} h`;
+        const d = Math.floor(s / 86400);
+        return d === 1 ? 'ontem' : `há ${d} dias`;
+    };
+
+    const dash = {
+        period: Number(localStorage.getItem('bolla_dash_period')) || 30,
+        metric: 'revenue',
+        data: null,
+        timer: 0
+    };
+
+    function inRange(o, from, to) { const t = new Date(o.createdAt).getTime(); return t >= from.getTime() && t < to.getTime(); }
+    function stats(list) {
+        const paid = list.filter(o => PAID.has(o.status));
         const revenue = paid.reduce((s, o) => s + o.total, 0);
         const units = paid.reduce((s, o) => s + o.items.reduce((a, i) => a + i.qty, 0), 0);
-        const avg = paid.length ? revenue / paid.length : 0;
-        const conv = orders.length ? (paid.length / orders.length * 100) : 0;
-        const todayStr = new Date().toDateString();
-        const todayRev = paid.filter(o => new Date(o.createdAt).toDateString() === todayStr).reduce((s, o) => s + o.total, 0);
+        return { paid, revenue, units, count: paid.length, avg: paid.length ? revenue / paid.length : 0, total: list.length };
+    }
+    function series(list, from, days, fn) {
+        const map = {}, keys = [];
+        for (let i = 0; i < days; i++) { const d = new Date(from); d.setDate(d.getDate() + i); const k = dayKey(d); keys.push(k); map[k] = 0; }
+        list.forEach(o => { const k = dayKey(o.createdAt); if (k in map) map[k] += fn(o); });
+        return keys.map(k => map[k]);
+    }
+    function spark(values) {
+        const w = 120, h = 34, max = Math.max(...values, 0.0001);
+        const pts = values.map((v, i) => [i / Math.max(1, values.length - 1) * w, h - 3 - (v / max) * (h - 8)]);
+        const line = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ');
+        const id = 'sg' + Math.random().toString(36).slice(2, 8);
+        return `<svg class="kpi-spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true">
+            <defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${G[300]}" stop-opacity=".35"/><stop offset="1" stop-color="${G[300]}" stop-opacity="0"/></linearGradient></defs>
+            <path d="${line} L${w} ${h} L0 ${h} Z" fill="url(#${id})"/>
+            <path d="${line}" fill="none" stroke="${G[300]}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg>`;
+    }
+    function delta(cur, prev) {
+        if (!prev && !cur) return '<span class="ag-trend flat">— sem movimento</span>';
+        if (!prev) return '<span class="ag-trend up"><i class="fa-solid fa-arrow-trend-up"></i> novo</span>';
+        const p = (cur - prev) / prev * 100;
+        const cls = Math.abs(p) < 0.5 ? 'flat' : (p > 0 ? 'up' : 'down');
+        const ico = cls === 'up' ? 'fa-arrow-trend-up' : cls === 'down' ? 'fa-arrow-trend-down' : 'fa-minus';
+        return `<span class="ag-trend ${cls}"><i class="fa-solid ${ico}"></i> ${p > 0 ? '+' : ''}${p.toFixed(0)}%</span>`;
+    }
+
+    function drawCharts(orders, from, days, prevFrom) {
+        const hasChart = typeof Chart !== 'undefined';
+        const mk = (el, cfg) => hasChart ? new Chart(el, cfg) : null;
+        Object.values(charts).forEach(c => c && c.destroy());
+        const cur = orders.filter(o => inRange(o, from, new Date(from.getTime() + days * 864e5)));
+        const prev = orders.filter(o => inRange(o, prevFrom, from));
+        const paidCur = cur.filter(o => PAID.has(o.status)), paidPrev = prev.filter(o => PAID.has(o.status));
+        const isRev = dash.metric === 'revenue';
+        const fn = isRev ? (o => o.total) : (() => 1);
+        const labels = [];
+        for (let i = 0; i < days; i++) { const d = new Date(from); d.setDate(d.getDate() + i); labels.push(d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })); }
+        const curS = series(paidCur, from, days, fn), prevS = series(paidPrev, prevFrom, days, fn);
+        const fmt = v => isRev ? fmtBRL(v) : fmtInt(v) + (v === 1 ? ' pedido' : ' pedidos');
+
+        const ctx = $('chart-revenue').getContext('2d');
+        const grad = ctx.createLinearGradient(0, 0, 0, 300);
+        grad.addColorStop(0, 'rgba(116,192,142,0.38)'); grad.addColorStop(1, 'rgba(116,192,142,0)');
+        charts.rev = mk(ctx, {
+            type: 'line',
+            data: { labels, datasets: [
+                { label: `Últimos ${days} dias`, data: curS, borderColor: G[300], backgroundColor: grad, fill: true, tension: 0.35, cubicInterpolationMode: 'monotone', borderWidth: 2, pointRadius: 0, pointHoverRadius: 5, pointHoverBackgroundColor: G[200], pointHoverBorderColor: '#05160c', pointHoverBorderWidth: 2 },
+                { label: `${days} dias anteriores`, data: prevS, borderColor: 'rgba(169,220,183,0.35)', borderDash: [5, 5], fill: false, tension: 0.35, cubicInterpolationMode: 'monotone', borderWidth: 1.5, pointRadius: 0, pointHoverRadius: 4, pointHoverBackgroundColor: 'rgba(169,220,183,0.6)' }
+            ] },
+            options: {
+                responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { display: true, position: 'top', align: 'end', labels: { usePointStyle: true, pointStyle: 'line', boxWidth: 22, padding: 14 } },
+                    tooltip: { callbacks: { label: c => ` ${c.dataset.label}: ${fmt(c.raw)}` } }
+                },
+                scales: {
+                    y: { beginAtZero: true, border: { display: false }, ticks: { maxTicksLimit: 5, precision: 0, callback: v => isRev ? 'R$ ' + v : v }, grid: { color: 'rgba(169,220,183,0.06)' } },
+                    x: { border: { display: false }, grid: { display: false }, ticks: { maxTicksLimit: days > 30 ? 10 : 8, maxRotation: 0 } }
+                }
+            }
+        });
+        $('rev-sub').textContent = `· ${isRev ? fmtBRL(curS.reduce((a, b) => a + b, 0)) : fmtInt(curS.reduce((a, b) => a + b, 0)) + ' pedidos'} no período`;
+
+        // Status (todos os pedidos do período) — "recusado" e "cancelado" somam num rótulo só
+        const byLabel = {};
+        cur.forEach(o => {
+            const lbl = STATUS_LABEL[o.status] || o.status;
+            if (!byLabel[lbl]) byLabel[lbl] = { n: 0, color: STATUS_COLOR[o.status] || '#777' };
+            byLabel[lbl].n++;
+        });
+        const sl = Object.entries(byLabel).sort((a, b) => b[1].n - a[1].n);
+        charts.status = mk($('chart-status'), {
+            type: 'doughnut',
+            data: { labels: sl.map(s => s[0]), datasets: [{ data: sl.length ? sl.map(s => s[1].n) : [1], backgroundColor: sl.length ? sl.map(s => s[1].color) : ['rgba(169,220,183,0.08)'], borderColor: '#06180d', borderWidth: 3, hoverOffset: 6, borderRadius: 4 }] },
+            options: { responsive: true, maintainAspectRatio: false, cutout: '72%', plugins: { legend: { display: false }, tooltip: { enabled: !!sl.length } } }
+        });
+        $('donut-total').textContent = fmtInt(cur.length);
+        $('status-legend').innerHTML = sl.length ? sl.map(([l, v]) => `
+            <li><span class="dot-c" style="background:${v.color}"></span><span class="lg-l">${esc(l)}</span><span class="lg-v">${v.n}</span><span class="lg-p">${(v.n / cur.length * 100).toFixed(0)}%</span></li>`).join('')
+            : '<li class="muted">Sem pedidos no período.</li>';
+
+        // Dia da semana (faturamento pago no período) — o melhor dia acende
+        const wd = [0, 0, 0, 0, 0, 0, 0];
+        paidCur.forEach(o => { wd[new Date(o.createdAt).getDay()] += o.total; });
+        const order = [1, 2, 3, 4, 5, 6, 0], wdl = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+        const vals = order.map(i => wd[i]), best = Math.max(...vals);
+        charts.wd = mk($('chart-weekday'), {
+            type: 'bar',
+            data: { labels: order.map(i => wdl[i]), datasets: [{ label: 'Faturamento', data: vals, backgroundColor: vals.map(v => v === best && best > 0 ? G[300] : 'rgba(74,161,104,0.45)'), hoverBackgroundColor: G[200], borderRadius: 6, borderSkipped: false, maxBarThickness: 28 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ' ' + fmtBRL(c.raw) } } },
+                scales: { y: { beginAtZero: true, border: { display: false }, ticks: { maxTicksLimit: 4, callback: v => 'R$ ' + v }, grid: { color: 'rgba(169,220,183,0.06)' } }, x: { border: { display: false }, grid: { display: false } } } }
+        });
+    }
+
+    function renderPanels(orders, from, days, comments, products, leads) {
+        const cur = orders.filter(o => inRange(o, from, new Date(from.getTime() + days * 864e5)));
+        const paid = cur.filter(o => PAID.has(o.status));
+
+        // Top produtos (unidades + receita, barra relativa ao 1º)
+        const prod = {};
+        paid.forEach(o => o.items.forEach(i => { const p = prod[i.name] || (prod[i.name] = { u: 0, r: 0 }); p.u += i.qty; p.r += i.qty * i.price; }));
+        const top = Object.entries(prod).sort((a, b) => b[1].u - a[1].u).slice(0, 5);
+        const topMax = top.length ? top[0][1].u : 1;
+        $('top-products').innerHTML = top.length ? top.map(([n, v], i) => `
+            <li><span class="rk">${i + 1}</span><div class="rk-body"><div class="rk-top"><span>${esc(n)}</span><b>${fmtInt(v.u)} un.</b></div>
+            <div class="bar"><span style="--w:${(v.u / topMax * 100).toFixed(1)}%"></span></div><small>${fmtBRL(v.r)}</small></div></li>`).join('')
+            : '<li class="empty"><i class="fa-regular fa-face-smile"></i> Nenhuma venda paga no período.</li>';
+
+        // Formas de pagamento (pedidos pagos)
+        const pm = {}; paid.forEach(o => { const k = PAY_LABEL[o.paymentMethod] ? o.paymentMethod : 'outro'; pm[k] = (pm[k] || 0) + 1; });
+        const PM = { pix: ['PIX', G[300], 'fa-brands fa-pix'], cartao: ['Cartão', '#fec81d', 'fa-solid fa-credit-card'], boleto: ['Boleto', '#5fb3a0', 'fa-solid fa-barcode'], manual: ['Manual', '#8fa89a', 'fa-solid fa-hand'], outro: ['Outro', '#8fa89a', 'fa-solid fa-circle-question'] };
+        const pmE = Object.entries(pm).sort((a, b) => b[1] - a[1]);
+        const pmT = paid.length || 1;
+        $('pay-split').innerHTML = pmE.length ? `
+            <div class="split-bar">${pmE.map(([k, n]) => `<span style="--w:${(n / pmT * 100).toFixed(1)}%;background:${PM[k][1]}" title="${PM[k][0]}: ${n}"></span>`).join('')}</div>
+            <ul class="split-list">${pmE.map(([k, n]) => `<li><i class="${PM[k][2]}" style="color:${PM[k][1]}"></i><span>${PM[k][0]}</span><b>${(n / pmT * 100).toFixed(0)}%</b><small>${n} pedido${n === 1 ? '' : 's'}</small></li>`).join('')}</ul>`
+            : '<p class="empty"><i class="fa-solid fa-wallet"></i> Sem pagamentos no período.</p>';
+
+        // Estoque
+        const act = (products || []).filter(p => p.active);
+        const sMax = Math.max(50, ...act.map(p => p.stock || 0));
+        $('stock-meters').innerHTML = act.length ? act.map(p => {
+            const n = p.stock || 0, lvl = n === 0 ? 'out' : n <= 10 ? 'low' : 'ok';
+            const lbl = n === 0 ? 'Esgotado' : n <= 10 ? 'Baixo' : 'OK';
+            return `<li class="lvl-${lvl}"><div class="rk-top"><span>${esc(p.name)}</span><b>${n} un. <em>${lbl}</em></b></div><div class="bar"><span style="--w:${Math.max(2, n / sMax * 100).toFixed(1)}%"></span></div></li>`;
+        }).join('') : '<li class="empty">Nenhum produto ativo.</li>';
+
+        // Regiões (pedidos pagos por cidade/UF)
+        const reg = {}; paid.forEach(o => { const c = o.customer || {}; const k = c.cidade ? `${c.cidade}/${c.uf || ''}` : (c.uf || '—'); reg[k] = (reg[k] || 0) + 1; });
+        const regE = Object.entries(reg).sort((a, b) => b[1] - a[1]).slice(0, 5), regMax = regE.length ? regE[0][1] : 1;
+        $('top-regions').innerHTML = regE.length ? regE.map(([k, n], i) => `
+            <li><span class="rk">${i + 1}</span><div class="rk-body"><div class="rk-top"><span>${esc(k)}</span><b>${n} pedido${n === 1 ? '' : 's'}</b></div>
+            <div class="bar"><span style="--w:${(n / regMax * 100).toFixed(1)}%"></span></div></div></li>`).join('')
+            : '<li class="empty"><i class="fa-solid fa-location-dot"></i> Sem pedidos pagos no período.</li>';
+
+        // Avaliações (todas)
+        const cm = comments || [];
+        const dist = [0, 0, 0, 0, 0]; cm.forEach(c => { dist[Math.min(5, Math.max(1, c.rating || 5)) - 1]++; });
+        const avg = cm.length ? cm.reduce((s, c) => s + (c.rating || 5), 0) / cm.length : 0;
+        const pend = cm.filter(c => !c.approved).length;
+        const dMax = Math.max(1, ...dist);
+        $('rating-box').innerHTML = `
+            <div class="rating-head"><strong>${avg ? avg.toFixed(1).replace('.', ',') : '—'}</strong>
+                <div><div class="stars">${[1, 2, 3, 4, 5].map(i => `<i class="fa-${avg >= i - 0.25 ? 'solid' : 'regular'} fa-star"></i>`).join('')}</div>
+                <small>${cm.length} avaliação${cm.length === 1 ? '' : 'ões'}${pend ? ` · <b>${pend} pendente${pend === 1 ? '' : 's'}</b>` : ''}</small></div></div>
+            <ul class="rating-dist">${[5, 4, 3, 2, 1].map(r => `<li><span>${r}★</span><div class="bar"><span style="--w:${(dist[r - 1] / dMax * 100).toFixed(1)}%"></span></div><b>${dist[r - 1]}</b></li>`).join('')}</ul>`;
+
+        // Atividade recente: pedidos + avaliações + leads, mais novos primeiro
+        const feed = [];
+        orders.slice(-15).forEach(o => feed.push({ t: o.createdAt, ico: PAID.has(o.status) ? 'fa-bag-shopping' : o.status === 'aguardando_pagamento' ? 'fa-hourglass-half' : 'fa-receipt', cls: PAID.has(o.status) ? 'ok' : o.status === 'aguardando_pagamento' ? 'warn' : 'bad', jump: 'orders',
+            html: `<b>${esc((o.customer || {}).nome || 'Cliente')}</b> ${PAID.has(o.status) ? 'comprou' : 'fez um pedido de'} ${o.items.map(i => `${i.qty}× ${esc(i.name)}`).join(', ')} · <b>${fmtBRL(o.total)}</b>` }));
+        cm.forEach(c => c.date && feed.push({ t: c.date, ico: 'fa-star', cls: c.approved ? 'ok' : 'warn', jump: 'comments', html: `<b>${esc(c.name)}</b> avaliou com ${c.rating || 5}★${c.approved ? '' : ' · <em>aguardando moderação</em>'}` }));
+        (leads || []).forEach(l => l.createdAt && feed.push({ t: l.createdAt, ico: 'fa-handshake', cls: 'info', jump: 'leads', html: `<b>${esc(l.nome)}</b>${l.empresa ? ` (${esc(l.empresa)})` : ''} quer revender` }));
+        feed.sort((a, b) => new Date(b.t) - new Date(a.t));
+        $('activity-feed').innerHTML = feed.length ? feed.slice(0, 8).map((f, i) => `
+            <li style="--i:${i}" data-jump="${f.jump}" tabindex="0"><span class="feed-ico ${f.cls}"><i class="fa-solid ${f.ico}"></i></span><p>${f.html}</p><time datetime="${f.t}" title="${fmtDate(f.t)}">${relTime(f.t)}</time></li>`).join('')
+            : '<li class="empty">Nada por aqui ainda.</li>';
+    }
+
+    function renderGoal(orders) {
+        const target = Number(localStorage.getItem('bolla_goal')) || 500;
+        const now = new Date(), m0 = new Date(now.getFullYear(), now.getMonth(), 1);
+        const done = orders.filter(o => PAID.has(o.status) && new Date(o.createdAt) >= m0).reduce((s, o) => s + o.total, 0);
+        const pct = target ? done / target : 0;
+        const C = 2 * Math.PI * 50;
+        const bar = $('goal-bar');
+        bar.style.strokeDasharray = C;
+        bar.style.strokeDashoffset = C;
+        requestAnimationFrame(() => requestAnimationFrame(() => { bar.style.strokeDashoffset = C * (1 - Math.min(1, pct)); }));
+        animateNum($('goal-pct'), pct * 100, v => Math.round(v) + '%');
+        $('goal-done').textContent = fmtBRL(done);
+        $('goal-target').textContent = fmtBRL(target);
+        $('goal-month').textContent = now.toLocaleDateString('pt-BR', { month: 'long' });
+        const daysLeft = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate() - now.getDate() + 1;
+        const missing = Math.max(0, target - done);
+        $('goal-sub').innerHTML = pct >= 1 ? '<i class="fa-solid fa-trophy"></i> Meta batida! 🎉'
+            : `Faltam <b>${fmtBRL(missing)}</b> · ~${fmtBRL(missing / daysLeft)}/dia em ${daysLeft} dia${daysLeft === 1 ? '' : 's'}`;
+        $('goal-card').classList.toggle('hit', pct >= 1);
+    }
+    $('goal-edit').addEventListener('click', () => {
+        const cur = Number(localStorage.getItem('bolla_goal')) || 500;
+        const box = $('goal-target');
+        if (box.querySelector('input')) return;
+        box.innerHTML = `<input type="number" min="1" step="50" value="${cur}" aria-label="Meta do mês em reais">`;
+        const inp = box.querySelector('input'); inp.focus(); inp.select();
+        const save = () => { const v = Math.max(1, Number(inp.value) || cur); localStorage.setItem('bolla_goal', v); if (dash.data) renderGoal(dash.data.orders); toast('Meta atualizada'); };
+        inp.addEventListener('keydown', e => { if (e.key === 'Enter') inp.blur(); if (e.key === 'Escape') { inp.value = cur; inp.blur(); } });
+        inp.addEventListener('blur', save, { once: true });
+    });
+
+    function renderDash() {
+        if (!dash.data) return;
+        const { d, orders, comments, products, leads } = dash.data;
+        const days = dash.period;
+        const from = startOfDay(-(days - 1));
+        const prevFrom = startOfDay(-(2 * days - 1));
+        const to = startOfDay(1);
+        const cur = stats(orders.filter(o => inRange(o, from, to)));
+        const prev = stats(orders.filter(o => inRange(o, prevFrom, from)));
+        const paidCurList = cur.paid;
 
         // Hero
         const h = new Date().getHours();
         $('hero-greeting').textContent = (h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite') + ' 👋';
         $('hero-date').textContent = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+        const todayRev = orders.filter(o => PAID.has(o.status) && dayKey(o.createdAt) === dayKey(new Date())).reduce((s, o) => s + o.total, 0);
         const nLow = (d.lowStock || []).length;
-        $('hero-sub').innerHTML = `Você tem <b>${d.awaitingPayment || 0} pedido(s) aguardando pgto</b>, <b>${nLow} item(ns) com estoque baixo</b> e <b>${d.paymentErrors || 0} recusa(s) de pagamento</b>.`;
+        const bits = [];
+        bits.push(todayRev ? `hoje você já faturou <b>${fmtBRL(todayRev)}</b>` : 'ainda sem vendas pagas hoje');
+        if (d.awaitingPayment) bits.push(`<b>${d.awaitingPayment} pedido${d.awaitingPayment === 1 ? '' : 's'}</b> aguardando pagamento`);
+        if (nLow) bits.push(`<b>${nLow} produto${nLow === 1 ? '' : 's'}</b> com estoque baixo`);
+        if (d.pendingComments) bits.push(`<b>${d.pendingComments} avaliação${d.pendingComments === 1 ? '' : 'ões'}</b> para moderar`);
+        $('hero-sub').innerHTML = bits.join(' · ').replace(/^./, c => c.toUpperCase()) + '.';
 
+        // KPIs principais
+        const sRev = series(paidCurList, from, days, o => o.total);
+        const sCnt = series(paidCurList, from, days, () => 1);
+        const sUnits = series(paidCurList, from, days, o => o.items.reduce((a, i) => a + i.qty, 0));
+        const sAvg = sRev.map((v, i) => sCnt[i] ? v / sCnt[i] : 0);
         const kpis = [
-            { ico: 'fa-sack-dollar', variant: 'kpi-green', c: 'var(--success)', val: revenue, money: true, lbl: 'Faturamento', sub: `${paid.length} pedidos pagos` },
-            { ico: 'fa-money-bill-trend-up', variant: 'kpi-gold', c: 'var(--accent)', val: todayRev, money: true, lbl: 'Vendas de hoje' },
-            { ico: 'fa-receipt', variant: 'kpi-blue', c: 'var(--accent-soft)', val: orders.length, lbl: 'Pedidos totais', sub: `${d.awaitingPayment} aguardando pgto` },
-            { ico: 'fa-tag', variant: 'kpi-blue', c: 'var(--accent-soft)', val: avg, money: true, lbl: 'Ticket médio' },
-            { ico: 'fa-percent', variant: 'kpi-purple', c: '#c8c8ff', val: conv, money: false, lbl: 'Conversão (%)', fixed: 1 },
-            { ico: 'fa-boxes-stacked', variant: 'kpi-green', c: 'var(--success)', val: units, lbl: 'Unidades vendidas' },
-            { ico: 'fa-handshake', variant: 'kpi-gold', c: 'var(--accent)', val: d.resellerLeads || 0, lbl: 'Leads revendedor', sub: `${d.newLeads || 0} novos` },
-            { ico: 'fa-comment-dots', variant: 'kpi-orange', c: 'var(--warning)', val: d.pendingComments || 0, lbl: 'Coment. pendentes' },
-            { ico: 'fa-triangle-exclamation', variant: 'kpi-red', c: 'var(--danger)', val: d.paymentErrors || 0, lbl: 'Recusas de pgto' }
+            { ico: 'fa-sack-dollar', lbl: 'Faturamento', val: cur.revenue, prev: prev.revenue, fmt: fmtBRL, s: sRev, jump: 'orders' },
+            { ico: 'fa-bag-shopping', lbl: 'Pedidos pagos', val: cur.count, prev: prev.count, fmt: fmtInt, s: sCnt, jump: 'orders' },
+            { ico: 'fa-tag', lbl: 'Ticket médio', val: cur.avg, prev: prev.avg, fmt: fmtBRL, s: sAvg, jump: 'orders' },
+            { ico: 'fa-boxes-stacked', lbl: 'Unidades vendidas', val: cur.units, prev: prev.units, fmt: fmtInt, s: sUnits, jump: 'products' }
         ];
-        $('kpi-grid').innerHTML = kpis.map(k => `
-            <div class="kpi-card ${k.variant}">
-                <div class="kpi-bg-symbol" style="position:absolute;top:-10px;right:-6px;font-size:78px;opacity:0.05;pointer-events:none;"><i class="fa-solid ${k.ico}"></i></div>
-                <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;position:relative;z-index:2;">
-                    <div class="kpi-icon-wrapper" style="width:42px;height:42px;border-radius:12px;background:rgba(255,255,255,0.05);display:flex;align-items:center;justify-content:center;font-size:20px;color:${k.c};"><i class="fa-solid ${k.ico}"></i></div>
-                    <div class="lbl">${k.lbl}</div>
-                </div>
-                <div class="num" data-val="${k.val}" data-money="${k.money ? 1 : 0}" data-fixed="${k.fixed || 0}" style="position:relative;z-index:2;">0</div>
-                ${k.sub ? `<div class="sub" style="position:relative;z-index:2;">${esc(k.sub)}</div>` : ''}
+        $('kpi-grid').innerHTML = kpis.map((k, i) => `
+            <div class="kpi-card kpi-v2 kpi-clickable" data-jump="${k.jump}" tabindex="0" style="--i:${i}">
+                <div class="kpi-head"><span class="kpi-ico"><i class="fa-solid ${k.ico}"></i></span><span class="lbl">${k.lbl}</span>${delta(k.val, k.prev)}</div>
+                <div class="num" data-val="${k.val}" data-k="${i}">0</div>
+                <div class="kpi-foot"><span class="sub">vs ${k.fmt(k.prev)} nos ${days} dias anteriores</span></div>
+                ${spark(k.s)}
             </div>`).join('');
-        document.querySelectorAll('#kpi-grid .num').forEach(el => {
-            const val = Number(el.dataset.val), money = el.dataset.money === '1', fixed = Number(el.dataset.fixed);
-            const fmt = fixed ? (v => v.toFixed(1) + '%') : (money ? fmtBRL : fmtInt);
-            animateNum(el, val, fmt);
-        });
+        $('kpi-grid').querySelectorAll('.num').forEach(el => animateNum(el, Number(el.dataset.val), kpis[el.dataset.k].fmt));
+
+        // Operação
+        const conv = cur.total ? cur.count / cur.total * 100 : 0;
+        const ops = [
+            { ico: 'fa-hourglass-half', lbl: 'Aguardando pgto', val: d.awaitingPayment || 0, jump: 'orders', tone: d.awaitingPayment ? 'warn' : '' },
+            { ico: 'fa-percent', lbl: 'Conversão no período', val: conv.toFixed(0) + '%', jump: 'orders', tone: '' },
+            { ico: 'fa-handshake', lbl: 'Leads novos', val: d.newLeads || 0, jump: 'leads', tone: d.newLeads ? 'info' : '' },
+            { ico: 'fa-comment-dots', lbl: 'Avaliações pendentes', val: d.pendingComments || 0, jump: 'comments', tone: d.pendingComments ? 'warn' : '' },
+            { ico: 'fa-triangle-exclamation', lbl: 'Recusas de pgto', val: d.paymentErrors || 0, jump: 'payerrors', tone: d.paymentErrors ? 'bad' : '' }
+        ];
+        $('ops-strip').innerHTML = ops.map(o => `
+            <button type="button" class="ops-chip ${o.tone}" data-jump="${o.jump}"><i class="fa-solid ${o.ico}"></i><span>${o.lbl}</span><b>${o.val}</b><i class="fa-solid fa-chevron-right go"></i></button>`).join('');
 
         $('pending-dot').innerHTML = d.pendingComments > 0 ? `<span class="dot">${d.pendingComments}</span>` : '';
         $('leads-dot').innerHTML = d.newLeads > 0 ? `<span class="dot">${d.newLeads}</span>` : '';
         $('payerr-dot').innerHTML = d.paymentErrors > 0 ? `<span class="dot">${d.paymentErrors}</span>` : '';
-        $('low-stock-alert').innerHTML = d.lowStock.length
-            ? `<div class="alert-low"><i class="fa-solid fa-triangle-exclamation"></i> Estoque baixo: ${d.lowStock.map(p => `${esc(p.name)} (${p.stock} un.)`).join(', ')}</div>` : '';
+        $('low-stock-alert').innerHTML = (d.lowStock || []).length
+            ? `<div class="alert-low"><i class="fa-solid fa-triangle-exclamation"></i> Estoque baixo: ${d.lowStock.map(p => `${esc(p.name)} (${p.stock} un.)`).join(', ')}<button class="link-btn" data-jump="products">Repor <i class="fa-solid fa-arrow-right"></i></button></div>` : '';
 
         $('dash-orders').innerHTML = d.recentOrders.length ? d.recentOrders.map(o => `
             <tr>
@@ -624,9 +893,92 @@
                 <td><span class="badge b-${o.status}">${STATUS_LABEL[o.status] || o.status}</span></td>
             </tr>`).join('') : '<tr><td colspan="5" class="muted">Nenhum pedido ainda.</td></tr>';
 
-        drawCharts(orders, comments);
+        renderGoal(orders);
+        requestAnimationFrame(moveThumb);
+        drawCharts(orders, from, days, prevFrom);
+        renderPanels(orders, from, days, comments, products, leads);
     }
-    $('refresh-dash').addEventListener('click', () => loadDash().then(() => toast('Dashboard atualizado')));
+
+    /* ---- Dashboard ---- */
+    async function loadDash() {
+        const [d, orders, comments, products, leads] = await Promise.all([
+            api('GET', '/api/admin/overview'),
+            api('GET', '/api/admin/orders'),
+            api('GET', '/api/admin/comments'),
+            api('GET', '/api/admin/products').catch(() => []),
+            api('GET', '/api/admin/reseller-leads').catch(() => [])
+        ]);
+        dash.data = { d, orders: orders || [], comments: comments || [], products, leads };
+        dash.updatedAt = Date.now();
+        renderDash();
+        stampUpdated();
+    }
+    function stampUpdated() {
+        if (!dash.updatedAt) return;
+        const s = Math.round((Date.now() - dash.updatedAt) / 1000);
+        $('dash-updated').innerHTML = `<i class="fa-regular fa-clock"></i> Atualizado ${s < 10 ? 'agora' : s < 60 ? `há ${s}s` : `há ${Math.floor(s / 60)} min`}`;
+    }
+    setInterval(stampUpdated, 10000);
+
+    // Período (segmented control com "polegar" deslizante)
+    const seg = $('period-seg');
+    function moveThumb() {
+        const on = seg.querySelector('button.on'), th = seg.querySelector('.seg-thumb');
+        if (!on || !th) return;
+        th.style.width = on.offsetWidth + 'px';
+        th.style.transform = `translateX(${on.offsetLeft}px)`;
+    }
+    seg.querySelectorAll('button').forEach(b => {
+        b.classList.toggle('on', Number(b.dataset.days) === dash.period);
+        b.addEventListener('click', () => {
+            dash.period = Number(b.dataset.days);
+            localStorage.setItem('bolla_dash_period', dash.period);
+            seg.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
+            renderDash();
+        });
+    });
+    window.addEventListener('resize', moveThumb);
+    new MutationObserver(moveThumb).observe($('tab-dash'), { attributes: true, attributeFilter: ['class'] });
+    requestAnimationFrame(moveThumb);
+
+    $('rev-metric').querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+        dash.metric = b.dataset.m;
+        $('rev-metric').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
+        renderDash();
+    }));
+
+    // Atualização automática (60 s), pausa com a aba escondida
+    const auto = $('auto-refresh');
+    auto.checked = localStorage.getItem('bolla_dash_auto') === '1';
+    function setAuto() {
+        clearInterval(dash.timer);
+        localStorage.setItem('bolla_dash_auto', auto.checked ? '1' : '0');
+        if (auto.checked) dash.timer = setInterval(() => { if (!document.hidden && token) loadDash().catch(() => {}); }, 60000);
+    }
+    auto.addEventListener('change', setAuto); setAuto();
+
+    $('refresh-dash').addEventListener('click', e => {
+        const b = e.currentTarget; b.classList.add('spinning');
+        loadDash().then(() => toast('Dashboard atualizado')).finally(() => setTimeout(() => b.classList.remove('spinning'), 500));
+    });
+
+    // Exportar pedidos do período (CSV com ; e BOM — abre certo no Excel pt-BR)
+    $('export-csv').addEventListener('click', () => {
+        if (!dash.data) return;
+        const from = startOfDay(-(dash.period - 1));
+        const rows = dash.data.orders.filter(o => new Date(o.createdAt) >= from);
+        const q = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
+        const head = ['Pedido', 'Data', 'Cliente', 'E-mail', 'WhatsApp', 'Cidade', 'UF', 'Itens', 'Total', 'Status', 'Pagamento'];
+        const lines = rows.map(o => [o.id, new Date(o.createdAt).toLocaleString('pt-BR'), o.customer.nome, o.customer.email, o.customer.whatsapp, o.customer.cidade, o.customer.uf,
+            o.items.map(i => `${i.qty}x ${i.name}`).join(' | '), o.total.toFixed(2).replace('.', ','), STATUS_LABEL[o.status] || o.status, PAY_LABEL[o.paymentMethod] || ''].map(q).join(';'));
+        const blob = new Blob(['﻿' + [head.map(q).join(';'), ...lines].join('\r\n')], { type: 'text/csv;charset=utf-8' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `pedidos-bolladinho-${dayKey(new Date())}-${dash.period}d.csv`;
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+        toast(`${rows.length} pedido(s) exportado(s)`);
+    });
 
     /* ---- Produtos & Estoque ---- */
     let productsData = [];

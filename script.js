@@ -249,9 +249,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     function closeCheckout() { if (checkoutOverlay) checkoutOverlay.classList.remove('active'); }
 
+    // Versão estática (GitHub Pages): não há servidor para pagamento/frete,
+    // então o pedido segue pelo WhatsApp da loja com o carrinho já escrito.
+    const STATIC_HOST = /\.github\.io$/.test(location.hostname);
+    if (STATIC_HOST && checkoutBtn) checkoutBtn.innerHTML = '<i class="fa-brands fa-whatsapp"></i> Finalizar pelo WhatsApp';
+    function checkoutViaWhatsApp() {
+        const lines = cart.map(i => `• ${i.qty}x ${i.name} — ${formatBRL(i.price * i.qty)}`);
+        const msg = `Olá! Quero fazer um pedido Bolladinho:\n\n${lines.join('\n')}\n\nTotal: ${formatBRL(cartTotal())} + frete\n\nMeu CEP é: `;
+        window.open(`https://wa.me/5561995636229?text=${encodeURIComponent(msg)}`, '_blank', 'noopener');
+    }
+
     if (checkoutBtn) {
         checkoutBtn.addEventListener('click', () => {
             if (cart.length === 0) { alert('Seu carrinho está vazio!'); return; }
+            if (STATIC_HOST) return checkoutViaWhatsApp();
             openCheckout();
         });
     }
@@ -331,13 +342,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Ícone, cor e selo por transportadora (visual estilo imagem de referência)
         const SHIP_STYLE = {
-            1:  { icon: 'fa-truck',         color: '#3b82f6', badge: 'Econômico' },
-            2:  { icon: 'fa-truck-fast',    color: '#ef4444', badge: 'Expresso' },
-            3:  { icon: 'fa-boxes-stacked', color: '#f59e0b', badge: 'Transportadora' },
-            17: { icon: 'fa-box',           color: '#14b8a6', badge: 'Compacto' },
-            31: { icon: 'fa-paper-plane',   color: '#8b5cf6', badge: 'Ágil' },
-            motoboy: { icon: 'fa-motorcycle', color: '#22c55e', badge: 'Imediato' },
-            retirar: { icon: 'fa-store',      color: '#eab308', badge: 'Retirada' },
+            // Tons da mata: cada transportadora ganha um verde próprio (musgo → menta)
+            1:  { icon: 'fa-truck',         color: '#74c08e', badge: 'Econômico' },
+            2:  { icon: 'fa-truck-fast',    color: '#4aa168', badge: 'Expresso' },
+            3:  { icon: 'fa-boxes-stacked', color: '#8fbf6a', badge: 'Transportadora' },
+            17: { icon: 'fa-box',           color: '#5fb3a0', badge: 'Compacto' },
+            31: { icon: 'fa-paper-plane',   color: '#a9dcb7', badge: 'Ágil' },
+            motoboy: { icon: 'fa-motorcycle', color: '#33844f', badge: 'Imediato' },
+            retirar: { icon: 'fa-store',      color: '#fec81d', badge: 'Retirada' },
         };
         const shipDeadline = o => o.note ? o.note
             : (!o.days ? 'Prazo sob consulta' : `em até ${o.days} ${o.days === 1 ? 'dia útil' : 'dias úteis'}`);
@@ -655,7 +667,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         /* Finalizar Compra: valida dados; PIX redireciona, Cartão paga aqui mesmo */
         const payBtn = document.getElementById('pay-mp');
-        const invalid = (msg, el) => { alert(msg); if (el) el.focus(); };
+        // Erro inline (enhance.js) em vez de alert(); alert só se a camada não carregou
+        const invalid = (msg, el) => {
+            if (window.BollaForm) return window.BollaForm.error(msg, el);
+            alert(msg); if (el) el.focus();
+        };
 
         function collectCustomer() {
             const nome = document.getElementById('cust-nome').value.trim();
@@ -969,6 +985,7 @@ document.addEventListener('DOMContentLoaded', () => {
         touchMultiplier: 1.4,
     });
 
+    window.__lenis = lenis; // usado por enhance.js (voltar ao topo, etc.)
     lenis.on('scroll', ScrollTrigger.update);
     gsap.ticker.add((time) => lenis.raf(time * 1000));
     gsap.ticker.lagSmoothing(0);
@@ -1259,16 +1276,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
     if (prefersReduced || !finePointer) return;
 
+    // Interpolado a cada quadro (lerp) — o botão "persegue" o ponteiro com
+    // inércia em vez de saltar para a posição exata a cada mousemove.
     document.querySelectorAll('.pricing-card .btn').forEach(btn => {
+        let tx = 0, ty = 0, x = 0, y = 0, raf = 0;
+        const tick = () => {
+            x += (tx - x) * 0.14; y += (ty - y) * 0.14;
+            btn.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0)`;
+            if (Math.abs(tx - x) > 0.05 || Math.abs(ty - y) > 0.05) raf = requestAnimationFrame(tick);
+            else { raf = 0; if (!tx && !ty) btn.style.transform = ''; }
+        };
+        const go = () => { if (!raf) raf = requestAnimationFrame(tick); };
         btn.addEventListener('mousemove', (e) => {
             const r = btn.getBoundingClientRect();
-            const mx = e.clientX - r.left - r.width / 2;
-            const my = e.clientY - r.top - r.height / 2;
-            btn.style.transform = `translate(${mx * 0.25}px, ${my * 0.4}px)`;
+            tx = (e.clientX - r.left - r.width / 2) * 0.22;
+            ty = (e.clientY - r.top - r.height / 2) * 0.35;
+            go();
         });
-        btn.addEventListener('mouseleave', () => {
-            btn.style.transform = '';
-        });
+        btn.addEventListener('mouseleave', () => { tx = 0; ty = 0; go(); });
     });
 })();
 
