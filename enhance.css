@@ -1575,3 +1575,144 @@ html { scrollbar-color: var(--g-600) var(--g-950); scrollbar-width: thin; }
     background: rgba(74, 161, 104, 0.1); border: 1px solid rgba(169, 220, 183, 0.18);
 }
 .offline-card-note i { color: var(--g-300); margin-top: 2px; }
+
+/* ==================================================================
+   REFINO v3 — auditoria de página inteira
+   ================================================================== */
+
+/* 1. Emenda do hero: o fim do dissolve é um cinza-mata (#232823).
+   A primeira seção nasce dessa cor e se abre no verde, sem degrau. */
+.hero + section::before {
+    background:
+        linear-gradient(180deg, #232823 0%, rgba(35, 40, 35, 0.75) 90px, rgba(35, 40, 35, 0) 260px),
+        linear-gradient(180deg, rgba(3, 17, 10, 0) 0%, rgba(17, 57, 30, 0.35) 50%, rgba(3, 17, 10, 0) 100%);
+}
+.hero + section::after { display: none; }
+
+/* 2. Ritmo vertical mais firme */
+.visual-demo, .social-proof, .final-cta, .vantagens, .faq, .cta-form-section {
+    padding-top: clamp(4rem, 8vw, 6.5rem) !important;
+    padding-bottom: clamp(4rem, 8vw, 6.5rem) !important;
+}
+.final-cta { min-height: 0; }
+.cta-content .pricing-grid { margin: var(--space-7) 0 var(--space-5); }
+.cta-content .secure-text { margin-top: var(--space-4); }
+.payment-methods-strip { margin-top: var(--space-5) !important; }
+.review-cta { margin-top: var(--space-6); }
+
+/* 3. Cards de preço: sem vazio no rodapé */
+.pricing-card { padding-bottom: var(--space-5) !important; }
+.stock-note:empty { display: none; }
+.pricing-desc { margin-bottom: var(--space-4); }
+
+/* 4. Lista "Cada peça é única": ícone e texto em colunas próprias */
+.feature-list li {
+    display: grid;
+    grid-template-columns: 34px 1fr;
+    align-items: start;
+    gap: 0 0.6rem;
+    padding: 1rem 1.25rem;
+    text-indent: 0;
+    background: linear-gradient(135deg, rgba(74, 161, 104, 0.08), rgba(3, 17, 10, 0.25));
+    border-color: rgba(169, 220, 183, 0.1);
+}
+.feature-list li:hover { border-color: rgba(169, 220, 183, 0.26); background: linear-gradient(135deg, rgba(74, 161, 104, 0.14), rgba(3, 17, 10, 0.25)); }
+.feature-list i {
+    width: 34px; height: 34px; border-radius: 10px;
+    display: grid; place-items: center; grid-row: span 2;
+    background: rgba(74, 161, 104, 0.16); color: var(--g-200);
+}
+.feature-list strong { display: block; color: var(--g-100); margin-bottom: 0.1rem; }
+
+/* 5. Faixa "Pague com" no celular: uma linha só */
+@media (max-width: 768px) {
+    .payment-methods-strip { flex-wrap: nowrap !important; gap: 0.75rem !important; padding: 0.8rem 1.1rem !important; border-radius: 999px !important; max-width: 100%; }
+    .payment-methods-strip .pm-label { font-size: 0.62rem; letter-spacing: 0.18em; padding-right: 0.6rem; }
+    .payment-methods-strip i { font-size: 1.35rem; }
+}
+
+/* 6. Depoimentos em carrossel contínuo (4+ avaliações) */
+.testimonials-grid.is-marquee {
+    display: block;
+    overflow: hidden;
+    padding: 1.2rem 0 1.6rem;
+    margin: 0 calc(50% - 50vw);
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
+}
+.t-track {
+    display: flex;
+    width: max-content;
+    animation: t-marquee var(--t-dur, 60s) linear infinite;
+}
+.testimonials-grid.is-marquee:hover .t-track,
+.testimonials-grid.is-marquee:focus-within .t-track { animation-play-state: paused; }
+.t-track .testimonial-card {
+    width: min(380px, 82vw);
+    flex-shrink: 0;
+    margin-right: 1.25rem;
+    opacity: 1 !important;
+    transform: none;
+    filter: none !important;
+}
+@keyframes t-marquee { to { transform: translate3d(-50%, 0, 0); } }
+@media (prefers-reduced-motion: reduce) {
+    .testimonials-grid.is-marquee { overflow-x: auto; }
+    .t-track { animation: none; }
+}
+
+/* 7. Revendedor */
+.btn-whatsapp {
+    background: var(--grad-action) !important;
+    background-size: 180% 180% !important;
+    color: #fff !important;
+    border: 1px solid rgba(169, 220, 183, 0.25);
+    box-shadow: var(--glow-green);
+}
+.btn-whatsapp:hover { background-position: 100% 50% !important; transform: translateY(-3px); box-shadow: var(--glow-green-lg); }
+.btn-whatsapp i { font-size: 1.15em; }
+.faq-card h4 { line-height: 1.25; margin-bottom: 0.75rem; }
+.faq-card {
+    transition: transform 0.8s var(--ease-silk), border-color 0.6s var(--ease-soft), box-shadow 0.8s var(--ease-silk);
+}
+.faq-card:hover { transform: translateY(-6px); border-color: rgba(169, 220, 183, 0.28); box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.8); }
+.faq-card .icon { background: linear-gradient(135deg, rgba(116, 192, 142, 0.35), rgba(38, 107, 63, 0.3)) !important; color: var(--g-100) !important; }
+.cta-form-perks i { color: var(--g-300) !important; }
+
+/* Títulos editoriais do revendedor: mesma assinatura em degradê da home */
+.vantagens .textual-content h2,
+.cta-form-text h2 { color: #f3efe4; }
+.vantagens .textual-content h2 span,
+.cta-form-text h2 strong {
+    background: var(--grad-title);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.cta-form-text .eyebrow, .cta-form-text + * .eyebrow { color: var(--g-200); }
+
+/* Marquee no celular: menos máscara nas bordas */
+@media (max-width: 768px) {
+    .testimonials-grid.is-marquee {
+        -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+        mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent);
+        padding-bottom: 0.6rem;
+    }
+}
+
+/* Carrinho: acabamento */
+.cart-item { justify-content: flex-start; }
+.cart-item-info { flex: 1; min-width: 0; }
+.cart-item-ico {
+    width: 44px; height: 44px; flex-shrink: 0; border-radius: 12px;
+    display: grid; place-items: center; color: #fff;
+    background: var(--grad-action); box-shadow: var(--glow-green);
+}
+.cart-item-price small { color: var(--color-text-muted); font-weight: 500; }
+.cart-empty { display: flex; flex-direction: column; align-items: center; gap: 0.9rem; margin: auto; padding: 3rem 1rem; text-align: center; }
+.cart-empty-ico {
+    width: 72px; height: 72px; border-radius: 50%; display: grid; place-items: center;
+    font-size: 1.6rem; color: var(--g-200);
+    background: radial-gradient(circle at 30% 25%, rgba(116, 192, 142, 0.3), rgba(12, 46, 23, 0.6));
+    border: 1px solid rgba(169, 220, 183, 0.2);
+    animation: pin-bob 3s var(--ease-soft) infinite;
+}
+.cart-empty .cart-empty-msg { margin: 0; }

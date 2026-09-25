@@ -198,15 +198,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
         cartItemsContainer.innerHTML = '';
         if (cart.length === 0) {
-            cartItemsContainer.innerHTML = '<p class="cart-empty-msg">Seu carrinho está vazio.</p>';
+            cartItemsContainer.innerHTML = `
+                <div class="cart-empty">
+                    <span class="cart-empty-ico"><i class="fa-solid fa-leaf"></i></span>
+                    <p class="cart-empty-msg">Seu carrinho está vazio.</p>
+                    <a href="#comprar" class="btn btn-outline btn-sm cart-shop-link">Escolher minha caixa</a>
+                </div>`;
         } else {
             cart.forEach(item => {
                 const el = document.createElement('div');
                 el.classList.add('cart-item');
                 el.innerHTML = `
+                    <span class="cart-item-ico" aria-hidden="true"><i class="fa-solid fa-leaf"></i></span>
                     <div class="cart-item-info">
                         <h4>${item.name}</h4>
-                        <div class="cart-item-price">${formatBRL(item.price)}</div>
+                        <div class="cart-item-price">${formatBRL(item.price)}${item.qty > 1 ? ` <small>· ${formatBRL(item.price * item.qty)}</small>` : ''}</div>
                     </div>
                     <div class="cart-item-controls">
                         <button type="button" class="qty-btn" data-action="decrease" data-id="${item.id}" aria-label="Diminuir"><i class="fa-solid fa-minus"></i></button>
@@ -222,6 +228,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Delegação de eventos: um único listener resolve os botões +/- de forma confiável
     if (cartItemsContainer) {
         cartItemsContainer.addEventListener('click', e => {
+            if (e.target.closest('.cart-shop-link')) {
+                e.preventDefault(); closeCart();
+                const t = document.getElementById('comprar');
+                if (t) setTimeout(() => window.__lenis ? (window.__lenis.start(), window.__lenis.scrollTo(t, { offset: -110 })) : t.scrollIntoView({ behavior: 'smooth' }), 80);
+                return;
+            }
             const btn = e.target.closest('.qty-btn');
             if (!btn) return;
             e.preventDefault();
