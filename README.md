@@ -23,7 +23,7 @@ Biodescartável, reutilizável e única como uma impressão digital.
 
 | Versão | Link | O que funciona |
 |---|---|---|
-| **Vitrine** (GitHub Pages) | **https://cauamigueldev.github.io/bolladinho1/** | Site inteiro navegável, produtos, depoimentos, página de revendedor (formulário envia por e-mail). O carrinho **finaliza o pedido pelo WhatsApp** da loja e o [painel admin](https://cauamigueldev.github.io/bolladinho1/admin.html) abre em **modo demonstração** (dados de exemplo, nada é salvo). Atualiza sozinho a cada push na `main`. |
+| **Vitrine** (GitHub Pages) | **https://cauamigueldev.github.io/bolladinho1/** | Site inteiro navegável, produtos, depoimentos, página de revendedor (formulário envia por e-mail). O checkout completo abre normalmente (dados, CEP com endereço automático, PIX ou cartão animado) e o pedido **é concluído pelo WhatsApp** da loja — os dados do cartão nunca saem do aparelho. O [painel admin](https://cauamigueldev.github.io/bolladinho1/admin.html) abre em **modo demonstração** (dados de exemplo, nada é salvo). Atualiza sozinho a cada push na `main`. |
 | **Loja completa** (Render) | clique em **Deploy to Render** acima | Tudo da vitrine **+** checkout com Mercado Pago (PIX e cartão), cálculo de frete (SuperFrete), estoque, avaliações moderadas e o painel admin em `/admin`. |
 
 > O GitHub Pages só hospeda arquivos estáticos, por isso a versão de lá não tem o servidor de
@@ -88,6 +88,12 @@ node server.js                                      # Node 18+
    - `NOTIFY_EMAIL` (opcional)
 3. Em ~1 minuto o site fica no ar em `https://bolladinho.onrender.com` (ou o nome que o Render
    atribuir). Coloque esse link na tabela lá em cima.
+
+4. **Ligar o GitHub Pages ao Render (opcional):** em *Settings → Secrets and variables → Actions →
+   Variables*, crie a variável `BOLLA_API` com a URL do Render (ex.: `https://bolladinho.onrender.com`)
+   e rode o workflow *Publicar vitrine*. A partir daí o site do GitHub Pages também cobra por PIX/cartão
+   de verdade, calcula frete e o `admin.html` faz login real — o servidor já libera o acesso (CORS)
+   para `https://cauamigueldev.github.io`.
 
 > ⚠️ O disco do plano grátis é **efêmero**: pedidos e avaliações gravados em `data/` se perdem
 > a cada redeploy/restart, e o serviço hiberna após 15 min sem acesso. Para produção de

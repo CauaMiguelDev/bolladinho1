@@ -444,8 +444,10 @@
         </div>
     </div>
 
+<script src="config.js"></script>
 <script>
 (() => {
+    const API = String(window.BOLLA_API || '').replace(/\/+$/, '');
     let token = sessionStorage.getItem('bolla_admin_token') || '';
     const $ = id => document.getElementById(id);
     const fmtBRL = v => 'R$ ' + Number(v).toFixed(2).replace('.', ',');
@@ -489,7 +491,7 @@
     /* ---- Modo demonstração (GitHub Pages: não há servidor) ----
        Tudo roda em memória com pedidos de exemplo gerados aqui mesmo.
        Nada é salvo e nada sai do navegador. */
-    const STATIC_HOST = /\.github\.io$/.test(location.hostname);
+    const STATIC_HOST = /\.github\.io$/.test(location.hostname) && !API;
     let DEMO = STATIC_HOST && sessionStorage.getItem('bolla_admin_demo') === '1';
     let demoDB = null;
     function buildDemo() {
@@ -555,7 +557,7 @@
 
     async function api(method, path, body) {
         if (DEMO) return demoApi(method, path, body);
-        const res = await fetch(path, {
+        const res = await fetch(API + path, {
             method,
             headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
             body: body ? JSON.stringify(body) : undefined
@@ -584,7 +586,7 @@
     async function doLogin() {
         $('login-err').textContent = '';
         try {
-            const res = await fetch('/api/admin/login', {
+            const res = await fetch(API + '/api/admin/login', {
                 method: 'POST', headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ user: $('login-user').value.trim(), password: $('login-pass').value })
             });

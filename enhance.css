@@ -1566,3 +1566,12 @@ html { scrollbar-color: var(--g-600) var(--g-950); scrollbar-width: thin; }
     .offer-actions { margin-top: 1.2rem; }
     .offer-actions .btn { flex: 1 1 100%; }
 }
+
+/* Checkout em modo vitrine (GitHub Pages sem servidor) */
+.offline-card-note {
+    display: flex; gap: 0.6rem; align-items: flex-start;
+    margin: 0 0 0.4rem; padding: 0.8rem 1rem; border-radius: 12px;
+    font-size: var(--text-xs); line-height: 1.5; color: var(--g-100);
+    background: rgba(74, 161, 104, 0.1); border: 1px solid rgba(169, 220, 183, 0.18);
+}
+.offline-card-note i { color: var(--g-300); margin-top: 2px; }

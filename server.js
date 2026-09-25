@@ -947,8 +947,22 @@ function serveStatic(req, res, pathname) {
 }
 
 /* ---------------- Servidor ---------------- */
+// CORS: permite que a vitrine do GitHub Pages use esta API (checkout, frete, admin).
+// Outras origens podem ser liberadas com ALLOWED_ORIGINS="https://a.com,https://b.com".
+const ALLOWED_ORIGINS = new Set(String(process.env.ALLOWED_ORIGINS || 'https://cauamigueldev.github.io')
+    .split(',').map(s => s.trim()).filter(Boolean));
+
 http.createServer(async (req, res) => {
     const urlObj = new URL(req.url, 'http://x');
+    const origin = req.headers.origin;
+    if (origin && ALLOWED_ORIGINS.has(origin) && urlObj.pathname.startsWith('/api/')) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+        res.setHeader('Vary', 'Origin');
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        res.setHeader('Access-Control-Max-Age', '600');
+        if (req.method === 'OPTIONS') { res.writeHead(204); return res.end(); }
+    }
     const key = `${req.method} ${urlObj.pathname}`;
     const handler = routes[key];
     try {
