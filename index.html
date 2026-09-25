@@ -534,7 +534,7 @@
             const err = document.getElementById('al-err');
             const uEl = document.getElementById('al-user'), pEl = document.getElementById('al-pass');
             const submitBtn = document.getElementById('al-submit');
-            function open() { err.textContent = ''; uEl.value = ''; pEl.value = ''; submitBtn.disabled = false; ov.classList.add('show'); setTimeout(() => uEl.focus(), 60); }
+            function open() { if (/\.github\.io$/.test(location.hostname)) { location.href = 'admin.html'; return; } err.textContent = ''; uEl.value = ''; pEl.value = ''; submitBtn.disabled = false; ov.classList.add('show'); setTimeout(() => uEl.focus(), 60); }
             function close() { ov.classList.remove('show'); }
             if (btn) btn.addEventListener('dblclick', open); // exige clique duplo
             document.getElementById('al-cancel').addEventListener('click', close);

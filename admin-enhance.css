@@ -521,3 +521,15 @@ th { color: var(--g-300); opacity: .8; }
     .kpi-card.kpi-v2, .feed li, .bar > span, .split-bar span { animation: none !important; }
     .goal-bar, .seg-thumb { transition: none !important; }
 }
+
+/* ---------------- Modo demonstração (GitHub Pages) ---------------- */
+.demo-note {
+    margin-top: 1.4rem; padding: 1rem; border-radius: 14px; text-align: left;
+    display: grid; grid-template-columns: 20px 1fr; gap: 6px 10px;
+    background: rgba(74, 161, 104, 0.08); border: 1px solid rgba(169, 220, 183, 0.2);
+}
+.demo-note > i { color: var(--g-300); margin-top: 3px; }
+.demo-note p { margin: 0 !important; font-size: 12.5px !important; line-height: 1.5; color: var(--text-secondary); }
+.demo-note button { grid-column: 1 / -1; margin-top: 8px; width: 100%; }
+body.is-demo .ag-status-pill { color: #fed25a; background: rgba(254, 200, 29, 0.08); border-color: rgba(254, 200, 29, 0.3); }
+body.is-demo .ag-status-dot { background: #fec81d; box-shadow: 0 0 8px #fec81d; }

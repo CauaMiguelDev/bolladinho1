@@ -23,7 +23,7 @@ jobs:
       - name: Montar site estático
         run: |
           mkdir -p _site
-          cp index.html revendedor.html style.css enhance.css enhance.js script.js _site/
+          cp index.html revendedor.html admin.html style.css enhance.css enhance.js script.js admin-design.css admin-enhance.css _site/
           cp -r img assets _site/
           touch _site/.nojekyll
       - name: Publicar na branch gh-pages
