@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" type="image/png" href="img/favicon.png">
+    <title>Painel Admin | Bolladinho</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <!-- Sistema de design (glassmorphism premium) -->
+    <link rel="stylesheet" href="admin-design.css">
+    <style>
+        /* ===== Complementos: adapta o painel Bolladinho ao design system ===== */
+        .panel { display: none; }
+
+        /* Shell (o design system define estas classes, mas o layout base fica aqui) */
+        .admin-layout-wrapper { display: flex; position: relative; z-index: 1; min-height: calc(100vh - var(--topbar-h)); }
+        .admin-sidebar.ag-sidebar { position: sticky; top: var(--topbar-h); height: calc(100vh - var(--topbar-h)); flex-shrink: 0; }
+        .admin-main-content { flex: 1; min-width: 0; padding: 26px; overflow-x: hidden; }
+
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .kpi-card .num { font-size: 26px; font-weight: 800; color: #fff; font-family: 'Outfit', sans-serif; line-height: 1.05; }
+        .kpi-card .lbl { font-size: 12.5px; color: var(--text-secondary); font-weight: 500; line-height: 1.3; }
+        .kpi-card .sub { font-size: 11px; color: var(--text-muted); margin-top: 6px; }
+
+        /* Login */
+        .login-view { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1rem; position: relative; z-index: 1; }
+        .login-card { width: 100%; max-width: 390px; text-align: center; padding: 2.6rem 2.2rem; border-radius: var(--radius-lg); background: var(--glass-bg-2); border: 1px solid var(--glass-border); box-shadow: var(--shadow-card); backdrop-filter: blur(var(--glass-blur)); animation: slideUp .5s var(--ease-lux) both; }
+        .login-card .logo-i { width: 60px; height: 60px; margin: 0 auto 1.1rem; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; color: #000; background: var(--accent-grad); box-shadow: 0 8px 24px rgba(201,162,90,0.25); }
+        .login-card h1 { font-family: var(--serif); font-size: 1.5rem; color: #fff; margin-bottom: .4rem; }
+        .login-card p { color: var(--text-secondary); font-size: .9rem; margin-bottom: 1.5rem; }
+        .login-card input { width: 100%; margin-bottom: 1rem; height: 46px; }
+        .login-err { color: var(--danger); font-size: .85rem; min-height: 1.2em; margin-bottom: .5rem; }
+
+        /* Abas / painéis */
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; animation: slideUp .5s var(--ease-lux) both; }
+
+        /* Cabeçalho de seção */
+        .section-h { display: flex; align-items: center; justify-content: space-between; margin: 0 0 18px; flex-wrap: wrap; gap: .6rem; }
+        .section-h h2 { font-family: var(--serif); font-size: 1.4rem; color: #fff; display: flex; align-items: center; gap: .5rem; font-weight: 600; }
+        .section-h h2 i { color: var(--accent); font-size: 1.05rem; }
+
+        /* Cards de gráfico */
+        .cards-row { display: grid; grid-template-columns: 1.4fr 1fr; gap: 18px; margin-bottom: 22px; }
+        .card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: 20px 22px; box-shadow: var(--shadow-card); backdrop-filter: blur(var(--glass-blur)); }
+        .card h3 { font-size: 1rem; color: #fff; font-family: 'Outfit', sans-serif; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: .5rem; }
+        .card h3 i { color: var(--accent); }
+        .chart-box { position: relative; height: 240px; }
+        @media (max-width: 860px) { .cards-row { grid-template-columns: 1fr; } }
+
+        /* Tabelas em vidro */
+        .table-wrap { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: var(--radius-md); padding: 6px 18px 14px; overflow-x: auto; backdrop-filter: blur(var(--glass-blur)); box-shadow: var(--shadow-card); }
+        table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+        th { text-align: left; color: var(--text-muted); font-weight: 700; font-size: .72rem; text-transform: uppercase; letter-spacing: 1px; padding: .7rem .8rem; border-bottom: 1px solid var(--glass-border); }
+        td { padding: .8rem .8rem; border-bottom: 1px solid rgba(255,255,255,.04); vertical-align: middle; color: var(--text-primary); }
+        tbody tr { transition: background .2s ease; }
+        tbody tr:hover { background: rgba(255,255,255,.03); }
+
+        /* Inputs */
+        input, textarea, select { font-family: 'Plus Jakarta Sans', sans-serif; background: rgba(255,255,255,.035); color: #fff; border: 1px solid var(--glass-border); border-radius: 8px; padding: .55rem .7rem; font-size: .88rem; }
+        input:focus, textarea:focus, select:focus { outline: none; border-color: var(--accent); }
+        option { background: #121212; color: #fff; }
+        .prod-table input[type=number] { width: 90px; }
+        .prod-table input[type=text] { width: 100%; min-width: 150px; }
+
+        /* Botões (compat: o JS gera .btn dinamicamente) */
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; background: var(--accent-grad); color: #000; border: none; padding: .7rem 1.3rem; border-radius: 12px; font-weight: 700; font-size: .9rem; transition: all .2s ease; font-family: 'Outfit', sans-serif; cursor: pointer; }
+        .btn:hover { filter: brightness(1.08); transform: translateY(-1px); }
+        .btn.small { padding: .45rem .9rem; font-size: .8rem; border-radius: 9px; }
+        .btn.ghost { background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-secondary); }
+        .btn.ghost:hover { background: rgba(255,255,255,.08); color: #fff; filter: none; }
+        .btn.danger { background: rgba(255,23,68,.14); border: 1px solid rgba(255,23,68,.4); color: var(--danger); }
+        .btn.danger:hover { filter: none; background: rgba(255,23,68,.22); }
+        .btn.okbtn { background: rgba(0,230,118,.14); border: 1px solid rgba(0,230,118,.4); color: var(--success); }
+        .btn.okbtn:hover { filter: none; background: rgba(0,230,118,.22); }
+        .btn:disabled { opacity: .5; cursor: default; transform: none; filter: none; }
+
+        /* Badges de status */
+        .badge { display: inline-block; padding: .28rem .7rem; border-radius: 20px; font-size: .72rem; font-weight: 700; letter-spacing: .3px; }
+        .b-pago { background: rgba(0,230,118,.14); color: var(--success); }
+        .b-aguardando_pagamento { background: rgba(255,214,0,.14); color: var(--warning); }
+        .b-enviado { background: rgba(110,168,254,.16); color: #9fc2ff; }
+        .b-entregue { background: rgba(160,160,255,.16); color: #c8c8ff; }
+        .b-cancelado, .b-recusado { background: rgba(255,23,68,.14); color: var(--danger); }
+        select.b-novo { color: var(--warning); } select.b-contatado { color: #6ea8fe; }
+        select.b-fechado { color: var(--success); } select.b-descartado { color: var(--text-muted); }
+
+        /* Filtros da aba Pagamentos */
+        .pay-chip { background: rgba(255,255,255,.03); border: 1px solid var(--glass-border); color: var(--text-secondary); font-weight: 600; font-size: 12px; padding: 7px 14px; border-radius: 20px; cursor: pointer; transition: all .2s; }
+        .pay-chip:hover { background: rgba(255,255,255,.07); color: #fff; }
+        .pay-chip.active { background: rgba(201,162,90,.15); border-color: var(--accent); color: var(--accent); }
+
+        /* Estoque: steppers e toggles */
+        .stock-stepper { display: inline-flex; align-items: center; gap: 6px; }
+        .stock-stepper button { width: 26px; height: 26px; border-radius: 8px; border: 1px solid var(--glass-border); background: rgba(255,255,255,.04); color: #fff; font-size: 14px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: all .15s; line-height: 1; }
+        .stock-stepper button:hover { background: rgba(255,255,255,.10); border-color: var(--accent); }
+        .stock-stepper input { width: 58px; text-align: center; padding: .4rem; }
+        .prod-toggle { width: 44px; height: 24px; border-radius: 20px; border: 1px solid var(--glass-border); background: rgba(255,255,255,.06); position: relative; cursor: pointer; transition: all .2s; flex-shrink: 0; }
+        .prod-toggle::after { content: ''; position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%; background: #9aa3b5; transition: all .2s; }
+        .prod-toggle.on { background: rgba(0,230,118,.25); border-color: var(--success); }
+        .prod-toggle.on::after { left: 22px; background: var(--success); }
+        .stock-badge { display: inline-block; padding: .22rem .6rem; border-radius: 20px; font-size: .68rem; font-weight: 700; }
+
+        /* Badge de contagem na navegação lateral */
+        .dot { display: inline-flex; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--danger); color: #fff; font-size: .66rem; align-items: center; justify-content: center; font-weight: 800; }
+
+        .muted { color: var(--text-secondary); font-size: .82rem; }
+        .alert-low { background: rgba(255,214,0,.08); border: 1px solid rgba(255,214,0,.28); color: var(--warning); border-radius: 12px; padding: .85rem 1.2rem; font-size: .88rem; margin-bottom: 1.4rem; display: flex; align-items: center; gap: .6rem; }
+
+        /* Comentários */
+        .comment-card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 14px; padding: 1.1rem 1.3rem; margin-bottom: 1rem; backdrop-filter: blur(var(--glass-blur)); }
+        .comment-card.pending { border-color: rgba(255,214,0,.4); }
+        .comment-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: .5rem; margin-bottom: .6rem; }
+        .comment-head .who { font-weight: 700; color: #fff; }
+        .comment-head .stars { color: var(--warning); font-size: .8rem; }
+        .comment-card textarea { width: 100%; margin: .5rem 0; resize: vertical; }
+        .comment-actions { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .6rem; }
+
+        details.order-det summary { cursor: pointer; color: var(--accent); font-size: .82rem; }
+        details.order-det div { padding: .6rem 0 .2rem; color: var(--text-secondary); font-size: .85rem; line-height: 1.6; }
+
+        /* Toast */
+        .toastmsg { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 300; background: var(--bg-elevated); border: 1px solid rgba(0,230,118,.5); color: var(--success); padding: .9rem 1.4rem; border-radius: 12px; font-size: .9rem; opacity: 0; transform: translateY(10px); transition: all .3s ease; pointer-events: none; box-shadow: var(--shadow-card); }
+        .toastmsg.show { opacity: 1; transform: translateY(0); }
+
+        /* Confirmação */
+        .confirm-overlay { position: fixed; inset: 0; z-index: 400; display: none; align-items: center; justify-content: center; padding: 1rem; background: rgba(0,0,0,.7); backdrop-filter: blur(8px); opacity: 0; transition: opacity .25s ease; }
+        .confirm-overlay.show { display: flex; opacity: 1; }
+        .confirm-box { width: 100%; max-width: 390px; text-align: center; background: var(--glass-bg-2); border: 1px solid var(--glass-border); border-radius: 18px; padding: 2rem 1.8rem; box-shadow: var(--shadow-card); transform: translateY(16px) scale(.96); transition: transform .3s var(--ease-lux); }
+        .confirm-overlay.show .confirm-box { transform: none; }
+        .confirm-ico { font-size: 2rem; color: var(--warning); margin-bottom: .8rem; }
+        .confirm-msg { color: #fff; font-size: 1rem; margin-bottom: 1.4rem; line-height: 1.5; }
+        .confirm-actions { display: flex; gap: .7rem; justify-content: center; }
+
+        @media (max-width: 860px) {
+            .admin-layout-wrapper { flex-direction: column; }
+            .admin-sidebar.ag-sidebar { position: static; height: auto; width: 100% !important; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .bg-glow-spot-1, .bg-glow-spot-2, .bg-glow-spot-3, .tab-panel, .kpi-card, .login-card { animation: none !important; }
+        }
+    </style>
+    <!-- Camada de realce: paleta verde, botões macios, dashboard novo -->
+    <link rel="stylesheet" href="admin-enhance.css">
+</head>
+<body>
+<div class="admin-main-container">
+    <div class="bg-glow-spot-1"></div>
+    <div class="bg-glow-spot-2"></div>
+    <div class="bg-glow-spot-3"></div>
+
+    <!-- LOGIN -->
+    <div class="login-view" id="login-view">
+        <div class="login-card">
+            <div class="logo-i"><i class="fa-solid fa-leaf"></i></div>
+            <h1>Painel Bolladinho</h1>
+            <p>Acesso restrito à administração</p>
+            <input class="premium-input" type="text" id="login-user" placeholder="E-mail / usuário" autocomplete="username" style="margin-bottom:1rem;height:46px;">
+            <input class="premium-input" type="password" id="login-pass" placeholder="Senha de administrador" autocomplete="current-password">
+            <div class="login-err" id="login-err"></div>
+            <button class="premium-btn premium-btn-gold" style="width:100%;padding:12px;" id="login-btn"><i class="fa-solid fa-lock-open"></i> Entrar</button>
+        </div>
+    </div>
+
+    <!-- PAINEL -->
+    <div class="panel" id="panel-view">
+
+        <!-- Topbar -->
+        <div class="ag-topbar">
+            <div class="ag-breadcrumb">
+                <span>Admin</span>
+                <span class="crumb-sep">›</span>
+                <span class="crumb-active" id="crumb-active">Dashboard</span>
+            </div>
+            <div class="ag-search">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="text" id="topsearch" placeholder="Buscar nesta seção…">
+            </div>
+            <div class="ag-topbar-right">
+                <div class="ag-status-pill"><span class="ag-status-dot"></span> Site online</div>
+            </div>
+        </div>
+
+        <!-- Layout: sidebar + conteúdo -->
+        <div class="admin-layout-wrapper">
+
+            <!-- Sidebar -->
+            <div class="admin-sidebar ag-sidebar">
+                <div class="ag-brand">
+                    <div class="ag-brand-logo"><i class="fa-solid fa-leaf" style="color:var(--accent);font-size:18px;"></i></div>
+                    <div>
+                        <div class="ag-brand-name">Bolladinho</div>
+                        <div class="ag-brand-tag">Painel Admin</div>
+                    </div>
+                </div>
+
+                <div class="ag-nav-scroll">
+                    <div class="ag-nav-section">Menu</div>
+                    <div class="nav-item active-nav" data-tab="dash" data-label="Dashboard">
+                        <div style="display:flex;align-items:center;gap:11px;"><span><i class="fa-solid fa-chart-line"></i></span> Dashboard</div>
+                    </div>
+                    <div class="nav-item" data-tab="products" data-label="Produtos">
+                        <div style="display:flex;align-items:center;gap:11px;"><span><i class="fa-solid fa-box"></i></span> Produtos</div>
+                    </div>
+                    <div class="nav-item" data-tab="orders" data-label="Pedidos">
+                        <div style="display:flex;align-items:center;gap:11px;"><span><i class="fa-solid fa-receipt"></i></span> Pedidos</div>
+                    </div>
+                    <div class="nav-item" data-tab="comments" data-label="Comentários">
+                        <div style="display:flex;align-items:center;gap:11px;"><span><i class="fa-solid fa-comments"></i></span> Comentários</div>
+                        <span id="pending-dot"></span>
+                    </div>
+                    <div class="nav-item" data-tab="leads" data-label="Revendedores">
+                        <div style="display:flex;align-items:center;gap:11px;"><span><i class="fa-solid fa-handshake"></i></span> Revendedores</div>
+                        <span id="leads-dot"></span>
+                    </div>
+                    <div class="nav-item" data-tab="payerrors" data-label="Pagamentos">
+                        <div style="display:flex;align-items:center;gap:11px;"><span><i class="fa-solid fa-triangle-exclamation"></i></span> Pagamentos</div>
+                        <span id="payerr-dot"></span>
+                    </div>
+
+                    <div class="ag-nav-section" style="margin-top:14px;">Loja</div>
+                    <div style="margin:0 12px;background:rgba(0,230,118,0.06);border:1px solid rgba(0,230,118,0.18);border-radius:12px;padding:11px 13px;">
+                        <div style="font-size:11px;color:var(--success);font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:6px;">
+                            <span style="width:7px;height:7px;border-radius:50%;background:var(--success);box-shadow:0 0 8px var(--success);"></span> Conectado
+                        </div>
+                        <div style="font-size:10.5px;color:var(--text-muted);line-height:1.45;">Alterações refletem em tempo real no site</div>
+                    </div>
+                </div>
+
+                <div class="ag-user-card" id="logout-btn" title="Sair do painel">
+                    <div class="ag-user-av">B</div>
+                    <div style="flex:1;min-width:0;">
+                        <div class="ag-user-name">Administrador</div>
+                        <div class="ag-user-role">Bolladinho</div>
+                    </div>
+                    <button class="ag-user-logout" title="Sair"><i class="fa-solid fa-right-from-bracket"></i></button>
+                </div>
+            </div>
+
+            <!-- Conteúdo -->
+            <div class="admin-main-content">
+                <!-- DASHBOARD -->
+                <div class="tab-panel active" id="tab-dash">
+                    <!-- Hero: saudação + resumo + meta do mês -->
+                    <div class="ag-hero dash-hero">
+                        <div class="dash-hero-main">
+                            <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+                                <span class="ag-hero-pill"><span class="live-dot"></span> Loja Online</span>
+                                <span class="ag-hero-date" id="hero-date" style="text-transform:capitalize;"></span>
+                            </div>
+                            <h1 id="hero-greeting">Bem-vindo</h1>
+                            <p id="hero-sub">Carregando os dados da sua loja…</p>
+                            <div class="dash-quick">
+                                <button class="premium-btn premium-btn-gold" data-jump="orders"><i class="fa-solid fa-receipt"></i> Ver pedidos</button>
+                                <button class="premium-btn" data-jump="products"><i class="fa-solid fa-box"></i> Estoque</button>
+                                <button class="premium-btn" data-jump="comments"><i class="fa-solid fa-comments"></i> Moderar</button>
+                                <a class="premium-btn" href="./" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Ver site</a>
+                            </div>
+                        </div>
+                        <div class="goal-card" id="goal-card">
+                            <div class="goal-ring">
+                                <svg viewBox="0 0 120 120" aria-hidden="true">
+                                    <defs><linearGradient id="goalGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a9dcb7"/><stop offset="1" stop-color="#33844f"/></linearGradient></defs>
+                                    <circle cx="60" cy="60" r="50" class="goal-track"/>
+                                    <circle cx="60" cy="60" r="50" class="goal-bar" id="goal-bar"/>
+                                </svg>
+                                <div class="goal-center"><strong id="goal-pct">0%</strong><span>da meta</span></div>
+                            </div>
+                            <div class="goal-info">
+                                <span class="goal-lbl">Meta de <span id="goal-month"></span></span>
+                                <div class="goal-val"><b id="goal-done">R$ 0,00</b> <span>de</span> <button type="button" class="goal-edit" id="goal-edit" title="Editar meta"><span id="goal-target">R$ 0,00</span> <i class="fa-solid fa-pen"></i></button></div>
+                                <span class="goal-sub" id="goal-sub"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Barra de controle: período, atualização automática, exportação -->
+                    <div class="dash-toolbar">
+                        <div class="seg" id="period-seg" role="tablist" aria-label="Período">
+                            <span class="seg-thumb" aria-hidden="true"></span>
+                            <button type="button" data-days="7">7 dias</button>
+                            <button type="button" data-days="14">14 dias</button>
+                            <button type="button" data-days="30" class="on">30 dias</button>
+                            <button type="button" data-days="90">90 dias</button>
+                        </div>
+                        <div class="dash-toolbar-right">
+                            <span class="dash-updated" id="dash-updated"><i class="fa-regular fa-clock"></i> —</span>
+                            <label class="auto-toggle" title="Atualiza sozinho a cada 60 s">
+                                <input type="checkbox" id="auto-refresh"><span class="sw"></span> Auto
+                            </label>
+                            <button class="btn ghost small" id="export-csv"><i class="fa-solid fa-file-arrow-down"></i> Exportar CSV</button>
+                            <button class="btn ghost small" id="refresh-dash"><i class="fa-solid fa-rotate"></i> Atualizar</button>
+                        </div>
+                    </div>
+
+                    <!-- KPIs principais (com tendência vs período anterior e sparkline) -->
+                    <div class="kpi-grid kpi-main" id="kpi-grid"></div>
+                    <!-- Indicadores de operação (clicáveis) -->
+                    <div class="ops-strip" id="ops-strip"></div>
+                    <div id="low-stock-alert"></div>
+
+                    <div class="dash-grid">
+                        <div class="card span-8">
+                            <div class="card-h">
+                                <h3><i class="fa-solid fa-chart-area"></i> Faturamento <span class="card-h-sub" id="rev-sub"></span></h3>
+                                <div class="mini-seg" id="rev-metric">
+                                    <button type="button" data-m="revenue" class="on">R$</button>
+                                    <button type="button" data-m="orders">Pedidos</button>
+                                </div>
+                            </div>
+                            <div class="chart-box tall"><canvas id="chart-revenue" aria-label="Gráfico de faturamento por dia"></canvas></div>
+                        </div>
+                        <div class="card span-4">
+                            <div class="card-h"><h3><i class="fa-solid fa-chart-pie"></i> Pedidos por status</h3></div>
+                            <div class="donut-wrap">
+                                <div class="chart-box donut"><canvas id="chart-status" aria-label="Pedidos por status"></canvas>
+                                    <div class="donut-center"><strong id="donut-total">0</strong><span>pedidos</span></div>
+                                </div>
+                                <ul class="legend-list" id="status-legend"></ul>
+                            </div>
+                        </div>
+
+                        <div class="card span-4">
+                            <div class="card-h"><h3><i class="fa-solid fa-ranking-star"></i> Produtos mais vendidos</h3></div>
+                            <ul class="rank-list" id="top-products"></ul>
+                        </div>
+                        <div class="card span-4">
+                            <div class="card-h"><h3><i class="fa-solid fa-calendar-week"></i> Vendas por dia da semana</h3></div>
+                            <div class="chart-box"><canvas id="chart-weekday" aria-label="Faturamento por dia da semana"></canvas></div>
+                        </div>
+                        <div class="card span-4">
+                            <div class="card-h"><h3><i class="fa-solid fa-wallet"></i> Formas de pagamento</h3></div>
+                            <div class="pay-split" id="pay-split"></div>
+                        </div>
+
+                        <div class="card span-4">
+                            <div class="card-h"><h3><i class="fa-solid fa-boxes-stacked"></i> Nível de estoque</h3><button class="link-btn" data-jump="products">Gerenciar <i class="fa-solid fa-arrow-right"></i></button></div>
+                            <ul class="stock-meters" id="stock-meters"></ul>
+                        </div>
+                        <div class="card span-4">
+                            <div class="card-h"><h3><i class="fa-solid fa-map-location-dot"></i> Onde estão seus clientes</h3></div>
+                            <ul class="rank-list" id="top-regions"></ul>
+                        </div>
+                        <div class="card span-4">
+                            <div class="card-h"><h3><i class="fa-solid fa-star-half-stroke"></i> Avaliações</h3><button class="link-btn" data-jump="comments">Moderar <i class="fa-solid fa-arrow-right"></i></button></div>
+                            <div class="rating-box" id="rating-box"></div>
+                        </div>
+
+                        <div class="card span-12">
+                            <div class="card-h"><h3><i class="fa-solid fa-wave-square"></i> Atividade recente</h3></div>
+                            <ul class="feed" id="activity-feed"></ul>
+                        </div>
+                    </div>
+
+                    <div class="section-h"><h2><i class="fa-solid fa-clock-rotate-left"></i> Últimos Pedidos</h2><button class="btn ghost small" data-jump="orders">Ver todos <i class="fa-solid fa-arrow-right"></i></button></div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead><tr><th>Data</th><th>Cliente</th><th>Itens</th><th>Total</th><th>Status</th></tr></thead>
+                            <tbody id="dash-orders"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- PRODUTOS -->
+                <div class="tab-panel" id="tab-products">
+                    <div class="section-h"><h2><i class="fa-solid fa-boxes-stacked"></i> Produtos &amp; Estoque</h2><button class="btn" id="save-products"><i class="fa-solid fa-floppy-disk"></i> Salvar Alterações</button></div>
+                    <div id="stock-summary" style="display:flex;flex-wrap:wrap;gap:14px;margin-bottom:18px;"></div>
+                    <div class="table-wrap prod-table">
+                        <table>
+                            <thead><tr>
+                                <th><i class="fa-solid fa-tag"></i> Nome</th>
+                                <th><i class="fa-solid fa-align-left"></i> Descrição</th>
+                                <th><i class="fa-solid fa-brazilian-real-sign"></i> Preço</th>
+                                <th><i class="fa-solid fa-boxes-stacked"></i> Estoque</th>
+                                <th><i class="fa-solid fa-eye"></i> Ativo</th>
+                                <th><i class="fa-solid fa-star"></i> Destaque</th>
+                            </tr></thead>
+                            <tbody id="products-body"></tbody>
+                        </table>
+                    </div>
+                    <p class="muted" style="margin-top:0.8rem;"><i class="fa-solid fa-circle-info"></i> O estoque baixa automaticamente quando um pagamento é aprovado. Produtos inativos somem do site.</p>
+                </div>
+
+                <!-- PEDIDOS -->
+                <div class="tab-panel" id="tab-orders">
+                    <div class="section-h"><h2><i class="fa-solid fa-receipt"></i> Todos os Pedidos</h2><button class="btn ghost small" id="refresh-orders"><i class="fa-solid fa-rotate"></i> Atualizar</button></div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead><tr><th>Data</th><th>Cliente</th><th>Detalhes</th><th>Total</th><th>Status</th></tr></thead>
+                            <tbody id="orders-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- COMENTÁRIOS -->
+                <div class="tab-panel" id="tab-comments">
+                    <div class="section-h"><h2><i class="fa-solid fa-comments"></i> Moderação de Comentários</h2><button class="btn ghost small" id="refresh-comments"><i class="fa-solid fa-rotate"></i> Atualizar</button></div>
+                    <div id="comments-list"></div>
+                </div>
+
+                <!-- REVENDEDORES -->
+                <div class="tab-panel" id="tab-leads">
+                    <div class="section-h"><h2><i class="fa-solid fa-handshake"></i> Leads de Revendedores</h2><button class="btn ghost small" id="refresh-leads"><i class="fa-solid fa-rotate"></i> Atualizar</button></div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead><tr><th>Data</th><th>Nome</th><th>Empresa</th><th>Endereço</th><th>Telefone</th><th>Status</th><th></th></tr></thead>
+                            <tbody id="leads-body"></tbody>
+                        </table>
+                    </div>
+                    <p class="muted" style="margin-top:0.8rem;">Leads enviados pelo formulário da página de revendedor aparecem aqui automaticamente.</p>
+                </div>
+
+                <!-- PAGAMENTOS: tentativas (cartão + PIX) -->
+                <div class="tab-panel" id="tab-payerrors">
+                    <div class="section-h"><h2><i class="fa-solid fa-credit-card"></i> Tentativas de Pagamento</h2>
+                        <div style="display:flex;gap:0.5rem;">
+                            <button class="btn ghost small" id="refresh-payerrors"><i class="fa-solid fa-rotate"></i> Atualizar</button>
+                            <button class="btn danger small" id="clear-payerrors"><i class="fa-solid fa-broom"></i> Limpar tudo</button>
+                        </div>
+                    </div>
+                    <p class="muted" style="margin:-6px 0 18px;max-width:740px;">Toda tentativa fica registrada aqui, separada por <b style="color:var(--accent)">Cartão</b> e <b style="color:#00d1b2">PIX</b>, com o <b>motivo exato</b> informado pelo Mercado Pago. Quando um cliente disser que não conseguiu pagar, é aqui que você descobre o porquê.</p>
+                    <div id="pay-stats" style="display:flex;flex-wrap:wrap;gap:14px;margin-bottom:18px;"></div>
+                    <div id="pay-filters" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;"></div>
+                    <div id="pay-attempts" style="display:flex;flex-direction:column;gap:12px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <div class="toastmsg" id="toastmsg"></div>
+
+    <!-- Diálogo de confirmação (no site, não do navegador) -->
+    <div class="confirm-overlay" id="confirm-overlay">
+        <div class="confirm-box">
+            <div class="confirm-ico"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <p class="confirm-msg" id="confirm-msg"></p>
+            <div class="confirm-actions">
+                <button class="btn ghost small" id="confirm-cancel">Cancelar</button>
+                <button class="btn danger small" id="confirm-ok"><i class="fa-solid fa-check"></i> Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+<script src="config.js"></script>
+<script>
+(() => {
+    const API = String(window.BOLLA_API || '').replace(/\/+$/, '');
+    let token = sessionStorage.getItem('bolla_admin_token') || '';
+    const $ = id => document.getElementById(id);
+    const fmtBRL = v => 'R$ ' + Number(v).toFixed(2).replace('.', ',');
+    const fmtInt = v => Math.round(v).toLocaleString('pt-BR');
+    const fmtDate = iso => new Date(iso).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+    const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const STATUS_LABEL = {
+        aguardando_pagamento: 'Pendente', pago: 'Pago', enviado: 'Enviado',
+        entregue: 'Entregue', cancelado: 'Cancelado', recusado: 'Cancelado'
+    };
+    const LEAD_STATUS = { novo: 'Novo', contatado: 'Contatado', fechado: 'Fechado', descartado: 'Descartado' };
+    const PAY_LABEL = { cartao: 'Cartão de crédito', pix: 'PIX', boleto: 'Boleto', manual: 'Confirmado manualmente' };
+    const PAID = new Set(['pago', 'enviado', 'entregue']); // consideradas "faturadas"
+
+    function toast(msg) {
+        const t = $('toastmsg'); t.textContent = msg; t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2500);
+    }
+
+    /* Confirmação no site (substitui o confirm() do navegador) */
+    let _confirmResolve = null;
+    function confirmDialog(msg) {
+        $('confirm-msg').textContent = msg;
+        $('confirm-overlay').classList.add('show');
+        return new Promise(resolve => { _confirmResolve = resolve; });
+    }
+    function closeConfirm(result) {
+        $('confirm-overlay').classList.remove('show');
+        if (_confirmResolve) { _confirmResolve(result); _confirmResolve = null; }
+    }
+    $('confirm-ok').addEventListener('click', () => closeConfirm(true));
+    $('confirm-cancel').addEventListener('click', () => closeConfirm(false));
+    $('confirm-overlay').addEventListener('click', e => { if (e.target === $('confirm-overlay')) closeConfirm(false); });
+    document.addEventListener('keydown', e => {
+        if ($('confirm-overlay').classList.contains('show')) {
+            if (e.key === 'Escape') closeConfirm(false);
+            if (e.key === 'Enter') closeConfirm(true);
+        }
+    });
+
+    /* ---- Modo demonstração (GitHub Pages: não há servidor) ----
+       Tudo roda em memória com pedidos de exemplo gerados aqui mesmo.
+       Nada é salvo e nada sai do navegador. */
+    const STATIC_HOST = /\.github\.io$/.test(location.hostname) && !API;
+    let DEMO = STATIC_HOST && sessionStorage.getItem('bolla_admin_demo') === '1';
+    let demoDB = null;
+    function buildDemo() {
+        let seed = 11; const rnd = () => (seed = seed * 16807 % 2147483647) / 2147483647;
+        const P = [['pequena', 'Caixa Pequena', 5], ['media', 'Caixa Média', 9.9], ['grande', 'Caixa Grande', 20]];
+        const C = [['Brasília', 'DF'], ['Goiânia', 'GO'], ['São Paulo', 'SP'], ['Belo Horizonte', 'MG'], ['Rio de Janeiro', 'RJ'], ['Curitiba', 'PR']];
+        const S = ['pago', 'pago', 'pago', 'enviado', 'entregue', 'aguardando_pagamento', 'cancelado'];
+        const N = ['Ana', 'Bruno', 'Carla', 'Diego', 'Elisa', 'Felipe', 'Gabi', 'Heitor', 'Iara', 'João', 'Lia', 'Marcos'];
+        const orders = [];
+        for (let i = 0; i < 80; i++) {
+            const d = new Date(Date.now() - Math.floor(rnd() * 60 * 864e5)); d.setHours(8 + Math.floor(rnd() * 14), Math.floor(rnd() * 60));
+            const items = []; const n = 1 + Math.floor(rnd() * 2);
+            for (let k = 0; k < n; k++) { const p = P[Math.floor(rnd() * 3)]; items.push({ id: p[0], name: p[1], price: p[2], qty: 1 + Math.floor(rnd() * 3) }); }
+            const c = C[Math.floor(rnd() * C.length)], nome = N[Math.floor(rnd() * N.length)] + ' ' + String.fromCharCode(65 + Math.floor(rnd() * 20)) + '.';
+            orders.push({ id: 'demo-' + i, createdAt: d.toISOString(), status: S[Math.floor(rnd() * S.length)], paymentMethod: rnd() > 0.45 ? 'pix' : 'cartao',
+                customer: { nome, cidade: c[0], uf: c[1], whatsapp: '(61) 90000-0000', email: 'cliente@exemplo.com', cpf: '000.000.000-00', rua: 'Rua Exemplo', numero: '100', bairro: 'Centro', cep: '70000-000' },
+                items, total: +items.reduce((s, x) => s + x.price * x.qty, 0).toFixed(2) });
+        }
+        orders.sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+        return {
+            orders,
+            products: [
+                { id: 'pequena', name: 'Caixa Pequena', desc: 'Ideal para quem quer experimentar a diferença.', price: 5, stock: 64, active: true, popular: false },
+                { id: 'media', name: 'Caixa Média', desc: 'O tamanho perfeito para o seu ritual diário.', price: 9.9, stock: 8, active: true, popular: true },
+                { id: 'grande', name: 'Caixa Grande', desc: 'Maior custo-benefício. Para uso prolongado.', price: 20, stock: 31, active: true, popular: false }
+            ],
+            comments: [
+                { id: 'd1', name: 'Lucas M.', city: 'Brasília - DF', rating: 5, approved: true, date: new Date(Date.now() - 9 * 864e5).toISOString(), text: 'O acabamento é impecável e o toque do bambu é muito melhor que qualquer piteira de vidro que já usei.' },
+                { id: 'd2', name: 'Ana P.', city: 'Goiânia - GO', rating: 5, approved: true, date: new Date(Date.now() - 6 * 864e5).toISOString(), text: 'Além de linda, é sustentável. A fumaça fica mais fresca e não altera o sabor em nada.' },
+                { id: 'd3', name: 'Visitante', city: 'Curitiba - PR', rating: 4, approved: false, date: new Date(Date.now() - 1 * 864e5).toISOString(), text: 'Chegou rápido, gostei bastante. (avaliação de exemplo aguardando moderação)' }
+            ],
+            leads: [{ id: 'l1', nome: 'Loja Exemplo', empresa: 'Tabacaria Central', endereco: 'Brasília / DF', telefone: '(61) 90000-0000', status: 'novo', createdAt: new Date(Date.now() - 2 * 864e5).toISOString() }],
+            attempts: []
+        };
+    }
+    function demoApi(method, path, body) {
+        const db = demoDB || (demoDB = buildDemo());
+        const url = new URL(path, location.href), route = url.pathname, id = url.searchParams.get('id');
+        const PAIDS = new Set(['pago', 'enviado', 'entregue']);
+        if (method === 'GET') {
+            if (route.endsWith('/overview')) return {
+                totalOrders: db.orders.length, paidOrders: db.orders.filter(o => PAIDS.has(o.status)).length,
+                paymentErrors: db.attempts.length, awaitingPayment: db.orders.filter(o => o.status === 'aguardando_pagamento').length,
+                pendingComments: db.comments.filter(c => !c.approved).length,
+                lowStock: db.products.filter(p => p.active && p.stock <= 10).map(p => ({ name: p.name, stock: p.stock })),
+                resellerLeads: db.leads.length, newLeads: db.leads.filter(l => l.status === 'novo').length,
+                recentOrders: db.orders.slice(-10).reverse()
+            };
+            if (route.endsWith('/orders')) return JSON.parse(JSON.stringify(db.orders));
+            if (route.endsWith('/products')) return JSON.parse(JSON.stringify(db.products));
+            if (route.endsWith('/comments')) return JSON.parse(JSON.stringify(db.comments));
+            if (route.endsWith('/reseller-leads')) return JSON.parse(JSON.stringify(db.leads));
+            if (route.endsWith('/payment-attempts') || route.endsWith('/payment-errors')) return [];
+            return {};
+        }
+        const coll = route.endsWith('/orders') ? db.orders : route.endsWith('/comments') ? db.comments : route.endsWith('/reseller-leads') ? db.leads : null;
+        if (method === 'PUT' && route.endsWith('/products')) db.products = JSON.parse(JSON.stringify(body));
+        else if (method === 'PUT' && coll && body) { const it = coll.find(x => x.id === body.id); if (it) Object.assign(it, body); }
+        else if (method === 'DELETE' && coll && id) coll.splice(coll.findIndex(x => x.id === id) >>> 0, 1);
+        else if (method === 'DELETE' && route.endsWith('/payment-attempts')) db.attempts = [];
+        return { ok: true };
+    }
+
+    async function api(method, path, body) {
+        if (DEMO) return demoApi(method, path, body);
+        const res = await fetch(API + path, {
+            method,
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+            body: body ? JSON.stringify(body) : undefined
+        });
+        if (res.status === 401) { logout(); throw new Error('Sessão expirada.'); }
+        return res.json();
+    }
+
+    function logout() {
+        token = ''; sessionStorage.removeItem('bolla_admin_token');
+        DEMO = false; sessionStorage.removeItem('bolla_admin_demo');
+        document.body.classList.remove('is-demo');
+        $('panel-view').style.display = 'none';
+        $('login-view').style.display = 'flex';
+    }
+
+    function showPanel() {
+        $('login-view').style.display = 'none';
+        $('panel-view').style.display = 'block';
+        loadDash(); loadProducts(); loadOrders(); loadComments(); loadLeads(); loadPayAttempts();
+    }
+
+    /* ---- Login ---- */
+    $('login-btn').addEventListener('click', doLogin);
+    $('login-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+    async function doLogin() {
+        $('login-err').textContent = '';
+        try {
+            const res = await fetch(API + '/api/admin/login', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user: $('login-user').value.trim(), password: $('login-pass').value })
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                let msg = data.msg || 'Senha incorreta.';
+                if (typeof data.remaining === 'number') msg += ` (${data.remaining} tentativa${data.remaining === 1 ? '' : 's'} restante${data.remaining === 1 ? '' : 's'})`;
+                $('login-err').textContent = msg;
+                if (data.locked) { $('login-pass').disabled = true; $('login-btn').disabled = true; }
+                return;
+            }
+            token = data.token;
+            sessionStorage.setItem('bolla_admin_token', token);
+            showPanel();
+        } catch (e) { $('login-err').textContent = 'Servidor indisponível.'; }
+    }
+    /* Sair pelo cartão de usuário na sidebar */
+    $('logout-btn').addEventListener('click', async () => {
+        if (await confirmDialog('Deseja sair do painel admin?')) logout();
+    });
+
+    /* ---- Navegação lateral (abas) ---- */
+    function goTab(tab) {
+        document.querySelectorAll('.nav-item').forEach(b => b.classList.toggle('active-nav', b.dataset.tab === tab));
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        const panel = $('tab-' + tab); if (panel) panel.classList.add('active');
+        const btn = document.querySelector(`.nav-item[data-tab="${tab}"]`);
+        if (btn) $('crumb-active').textContent = btn.dataset.label || 'Dashboard';
+        const s = $('topsearch'); if (s) { s.value = ''; applySearch(''); }
+    }
+    document.querySelectorAll('.nav-item').forEach(btn => {
+        btn.addEventListener('click', () => goTab(btn.dataset.tab));
+    });
+    /* Botões de atalho do hero */
+    // delegado: os atalhos do dashboard são gerados dinamicamente (KPIs, feed, alertas)
+    document.addEventListener('click', e => {
+        const j = e.target.closest('[data-jump]');
+        if (j && !e.target.closest('#goal-edit')) { goTab(j.dataset.jump); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    });
+    document.addEventListener('keydown', e => {
+        const j = e.target.closest && e.target.closest('[data-jump][tabindex]');
+        if (j && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); goTab(j.dataset.jump); }
+    });
+
+    /* ---- Busca na seção ativa ---- */
+    function applySearch(q) {
+        q = (q || '').trim().toLowerCase();
+        const panel = document.querySelector('.tab-panel.active');
+        if (!panel) return;
+        panel.querySelectorAll('tbody tr').forEach(tr => {
+            tr.style.display = (!q || tr.textContent.toLowerCase().includes(q)) ? '' : 'none';
+        });
+        panel.querySelectorAll('.comment-card').forEach(c => {
+            c.style.display = (!q || c.textContent.toLowerCase().includes(q)) ? '' : 'none';
+        });
+    }
+    $('topsearch').addEventListener('input', e => applySearch(e.target.value));
+
+    /* ---- Contador animado (com fallback caso rAF não rode) ---- */
+    function animateNum(el, target, fmt) {
+        const dur = 900, t0 = performance.now();
+        let done = false;
+        const finish = () => { if (!done) { done = true; el.textContent = fmt(target); } };
+        const step = now => {
+            if (done) return;
+            const p = Math.min((now - t0) / dur, 1);
+            el.textContent = fmt(target * (1 - Math.pow(1 - p, 3)));
+            if (p < 1) requestAnimationFrame(step); else finish();
+        };
+        requestAnimationFrame(step);
+        setTimeout(finish, dur + 150); // garante o valor final mesmo sem compositing
+    }
+
+    /* ---- Gráficos ---- */
+    const charts = {};
+    // Escala verde do painel (mesma da vitrine) + cores de estado com rótulo sempre visível
+    const G = { 100: '#dcf1e2', 200: '#a9dcb7', 300: '#74c08e', 400: '#4aa168', 500: '#33844f', 600: '#266b3f', 700: '#1c5330' };
+    const STATUS_COLOR = { pago: '#74c08e', enviado: '#5fb3a0', entregue: '#2f8f5b', aguardando_pagamento: '#fec81d', cancelado: '#e4705e', recusado: '#e4705e' };
+    if (typeof Chart !== 'undefined') {
+        Chart.defaults.color = '#8fa89a';
+        Chart.defaults.font.family = 'Plus Jakarta Sans, sans-serif';
+        Chart.defaults.font.size = 11.5;
+        Chart.defaults.borderColor = 'rgba(169,220,183,0.06)';
+        Object.assign(Chart.defaults.plugins.tooltip, {
+            backgroundColor: 'rgba(5,22,12,0.96)', borderColor: 'rgba(169,220,183,0.22)', borderWidth: 1,
+            titleColor: '#dcf1e2', bodyColor: '#cfe6d6', padding: 12, cornerRadius: 12, displayColors: true,
+            boxPadding: 4, usePointStyle: true, titleFont: { weight: '700' }
+        });
+        Chart.defaults.animation.duration = 900;
+        Chart.defaults.animation.easing = 'easeOutQuart';
+    }
+
+    const pad2 = n => String(n).padStart(2, '0');
+    const dayKey = dt => { const d = new Date(dt); return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`; };
+    const startOfDay = (offset = 0) => { const d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() + offset); return d; };
+    const relTime = iso => {
+        const s = (Date.now() - new Date(iso).getTime()) / 1000;
+        if (s < 60) return 'agora';
+        if (s < 3600) return `há ${Math.floor(s / 60)} min`;
+        if (s < 86400) return `há ${Math.floor(s / 3600)} h`;
+        const d = Math.floor(s / 86400);
+        return d === 1 ? 'ontem' : `há ${d} dias`;
+    };
+
+    const dash = {
+        period: Number(localStorage.getItem('bolla_dash_period')) || 30,
+        metric: 'revenue',
+        data: null,
+        timer: 0
+    };
+
+    function inRange(o, from, to) { const t = new Date(o.createdAt).getTime(); return t >= from.getTime() && t < to.getTime(); }
+    function stats(list) {
+        const paid = list.filter(o => PAID.has(o.status));
+        const revenue = paid.reduce((s, o) => s + o.total, 0);
+        const units = paid.reduce((s, o) => s + o.items.reduce((a, i) => a + i.qty, 0), 0);
+        return { paid, revenue, units, count: paid.length, avg: paid.length ? revenue / paid.length : 0, total: list.length };
+    }
+    function series(list, from, days, fn) {
+        const map = {}, keys = [];
+        for (let i = 0; i < days; i++) { const d = new Date(from); d.setDate(d.getDate() + i); const k = dayKey(d); keys.push(k); map[k] = 0; }
+        list.forEach(o => { const k = dayKey(o.createdAt); if (k in map) map[k] += fn(o); });
+        return keys.map(k => map[k]);
+    }
+    function spark(values) {
+        const w = 120, h = 34, max = Math.max(...values, 0.0001);
+        const pts = values.map((v, i) => [i / Math.max(1, values.length - 1) * w, h - 3 - (v / max) * (h - 8)]);
+        const line = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ');
+        const id = 'sg' + Math.random().toString(36).slice(2, 8);
+        return `<svg class="kpi-spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true">
+            <defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${G[300]}" stop-opacity=".35"/><stop offset="1" stop-color="${G[300]}" stop-opacity="0"/></linearGradient></defs>
+            <path d="${line} L${w} ${h} L0 ${h} Z" fill="url(#${id})"/>
+            <path d="${line}" fill="none" stroke="${G[300]}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/></svg>`;
+    }
+    function delta(cur, prev) {
+        if (!prev && !cur) return '<span class="ag-trend flat">— sem movimento</span>';
+        if (!prev) return '<span class="ag-trend up"><i class="fa-solid fa-arrow-trend-up"></i> novo</span>';
+        const p = (cur - prev) / prev * 100;
+        const cls = Math.abs(p) < 0.5 ? 'flat' : (p > 0 ? 'up' : 'down');
+        const ico = cls === 'up' ? 'fa-arrow-trend-up' : cls === 'down' ? 'fa-arrow-trend-down' : 'fa-minus';
+        return `<span class="ag-trend ${cls}"><i class="fa-solid ${ico}"></i> ${p > 0 ? '+' : ''}${p.toFixed(0)}%</span>`;
+    }
+
+    function drawCharts(orders, from, days, prevFrom) {
+        const hasChart = typeof Chart !== 'undefined';
+        const mk = (el, cfg) => hasChart ? new Chart(el, cfg) : null;
+        Object.values(charts).forEach(c => c && c.destroy());
+        const cur = orders.filter(o => inRange(o, from, new Date(from.getTime() + days * 864e5)));
+        const prev = orders.filter(o => inRange(o, prevFrom, from));
+        const paidCur = cur.filter(o => PAID.has(o.status)), paidPrev = prev.filter(o => PAID.has(o.status));
+        const isRev = dash.metric === 'revenue';
+        const fn = isRev ? (o => o.total) : (() => 1);
+        const labels = [];
+        for (let i = 0; i < days; i++) { const d = new Date(from); d.setDate(d.getDate() + i); labels.push(d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })); }
+        const curS = series(paidCur, from, days, fn), prevS = series(paidPrev, prevFrom, days, fn);
+        const fmt = v => isRev ? fmtBRL(v) : fmtInt(v) + (v === 1 ? ' pedido' : ' pedidos');
+
+        const ctx = $('chart-revenue').getContext('2d');
+        const grad = ctx.createLinearGradient(0, 0, 0, 300);
+        grad.addColorStop(0, 'rgba(116,192,142,0.38)'); grad.addColorStop(1, 'rgba(116,192,142,0)');
+        charts.rev = mk(ctx, {
+            type: 'line',
+            data: { labels, datasets: [
+                { label: `Últimos ${days} dias`, data: curS, borderColor: G[300], backgroundColor: grad, fill: true, tension: 0.35, cubicInterpolationMode: 'monotone', borderWidth: 2, pointRadius: 0, pointHoverRadius: 5, pointHoverBackgroundColor: G[200], pointHoverBorderColor: '#05160c', pointHoverBorderWidth: 2 },
+                { label: `${days} dias anteriores`, data: prevS, borderColor: 'rgba(169,220,183,0.35)', borderDash: [5, 5], fill: false, tension: 0.35, cubicInterpolationMode: 'monotone', borderWidth: 1.5, pointRadius: 0, pointHoverRadius: 4, pointHoverBackgroundColor: 'rgba(169,220,183,0.6)' }
+            ] },
+            options: {
+                responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    legend: { display: true, position: 'top', align: 'end', labels: { usePointStyle: true, pointStyle: 'line', boxWidth: 22, padding: 14 } },
+                    tooltip: { callbacks: { label: c => ` ${c.dataset.label}: ${fmt(c.raw)}` } }
+                },
+                scales: {
+                    y: { beginAtZero: true, border: { display: false }, ticks: { maxTicksLimit: 5, precision: 0, callback: v => isRev ? 'R$ ' + v : v }, grid: { color: 'rgba(169,220,183,0.06)' } },
+                    x: { border: { display: false }, grid: { display: false }, ticks: { maxTicksLimit: days > 30 ? 10 : 8, maxRotation: 0 } }
+                }
+            }
+        });
+        $('rev-sub').textContent = `· ${isRev ? fmtBRL(curS.reduce((a, b) => a + b, 0)) : fmtInt(curS.reduce((a, b) => a + b, 0)) + ' pedidos'} no período`;
+
+        // Status (todos os pedidos do período) — "recusado" e "cancelado" somam num rótulo só
+        const byLabel = {};
+        cur.forEach(o => {
+            const lbl = STATUS_LABEL[o.status] || o.status;
+            if (!byLabel[lbl]) byLabel[lbl] = { n: 0, color: STATUS_COLOR[o.status] || '#777' };
+            byLabel[lbl].n++;
+        });
+        const sl = Object.entries(byLabel).sort((a, b) => b[1].n - a[1].n);
+        charts.status = mk($('chart-status'), {
+            type: 'doughnut',
+            data: { labels: sl.map(s => s[0]), datasets: [{ data: sl.length ? sl.map(s => s[1].n) : [1], backgroundColor: sl.length ? sl.map(s => s[1].color) : ['rgba(169,220,183,0.08)'], borderColor: '#06180d', borderWidth: 3, hoverOffset: 6, borderRadius: 4 }] },
+            options: { responsive: true, maintainAspectRatio: false, cutout: '72%', plugins: { legend: { display: false }, tooltip: { enabled: !!sl.length } } }
+        });
+        $('donut-total').textContent = fmtInt(cur.length);
+        $('status-legend').innerHTML = sl.length ? sl.map(([l, v]) => `
+            <li><span class="dot-c" style="background:${v.color}"></span><span class="lg-l">${esc(l)}</span><span class="lg-v">${v.n}</span><span class="lg-p">${(v.n / cur.length * 100).toFixed(0)}%</span></li>`).join('')
+            : '<li class="muted">Sem pedidos no período.</li>';
+
+        // Dia da semana (faturamento pago no período) — o melhor dia acende
+        const wd = [0, 0, 0, 0, 0, 0, 0];
+        paidCur.forEach(o => { wd[new Date(o.createdAt).getDay()] += o.total; });
+        const order = [1, 2, 3, 4, 5, 6, 0], wdl = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+        const vals = order.map(i => wd[i]), best = Math.max(...vals);
+        charts.wd = mk($('chart-weekday'), {
+            type: 'bar',
+            data: { labels: order.map(i => wdl[i]), datasets: [{ label: 'Faturamento', data: vals, backgroundColor: vals.map(v => v === best && best > 0 ? G[300] : 'rgba(74,161,104,0.45)'), hoverBackgroundColor: G[200], borderRadius: 6, borderSkipped: false, maxBarThickness: 28 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => ' ' + fmtBRL(c.raw) } } },
+                scales: { y: { beginAtZero: true, border: { display: false }, ticks: { maxTicksLimit: 4, callback: v => 'R$ ' + v }, grid: { color: 'rgba(169,220,183,0.06)' } }, x: { border: { display: false }, grid: { display: false } } } }
+        });
+    }
+
+    function renderPanels(orders, from, days, comments, products, leads) {
+        const cur = orders.filter(o => inRange(o, from, new Date(from.getTime() + days * 864e5)));
+        const paid = cur.filter(o => PAID.has(o.status));
+
+        // Top produtos (unidades + receita, barra relativa ao 1º)
+        const prod = {};
+        paid.forEach(o => o.items.forEach(i => { const p = prod[i.name] || (prod[i.name] = { u: 0, r: 0 }); p.u += i.qty; p.r += i.qty * i.price; }));
+        const top = Object.entries(prod).sort((a, b) => b[1].u - a[1].u).slice(0, 5);
+        const topMax = top.length ? top[0][1].u : 1;
+        $('top-products').innerHTML = top.length ? top.map(([n, v], i) => `
+            <li><span class="rk">${i + 1}</span><div class="rk-body"><div class="rk-top"><span>${esc(n)}</span><b>${fmtInt(v.u)} un.</b></div>
+            <div class="bar"><span style="--w:${(v.u / topMax * 100).toFixed(1)}%"></span></div><small>${fmtBRL(v.r)}</small></div></li>`).join('')
+            : '<li class="empty"><i class="fa-regular fa-face-smile"></i> Nenhuma venda paga no período.</li>';
+
+        // Formas de pagamento (pedidos pagos)
+        const pm = {}; paid.forEach(o => { const k = PAY_LABEL[o.paymentMethod] ? o.paymentMethod : 'outro'; pm[k] = (pm[k] || 0) + 1; });
+        const PM = { pix: ['PIX', G[300], 'fa-brands fa-pix'], cartao: ['Cartão', '#fec81d', 'fa-solid fa-credit-card'], boleto: ['Boleto', '#5fb3a0', 'fa-solid fa-barcode'], manual: ['Manual', '#8fa89a', 'fa-solid fa-hand'], outro: ['Outro', '#8fa89a', 'fa-solid fa-circle-question'] };
+        const pmE = Object.entries(pm).sort((a, b) => b[1] - a[1]);
+        const pmT = paid.length || 1;
+        $('pay-split').innerHTML = pmE.length ? `
+            <div class="split-bar">${pmE.map(([k, n]) => `<span style="--w:${(n / pmT * 100).toFixed(1)}%;background:${PM[k][1]}" title="${PM[k][0]}: ${n}"></span>`).join('')}</div>
+            <ul class="split-list">${pmE.map(([k, n]) => `<li><i class="${PM[k][2]}" style="color:${PM[k][1]}"></i><span>${PM[k][0]}</span><b>${(n / pmT * 100).toFixed(0)}%</b><small>${n} pedido${n === 1 ? '' : 's'}</small></li>`).join('')}</ul>`
+            : '<p class="empty"><i class="fa-solid fa-wallet"></i> Sem pagamentos no período.</p>';
+
+        // Estoque
+        const act = (products || []).filter(p => p.active);
+        const sMax = Math.max(50, ...act.map(p => p.stock || 0));
+        $('stock-meters').innerHTML = act.length ? act.map(p => {
+            const n = p.stock || 0, lvl = n === 0 ? 'out' : n <= 10 ? 'low' : 'ok';
+            const lbl = n === 0 ? 'Esgotado' : n <= 10 ? 'Baixo' : 'OK';
+            return `<li class="lvl-${lvl}"><div class="rk-top"><span>${esc(p.name)}</span><b>${n} un. <em>${lbl}</em></b></div><div class="bar"><span style="--w:${Math.max(2, n / sMax * 100).toFixed(1)}%"></span></div></li>`;
+        }).join('') : '<li class="empty">Nenhum produto ativo.</li>';
+
+        // Regiões (pedidos pagos por cidade/UF)
+        const reg = {}; paid.forEach(o => { const c = o.customer || {}; const k = c.cidade ? `${c.cidade}/${c.uf || ''}` : (c.uf || '—'); reg[k] = (reg[k] || 0) + 1; });
+        const regE = Object.entries(reg).sort((a, b) => b[1] - a[1]).slice(0, 5), regMax = regE.length ? regE[0][1] : 1;
+        $('top-regions').innerHTML = regE.length ? regE.map(([k, n], i) => `
+            <li><span class="rk">${i + 1}</span><div class="rk-body"><div class="rk-top"><span>${esc(k)}</span><b>${n} pedido${n === 1 ? '' : 's'}</b></div>
+            <div class="bar"><span style="--w:${(n / regMax * 100).toFixed(1)}%"></span></div></div></li>`).join('')
+            : '<li class="empty"><i class="fa-solid fa-location-dot"></i> Sem pedidos pagos no período.</li>';
+
+        // Avaliações (todas)
+        const cm = comments || [];
+        const dist = [0, 0, 0, 0, 0]; cm.forEach(c => { dist[Math.min(5, Math.max(1, c.rating || 5)) - 1]++; });
+        const avg = cm.length ? cm.reduce((s, c) => s + (c.rating || 5), 0) / cm.length : 0;
+        const pend = cm.filter(c => !c.approved).length;
+        const dMax = Math.max(1, ...dist);
+        $('rating-box').innerHTML = `
+            <div class="rating-head"><strong>${avg ? avg.toFixed(1).replace('.', ',') : '—'}</strong>
+                <div><div class="stars">${[1, 2, 3, 4, 5].map(i => `<i class="fa-${avg >= i - 0.25 ? 'solid' : 'regular'} fa-star"></i>`).join('')}</div>
+                <small>${cm.length} avaliação${cm.length === 1 ? '' : 'ões'}${pend ? ` · <b>${pend} pendente${pend === 1 ? '' : 's'}</b>` : ''}</small></div></div>
+            <ul class="rating-dist">${[5, 4, 3, 2, 1].map(r => `<li><span>${r}★</span><div class="bar"><span style="--w:${(dist[r - 1] / dMax * 100).toFixed(1)}%"></span></div><b>${dist[r - 1]}</b></li>`).join('')}</ul>`;
+
+        // Atividade recente: pedidos + avaliações + leads, mais novos primeiro
+        const feed = [];
+        orders.slice(-15).forEach(o => feed.push({ t: o.createdAt, ico: PAID.has(o.status) ? 'fa-bag-shopping' : o.status === 'aguardando_pagamento' ? 'fa-hourglass-half' : 'fa-receipt', cls: PAID.has(o.status) ? 'ok' : o.status === 'aguardando_pagamento' ? 'warn' : 'bad', jump: 'orders',
+            html: `<b>${esc((o.customer || {}).nome || 'Cliente')}</b> ${PAID.has(o.status) ? 'comprou' : 'fez um pedido de'} ${o.items.map(i => `${i.qty}× ${esc(i.name)}`).join(', ')} · <b>${fmtBRL(o.total)}</b>` }));
+        cm.forEach(c => c.date && feed.push({ t: c.date, ico: 'fa-star', cls: c.approved ? 'ok' : 'warn', jump: 'comments', html: `<b>${esc(c.name)}</b> avaliou com ${c.rating || 5}★${c.approved ? '' : ' · <em>aguardando moderação</em>'}` }));
+        (leads || []).forEach(l => l.createdAt && feed.push({ t: l.createdAt, ico: 'fa-handshake', cls: 'info', jump: 'leads', html: `<b>${esc(l.nome)}</b>${l.empresa ? ` (${esc(l.empresa)})` : ''} quer revender` }));
+        feed.sort((a, b) => new Date(b.t) - new Date(a.t));
+        $('activity-feed').innerHTML = feed.length ? feed.slice(0, 8).map((f, i) => `
+            <li style="--i:${i}" data-jump="${f.jump}" tabindex="0"><span class="feed-ico ${f.cls}"><i class="fa-solid ${f.ico}"></i></span><p>${f.html}</p><time datetime="${f.t}" title="${fmtDate(f.t)}">${relTime(f.t)}</time></li>`).join('')
+            : '<li class="empty">Nada por aqui ainda.</li>';
+    }
+
+    function renderGoal(orders) {
+        const target = Number(localStorage.getItem('bolla_goal')) || 500;
+        const now = new Date(), m0 = new Date(now.getFullYear(), now.getMonth(), 1);
+        const done = orders.filter(o => PAID.has(o.status) && new Date(o.createdAt) >= m0).reduce((s, o) => s + o.total, 0);
+        const pct = target ? done / target : 0;
+        const C = 2 * Math.PI * 50;
+        const bar = $('goal-bar');
+        bar.style.strokeDasharray = C;
+        bar.style.strokeDashoffset = C;
+        requestAnimationFrame(() => requestAnimationFrame(() => { bar.style.strokeDashoffset = C * (1 - Math.min(1, pct)); }));
+        animateNum($('goal-pct'), pct * 100, v => Math.round(v) + '%');
+        $('goal-done').textContent = fmtBRL(done);
+        $('goal-target').textContent = fmtBRL(target);
+        $('goal-month').textContent = now.toLocaleDateString('pt-BR', { month: 'long' });
+        const daysLeft = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate() - now.getDate() + 1;
+        const missing = Math.max(0, target - done);
+        $('goal-sub').innerHTML = pct >= 1 ? '<i class="fa-solid fa-trophy"></i> Meta batida! 🎉'
+            : `Faltam <b>${fmtBRL(missing)}</b> · ~${fmtBRL(missing / daysLeft)}/dia em ${daysLeft} dia${daysLeft === 1 ? '' : 's'}`;
+        $('goal-card').classList.toggle('hit', pct >= 1);
+    }
+    $('goal-edit').addEventListener('click', () => {
+        const cur = Number(localStorage.getItem('bolla_goal')) || 500;
+        const box = $('goal-target');
+        if (box.querySelector('input')) return;
+        box.innerHTML = `<input type="number" min="1" step="50" value="${cur}" aria-label="Meta do mês em reais">`;
+        const inp = box.querySelector('input'); inp.focus(); inp.select();
+        const save = () => { const v = Math.max(1, Number(inp.value) || cur); localStorage.setItem('bolla_goal', v); if (dash.data) renderGoal(dash.data.orders); toast('Meta atualizada'); };
+        inp.addEventListener('keydown', e => { if (e.key === 'Enter') inp.blur(); if (e.key === 'Escape') { inp.value = cur; inp.blur(); } });
+        inp.addEventListener('blur', save, { once: true });
+    });
+
+    function renderDash() {
+        if (!dash.data) return;
+        const { d, orders, comments, products, leads } = dash.data;
+        const days = dash.period;
+        const from = startOfDay(-(days - 1));
+        const prevFrom = startOfDay(-(2 * days - 1));
+        const to = startOfDay(1);
+        const cur = stats(orders.filter(o => inRange(o, from, to)));
+        const prev = stats(orders.filter(o => inRange(o, prevFrom, from)));
+        const paidCurList = cur.paid;
+
+        // Hero
+        const h = new Date().getHours();
+        $('hero-greeting').textContent = (h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite') + ' 👋';
+        $('hero-date').textContent = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+        const todayRev = orders.filter(o => PAID.has(o.status) && dayKey(o.createdAt) === dayKey(new Date())).reduce((s, o) => s + o.total, 0);
+        const nLow = (d.lowStock || []).length;
+        const bits = [];
+        bits.push(todayRev ? `hoje você já faturou <b>${fmtBRL(todayRev)}</b>` : 'ainda sem vendas pagas hoje');
+        if (d.awaitingPayment) bits.push(`<b>${d.awaitingPayment} pedido${d.awaitingPayment === 1 ? '' : 's'}</b> aguardando pagamento`);
+        if (nLow) bits.push(`<b>${nLow} produto${nLow === 1 ? '' : 's'}</b> com estoque baixo`);
+        if (d.pendingComments) bits.push(`<b>${d.pendingComments} avaliação${d.pendingComments === 1 ? '' : 'ões'}</b> para moderar`);
+        $('hero-sub').innerHTML = bits.join(' · ').replace(/^./, c => c.toUpperCase()) + '.';
+
+        // KPIs principais
+        const sRev = series(paidCurList, from, days, o => o.total);
+        const sCnt = series(paidCurList, from, days, () => 1);
+        const sUnits = series(paidCurList, from, days, o => o.items.reduce((a, i) => a + i.qty, 0));
+        const sAvg = sRev.map((v, i) => sCnt[i] ? v / sCnt[i] : 0);
+        const kpis = [
+            { ico: 'fa-sack-dollar', lbl: 'Faturamento', val: cur.revenue, prev: prev.revenue, fmt: fmtBRL, s: sRev, jump: 'orders' },
+            { ico: 'fa-bag-shopping', lbl: 'Pedidos pagos', val: cur.count, prev: prev.count, fmt: fmtInt, s: sCnt, jump: 'orders' },
+            { ico: 'fa-tag', lbl: 'Ticket médio', val: cur.avg, prev: prev.avg, fmt: fmtBRL, s: sAvg, jump: 'orders' },
+            { ico: 'fa-boxes-stacked', lbl: 'Unidades vendidas', val: cur.units, prev: prev.units, fmt: fmtInt, s: sUnits, jump: 'products' }
+        ];
+        $('kpi-grid').innerHTML = kpis.map((k, i) => `
+            <div class="kpi-card kpi-v2 kpi-clickable" data-jump="${k.jump}" tabindex="0" style="--i:${i}">
+                <div class="kpi-head"><span class="kpi-ico"><i class="fa-solid ${k.ico}"></i></span><span class="lbl">${k.lbl}</span>${delta(k.val, k.prev)}</div>
+                <div class="num" data-val="${k.val}" data-k="${i}">0</div>
+                <div class="kpi-foot"><span class="sub">vs ${k.fmt(k.prev)} nos ${days} dias anteriores</span></div>
+                ${spark(k.s)}
+            </div>`).join('');
+        $('kpi-grid').querySelectorAll('.num').forEach(el => animateNum(el, Number(el.dataset.val), kpis[el.dataset.k].fmt));
+
+        // Operação
+        const conv = cur.total ? cur.count / cur.total * 100 : 0;
+        const ops = [
+            { ico: 'fa-hourglass-half', lbl: 'Aguardando pgto', val: d.awaitingPayment || 0, jump: 'orders', tone: d.awaitingPayment ? 'warn' : '' },
+            { ico: 'fa-percent', lbl: 'Conversão no período', val: conv.toFixed(0) + '%', jump: 'orders', tone: '' },
+            { ico: 'fa-handshake', lbl: 'Leads novos', val: d.newLeads || 0, jump: 'leads', tone: d.newLeads ? 'info' : '' },
+            { ico: 'fa-comment-dots', lbl: 'Avaliações pendentes', val: d.pendingComments || 0, jump: 'comments', tone: d.pendingComments ? 'warn' : '' },
+            { ico: 'fa-triangle-exclamation', lbl: 'Recusas de pgto', val: d.paymentErrors || 0, jump: 'payerrors', tone: d.paymentErrors ? 'bad' : '' }
+        ];
+        $('ops-strip').innerHTML = ops.map(o => `
+            <button type="button" class="ops-chip ${o.tone}" data-jump="${o.jump}"><i class="fa-solid ${o.ico}"></i><span>${o.lbl}</span><b>${o.val}</b><i class="fa-solid fa-chevron-right go"></i></button>`).join('');
+
+        $('pending-dot').innerHTML = d.pendingComments > 0 ? `<span class="dot">${d.pendingComments}</span>` : '';
+        $('leads-dot').innerHTML = d.newLeads > 0 ? `<span class="dot">${d.newLeads}</span>` : '';
+        $('payerr-dot').innerHTML = d.paymentErrors > 0 ? `<span class="dot">${d.paymentErrors}</span>` : '';
+        $('low-stock-alert').innerHTML = (d.lowStock || []).length
+            ? `<div class="alert-low"><i class="fa-solid fa-triangle-exclamation"></i> Estoque baixo: ${d.lowStock.map(p => `${esc(p.name)} (${p.stock} un.)`).join(', ')}<button class="link-btn" data-jump="products">Repor <i class="fa-solid fa-arrow-right"></i></button></div>` : '';
+
+        $('dash-orders').innerHTML = d.recentOrders.length ? d.recentOrders.map(o => `
+            <tr>
+                <td>${fmtDate(o.createdAt)}</td>
+                <td>${esc(o.customer.nome)}</td>
+                <td>${o.items.map(i => `${i.qty}x ${esc(i.name)}`).join(', ')}</td>
+                <td>${fmtBRL(o.total)}</td>
+                <td><span class="badge b-${o.status}">${STATUS_LABEL[o.status] || o.status}</span></td>
+            </tr>`).join('') : '<tr><td colspan="5" class="muted">Nenhum pedido ainda.</td></tr>';
+
+        renderGoal(orders);
+        requestAnimationFrame(moveThumb);
+        drawCharts(orders, from, days, prevFrom);
+        renderPanels(orders, from, days, comments, products, leads);
+    }
+
+    /* ---- Dashboard ---- */
+    async function loadDash() {
+        const [d, orders, comments, products, leads] = await Promise.all([
+            api('GET', '/api/admin/overview'),
+            api('GET', '/api/admin/orders'),
+            api('GET', '/api/admin/comments'),
+            api('GET', '/api/admin/products').catch(() => []),
+            api('GET', '/api/admin/reseller-leads').catch(() => [])
+        ]);
+        dash.data = { d, orders: orders || [], comments: comments || [], products, leads };
+        dash.updatedAt = Date.now();
+        renderDash();
+        stampUpdated();
+    }
+    function stampUpdated() {
+        if (!dash.updatedAt) return;
+        const s = Math.round((Date.now() - dash.updatedAt) / 1000);
+        $('dash-updated').innerHTML = `<i class="fa-regular fa-clock"></i> Atualizado ${s < 10 ? 'agora' : s < 60 ? `há ${s}s` : `há ${Math.floor(s / 60)} min`}`;
+    }
+    setInterval(stampUpdated, 10000);
+
+    // Período (segmented control com "polegar" deslizante)
+    const seg = $('period-seg');
+    function moveThumb() {
+        const on = seg.querySelector('button.on'), th = seg.querySelector('.seg-thumb');
+        if (!on || !th) return;
+        th.style.width = on.offsetWidth + 'px';
+        th.style.transform = `translateX(${on.offsetLeft}px)`;
+    }
+    seg.querySelectorAll('button').forEach(b => {
+        b.classList.toggle('on', Number(b.dataset.days) === dash.period);
+        b.addEventListener('click', () => {
+            dash.period = Number(b.dataset.days);
+            localStorage.setItem('bolla_dash_period', dash.period);
+            seg.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
+            renderDash();
+        });
+    });
+    window.addEventListener('resize', moveThumb);
+    new MutationObserver(moveThumb).observe($('tab-dash'), { attributes: true, attributeFilter: ['class'] });
+    requestAnimationFrame(moveThumb);
+
+    $('rev-metric').querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+        dash.metric = b.dataset.m;
+        $('rev-metric').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
+        renderDash();
+    }));
+
+    // Atualização automática (60 s), pausa com a aba escondida
+    const auto = $('auto-refresh');
+    auto.checked = localStorage.getItem('bolla_dash_auto') === '1';
+    function setAuto() {
+        clearInterval(dash.timer);
+        localStorage.setItem('bolla_dash_auto', auto.checked ? '1' : '0');
+        if (auto.checked) dash.timer = setInterval(() => { if (!document.hidden && token) loadDash().catch(() => {}); }, 60000);
+    }
+    auto.addEventListener('change', setAuto); setAuto();
+
+    $('refresh-dash').addEventListener('click', e => {
+        const b = e.currentTarget; b.classList.add('spinning');
+        loadDash().then(() => toast('Dashboard atualizado')).finally(() => setTimeout(() => b.classList.remove('spinning'), 500));
+    });
+
+    // Exportar pedidos do período (CSV com ; e BOM — abre certo no Excel pt-BR)
+    $('export-csv').addEventListener('click', () => {
+        if (!dash.data) return;
+        const from = startOfDay(-(dash.period - 1));
+        const rows = dash.data.orders.filter(o => new Date(o.createdAt) >= from);
+        const q = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
+        const head = ['Pedido', 'Data', 'Cliente', 'E-mail', 'WhatsApp', 'Cidade', 'UF', 'Itens', 'Total', 'Status', 'Pagamento'];
+        const lines = rows.map(o => [o.id, new Date(o.createdAt).toLocaleString('pt-BR'), o.customer.nome, o.customer.email, o.customer.whatsapp, o.customer.cidade, o.customer.uf,
+            o.items.map(i => `${i.qty}x ${i.name}`).join(' | '), o.total.toFixed(2).replace('.', ','), STATUS_LABEL[o.status] || o.status, PAY_LABEL[o.paymentMethod] || ''].map(q).join(';'));
+        const blob = new Blob(['﻿' + [head.map(q).join(';'), ...lines].join('\r\n')], { type: 'text/csv;charset=utf-8' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `pedidos-bolladinho-${dayKey(new Date())}-${dash.period}d.csv`;
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+        toast(`${rows.length} pedido(s) exportado(s)`);
+    });
+
+    /* ---- Produtos & Estoque ---- */
+    let productsData = [];
+    function stockBadge(n) {
+        n = parseInt(n) || 0;
+        if (n === 0) return `<span class="stock-badge" style="background:rgba(255,23,68,.16);color:var(--danger);"><i class="fa-solid fa-ban"></i> Esgotado</span>`;
+        if (n <= 5) return `<span class="stock-badge" style="background:rgba(255,23,68,.12);color:#ff8a80;"><i class="fa-solid fa-triangle-exclamation"></i> Crítico (${n})</span>`;
+        if (n <= 10) return `<span class="stock-badge" style="background:rgba(255,214,0,.12);color:var(--warning);"><i class="fa-solid fa-arrow-down"></i> Baixo (${n})</span>`;
+        return `<span class="stock-badge" style="background:rgba(0,230,118,.12);color:var(--success);"><i class="fa-solid fa-check"></i> OK (${n})</span>`;
+    }
+    function refreshStockBadge(inp) {
+        const b = inp.closest('td').querySelector('.stock-badge');
+        if (b) b.outerHTML = stockBadge(inp.value);
+    }
+    function renderStockSummary() {
+        const total = productsData.length;
+        const out = productsData.filter(p => (p.stock || 0) === 0).length;
+        const low = productsData.filter(p => (p.stock || 0) > 0 && (p.stock || 0) <= 10).length;
+        const value = productsData.reduce((s, p) => s + (p.price || 0) * (p.stock || 0), 0);
+        const chip = (ico, val, lbl, col) => `
+            <div class="glass-card" style="flex:1 1 180px;min-width:160px;padding:14px 16px;display:flex;align-items:center;gap:12px;">
+                <div style="width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:17px;background:rgba(255,255,255,.05);color:${col};"><i class="fa-solid ${ico}"></i></div>
+                <div><div style="font-size:20px;font-weight:800;color:#fff;font-family:'Outfit',sans-serif;line-height:1;">${val}</div><div style="font-size:11px;color:var(--text-secondary);margin-top:3px;">${lbl}</div></div>
+            </div>`;
+        $('stock-summary').innerHTML =
+            chip('fa-boxes-stacked', total, 'Produtos', 'var(--accent-soft)') +
+            chip('fa-triangle-exclamation', low, 'Estoque baixo (≤10)', 'var(--warning)') +
+            chip('fa-ban', out, 'Esgotados', 'var(--danger)') +
+            chip('fa-gem', fmtBRL(value), 'Valor em estoque', 'var(--success)');
+    }
+    async function loadProducts() {
+        productsData = await api('GET', '/api/admin/products');
+        $('products-body').innerHTML = productsData.map((p, i) => `
+            <tr>
+                <td><input type="text" data-i="${i}" data-f="name" value="${esc(p.name)}"></td>
+                <td><input type="text" data-i="${i}" data-f="desc" value="${esc(p.desc)}"></td>
+                <td><input type="number" step="0.10" min="0" data-i="${i}" data-f="price" value="${p.price}" style="width:92px;"></td>
+                <td>
+                    <div class="stock-stepper">
+                        <button type="button" data-step="-1" title="Diminuir">−</button>
+                        <input type="number" min="0" step="1" data-i="${i}" data-f="stock" value="${p.stock}">
+                        <button type="button" data-step="1" title="Aumentar">+</button>
+                    </div>
+                    <div style="margin-top:7px;">${stockBadge(p.stock)}</div>
+                </td>
+                <td><div class="prod-toggle ${p.active ? 'on' : ''}" data-i="${i}" data-f="active" role="switch" aria-checked="${!!p.active}" title="Mostrar no site"></div></td>
+                <td><div class="prod-toggle ${p.popular ? 'on' : ''}" data-i="${i}" data-f="popular" role="switch" aria-checked="${!!p.popular}" title="Marcar como destaque"></div></td>
+            </tr>`).join('');
+        document.querySelectorAll('#products-body .stock-stepper button').forEach(b => b.addEventListener('click', () => {
+            const inp = b.parentElement.querySelector('input');
+            inp.value = Math.max(0, (parseInt(inp.value) || 0) + parseInt(b.dataset.step));
+            refreshStockBadge(inp);
+        }));
+        document.querySelectorAll('#products-body .stock-stepper input').forEach(inp => inp.addEventListener('input', () => refreshStockBadge(inp)));
+        document.querySelectorAll('#products-body .prod-toggle').forEach(t => t.addEventListener('click', () => {
+            t.classList.toggle('on'); t.setAttribute('aria-checked', t.classList.contains('on'));
+        }));
+        renderStockSummary();
+    }
+    $('save-products').addEventListener('click', async () => {
+        document.querySelectorAll('#products-body input').forEach(inp => {
+            const p = productsData[inp.dataset.i]; const f = inp.dataset.f;
+            p[f] = inp.type === 'number' ? Number(inp.value) : inp.value;
+        });
+        document.querySelectorAll('#products-body .prod-toggle').forEach(t => {
+            productsData[t.dataset.i][t.dataset.f] = t.classList.contains('on');
+        });
+        await api('PUT', '/api/admin/products', productsData);
+        toast('Produtos salvos!'); loadDash(); loadProducts();
+    });
+
+    /* ---- Pedidos ---- */
+    async function loadOrders() {
+        const orders = await api('GET', '/api/admin/orders');
+        $('orders-body').innerHTML = orders.length ? orders.map(o => `
+            <tr>
+                <td>${fmtDate(o.createdAt)}</td>
+                <td>${esc(o.customer.nome)}<br><span class="muted">${esc(o.customer.whatsapp)}</span></td>
+                <td>
+                    <details class="order-det"><summary>${o.items.map(i => `${i.qty}x ${esc(i.name)}`).join(', ')}</summary>
+                    <div>
+                    <i class="fa-solid fa-envelope"></i> ${esc(o.customer.email || '—')}<br>
+                    <i class="fa-solid fa-id-card"></i> CPF ${esc(o.customer.cpf || '—')}<br>
+                    <i class="fa-solid fa-location-dot"></i> ${esc(o.customer.rua)}, ${esc(o.customer.numero)} ${esc(o.customer.complemento || '')} — ${esc(o.customer.bairro)}, ${esc(o.customer.cidade)}/${esc(o.customer.uf)} — CEP ${esc(o.customer.cep)}<br>
+                    <i class="fa-solid fa-credit-card"></i> Pagamento: <strong>${PAY_LABEL[o.paymentMethod] || 'Mercado Pago'}</strong>${o.paymentId ? ` · id ${esc(o.paymentId)}` : ''}<br>
+                    <i class="fa-solid fa-hashtag"></i> Pedido: <code style="font-size:0.75rem;">${o.id}</code></div></details>
+                </td>
+                <td>${fmtBRL(o.total)}</td>
+                <td>
+                    <select data-oid="${o.id}" class="order-status">
+                        ${Object.entries(STATUS_LABEL).map(([v, l]) => `<option value="${v}" ${o.status === v ? 'selected' : ''}>${l}</option>`).join('')}
+                    </select>
+                </td>
+            </tr>`).join('') : '<tr><td colspan="5" class="muted">Nenhum pedido ainda.</td></tr>';
+
+        document.querySelectorAll('.order-status').forEach(sel => {
+            sel.addEventListener('change', async () => {
+                await api('PUT', '/api/admin/orders', { id: sel.dataset.oid, status: sel.value });
+                toast('Status do pedido atualizado'); loadDash();
+            });
+        });
+    }
+    $('refresh-orders').addEventListener('click', () => loadOrders().then(() => toast('Pedidos atualizados')));
+
+    /* ---- Comentários ---- */
+    async function loadComments() {
+        const comments = await api('GET', '/api/admin/comments');
+        const stars = n => Array.from({ length: 5 }, (_, i) => `<i class="fa-${i < n ? 'solid' : 'regular'} fa-star"></i>`).join('');
+        $('comments-list').innerHTML = comments.length ? comments.map(c => `
+            <div class="comment-card ${c.approved ? '' : 'pending'}">
+                <div class="comment-head">
+                    <span class="who">${esc(c.name)} ${c.city ? '— ' + esc(c.city) : ''}</span>
+                    <span class="stars">${stars(c.rating)}</span>
+                    <span class="muted">${fmtDate(c.date)} · ${c.approved ? 'Publicado' : '⏳ Pendente'}</span>
+                </div>
+                <textarea rows="2" data-cid="${c.id}" class="c-text">${esc(c.text)}</textarea>
+                <div class="comment-actions">
+                    ${c.approved
+                        ? `<button class="btn small ghost c-act" data-id="${c.id}" data-act="unapprove"><i class="fa-solid fa-eye-slash"></i> Ocultar</button>`
+                        : `<button class="btn small okbtn c-act" data-id="${c.id}" data-act="approve"><i class="fa-solid fa-check"></i> Aprovar</button>`}
+                    <button class="btn small ghost c-act" data-id="${c.id}" data-act="save"><i class="fa-solid fa-floppy-disk"></i> Salvar texto</button>
+                    <button class="btn small danger c-act" data-id="${c.id}" data-act="delete"><i class="fa-solid fa-trash"></i> Excluir</button>
+                </div>
+            </div>`).join('') : '<p class="muted">Nenhum comentário ainda.</p>';
+
+        document.querySelectorAll('.c-act').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const id = btn.dataset.id, act = btn.dataset.act;
+                if (act === 'delete') {
+                    if (!await confirmDialog('Excluir este comentário permanentemente?')) return;
+                    await api('DELETE', `/api/admin/comments?id=${id}`); toast('Comentário excluído');
+                } else if (act === 'save') {
+                    const text = document.querySelector(`.c-text[data-cid="${id}"]`).value;
+                    await api('PUT', '/api/admin/comments', { id, text }); toast('Texto salvo');
+                } else {
+                    await api('PUT', '/api/admin/comments', { id, approved: act === 'approve' });
+                    toast(act === 'approve' ? 'Comentário publicado no site!' : 'Comentário ocultado');
+                }
+                loadComments(); loadDash();
+            });
+        });
+    }
+    $('refresh-comments').addEventListener('click', () => loadComments().then(() => toast('Comentários atualizados')));
+
+    /* ---- Revendedores ---- */
+    async function loadLeads() {
+        const leads = await api('GET', '/api/admin/reseller-leads');
+        $('leads-body').innerHTML = leads.length ? leads.map(l => {
+            const wa = (l.telefone || '').replace(/\D/g, '');
+            return `<tr>
+                <td>${fmtDate(l.createdAt)}</td>
+                <td>${esc(l.nome)}</td>
+                <td>${esc(l.empresa || '—')}</td>
+                <td>${esc(l.endereco || '—')}</td>
+                <td>${esc(l.telefone)} ${wa ? `<a href="https://wa.me/55${wa}" target="_blank" title="Chamar no WhatsApp"><i class="fa-brands fa-whatsapp" style="color:#25D366"></i></a>` : ''}</td>
+                <td><select data-lid="${l.id}" class="lead-status b-${l.status}">${Object.entries(LEAD_STATUS).map(([v, t]) => `<option value="${v}" ${l.status === v ? 'selected' : ''}>${t}</option>`).join('')}</select></td>
+                <td><button class="btn small danger lead-del" data-id="${l.id}"><i class="fa-solid fa-trash"></i></button></td>
+            </tr>`;
+        }).join('') : '<tr><td colspan="7" class="muted">Nenhum lead ainda.</td></tr>';
+
+        document.querySelectorAll('.lead-status').forEach(sel => {
+            sel.addEventListener('change', async () => {
+                sel.className = 'lead-status b-' + sel.value;
+                await api('PUT', '/api/admin/reseller-leads', { id: sel.dataset.lid, status: sel.value });
+                toast('Lead atualizado'); loadDash();
+            });
+        });
+        document.querySelectorAll('.lead-del').forEach(b => {
+            b.addEventListener('click', async () => {
+                if (!await confirmDialog('Excluir este lead?')) return;
+                await api('DELETE', `/api/admin/reseller-leads?id=${b.dataset.id}`);
+                toast('Lead excluído'); loadLeads(); loadDash();
+            });
+        });
+    }
+    $('refresh-leads').addEventListener('click', () => loadLeads().then(() => toast('Leads atualizados')));
+
+    /* ---- Pagamentos: tentativas (cartão + PIX) ---- */
+    const PAY_REASONS = {
+        accredited: { titulo: 'Pagamento aprovado', desc: 'O dinheiro caiu na conta.', acao: 'Nada a fazer — pode separar o pedido.', tom: 'ok' },
+        approved: { titulo: 'Pagamento aprovado', desc: 'O dinheiro caiu na conta.', acao: 'Nada a fazer — pode separar o pedido.', tom: 'ok' },
+        pending: { titulo: 'Aguardando pagamento', desc: 'Cobrança criada, mas o cliente ainda não pagou (típico de PIX gerado e não pago).', acao: 'Aguarde. Se expirar, o pedido é cancelado sozinho.', tom: 'aviso' },
+        pix_generated: { titulo: 'PIX gerado', desc: 'QR Code criado; aguardando o cliente pagar pelo app do banco.', acao: 'Aguarde a confirmação — o PIX costuma cair em segundos.', tom: 'aviso' },
+        pending_contingency: { titulo: 'Em processamento', desc: 'O Mercado Pago está confirmando o pagamento.', acao: 'Aguarde alguns minutos, o status atualiza sozinho.', tom: 'aviso' },
+        pending_review_manual: { titulo: 'Em análise antifraude', desc: 'O Mercado Pago está revisando manualmente.', acao: 'Aguarde — o resultado sai em até 2 dias úteis.', tom: 'aviso' },
+        in_process: { titulo: 'Em análise', desc: 'O Mercado Pago está processando/revisando o pagamento.', acao: 'Aguarde — geralmente resolve em minutos a 2 dias úteis.', tom: 'aviso' },
+        cc_rejected_insufficient_amount: { titulo: 'Limite insuficiente', desc: 'O cartão não tem limite disponível para este valor.', acao: 'Cliente deve usar outro cartão, parcelar em mais vezes ou pagar via PIX.', tom: 'erro' },
+        cc_rejected_bad_filled_security_code: { titulo: 'CVV incorreto', desc: 'O código de segurança digitado não confere.', acao: 'Cliente deve conferir os 3 dígitos do verso do cartão.', tom: 'erro' },
+        cc_rejected_bad_filled_date: { titulo: 'Validade incorreta', desc: 'A data de validade não confere.', acao: 'Cliente deve conferir o mês/ano impresso no cartão.', tom: 'erro' },
+        cc_rejected_bad_filled_other: { titulo: 'Dado do cartão incorreto', desc: 'Algum dado digitado não confere com o cartão.', acao: 'Cliente deve revisar número, validade, CVV e nome.', tom: 'erro' },
+        cc_rejected_bad_filled_card_number: { titulo: 'Número do cartão incorreto', desc: 'O número digitado não é válido.', acao: 'Cliente deve redigitar o número do cartão.', tom: 'erro' },
+        cc_rejected_call_for_authorize: { titulo: 'Banco pede autorização', desc: 'O banco exige que o cliente autorize esta compra.', acao: 'Cliente deve ligar para o banco (número do verso do cartão) e liberar a compra.', tom: 'erro' },
+        cc_rejected_card_disabled: { titulo: 'Cartão desativado', desc: 'O cartão está bloqueado ou não foi ativado.', acao: 'Cliente deve ligar para o banco e ativar o cartão.', tom: 'erro' },
+        cc_rejected_card_error: { titulo: 'Erro no cartão', desc: 'O banco não conseguiu processar o cartão.', acao: 'Cliente deve tentar de novo ou usar outro cartão.', tom: 'erro' },
+        cc_rejected_duplicated_payment: { titulo: 'Pagamento duplicado', desc: 'Já existe um pagamento igual há pouco tempo.', acao: 'Confira se a primeira cobrança passou antes de tentar de novo.', tom: 'aviso' },
+        cc_rejected_high_risk: { titulo: 'Recusado por antifraude', desc: 'O antifraude do Mercado Pago barrou a compra.', acao: 'Oriente o cliente a pagar via PIX ou usar outro cartão/e-mail.', tom: 'erro' },
+        cc_rejected_max_attempts: { titulo: 'Tentativas excedidas', desc: 'O cartão foi tentado vezes demais seguidas.', acao: 'Cliente deve aguardar algumas horas ou usar outro cartão.', tom: 'erro' },
+        cc_rejected_invalid_installments: { titulo: 'Parcelamento não aceito', desc: 'O cartão não aceita esse número de parcelas.', acao: 'Cliente deve escolher menos parcelas.', tom: 'erro' },
+        cc_rejected_other_reason: { titulo: 'Recusado pelo banco', desc: 'O banco emissor recusou sem informar o motivo.', acao: 'Cliente deve falar com o banco ou usar outro cartão / PIX.', tom: 'erro' },
+        cc_rejected_blacklist: { titulo: 'Cartão em lista restritiva', desc: 'O cartão consta em lista de bloqueio.', acao: 'Cliente precisa usar outro cartão ou PIX.', tom: 'erro' },
+        bin_not_found: { titulo: 'Cartão não reconhecido', desc: 'O Mercado Pago não reconhece esse número (típico de cartão de teste usado em produção).', acao: 'Use um cartão real.', tom: 'erro' },
+        expired: { titulo: 'PIX expirado', desc: 'O tempo do QR Code acabou sem pagamento.', acao: 'O cliente pode gerar um novo PIX e pagar de novo.', tom: 'aviso' },
+        error: { titulo: 'Erro técnico', desc: 'Falha na comunicação com o Mercado Pago.', acao: 'Verifique conexão/credenciais e peça ao cliente para tentar de novo.', tom: 'erro' }
+    };
+    function reasonFor(status, detail) {
+        if (detail && PAY_REASONS[detail]) return PAY_REASONS[detail];
+        if (status && PAY_REASONS[status]) return PAY_REASONS[status];
+        const k = Object.keys(PAY_REASONS).find(key => String(detail || '').includes(key));
+        if (k) return PAY_REASONS[k];
+        return { titulo: status || 'Sem detalhe', desc: 'O Mercado Pago não informou um motivo específico.', acao: 'Se repetir, tente outro cartão ou PIX.', tom: 'aviso' };
+    }
+    const tomColor = t => t === 'ok' ? 'var(--success)' : t === 'aviso' ? 'var(--warning)' : 'var(--danger)';
+    let payCache = [], payFilter = 'all';
+
+    function renderPayStats(list) {
+        const card = list.filter(a => a.method === 'card'), pix = list.filter(a => a.method === 'pix');
+        const cardApproved = card.filter(a => a.status === 'approved').length;
+        const rate = card.length ? Math.round(cardApproved / card.length * 100) : 0;
+        const pixPaid = pix.filter(a => a.status === 'approved').length;
+        const pixWait = pix.filter(a => a.status === 'pending' || a.status === 'in_process').length;
+        const box = (icon, title, color, cells) => `
+            <div class="glass-card" style="flex:1 1 320px;min-width:280px;padding:18px;">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;color:${color};font-weight:700;font-size:14px;"><span>${icon}</span> ${title}</div>
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+                    ${cells.map(c => `<div><div style="font-size:24px;font-weight:800;color:${c.color};line-height:1.1;font-family:'Outfit',sans-serif;">${c.value}</div><div style="font-size:11px;color:var(--text-secondary);margin-top:3px;">${c.label}</div></div>`).join('')}
+                </div>
+            </div>`;
+        $('pay-stats').innerHTML =
+            box('💳', 'Cartão de crédito', '#8ab4f8', [
+                { value: card.length, label: 'Tentativas', color: '#8ab4f8' },
+                { value: cardApproved, label: 'Aprovados', color: 'var(--success)' },
+                { value: rate + '%', label: 'Aprovação', color: rate >= 70 ? 'var(--success)' : rate >= 40 ? 'var(--warning)' : 'var(--danger)' }
+            ]) +
+            box('⚡', 'PIX', '#00d1b2', [
+                { value: pix.length, label: 'Gerados', color: '#00d1b2' },
+                { value: pixPaid, label: 'Pagos', color: 'var(--success)' },
+                { value: pixWait, label: 'Aguardando', color: 'var(--warning)' }
+            ]);
+    }
+    function renderPayFilters(list) {
+        const counts = { all: list.length, card: list.filter(a => a.method === 'card').length, pix: list.filter(a => a.method === 'pix').length, rejected: list.filter(a => a.status === 'rejected' || a.status === 'error').length };
+        const defs = [['all', 'Todos'], ['card', '💳 Cartão'], ['pix', '⚡ PIX'], ['rejected', '❌ Só recusados']];
+        $('pay-filters').innerHTML = defs.map(([k, l]) => `<button class="pay-chip ${payFilter === k ? 'active' : ''}" data-f="${k}">${l} <span style="opacity:.7">(${counts[k]})</span></button>`).join('');
+        document.querySelectorAll('.pay-chip').forEach(b => b.addEventListener('click', () => { payFilter = b.dataset.f; renderPayFilters(payCache); renderPayCards(payCache); }));
+    }
+    function renderPayCards(list) {
+        let items = list;
+        if (payFilter === 'card') items = list.filter(a => a.method === 'card');
+        else if (payFilter === 'pix') items = list.filter(a => a.method === 'pix');
+        else if (payFilter === 'rejected') items = list.filter(a => a.status === 'rejected' || a.status === 'error');
+        if (!items.length) { $('pay-attempts').innerHTML = '<div class="glass-card" style="text-align:center;color:var(--text-secondary);padding:34px;">🧾 Nenhuma tentativa registrada neste filtro.</div>'; return; }
+        $('pay-attempts').innerHTML = items.map(a => {
+            const r = reasonFor(a.status, a.statusDetail), c = tomColor(r.tom), isPix = a.method === 'pix';
+            const wa = (a.whatsapp || '').replace(/\D/g, '');
+            return `<div class="glass-card" style="padding:16px 18px;border-left:3px solid ${c};">
+                <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:10px;">
+                    <span style="font-size:11px;font-weight:800;color:${isPix ? '#00d1b2' : '#8ab4f8'};background:${isPix ? 'rgba(0,209,178,.12)' : 'rgba(138,180,248,.12)'};border-radius:6px;padding:3px 9px;">${isPix ? '⚡ PIX' : '💳 CARTÃO'}</span>
+                    <strong style="color:#fff;font-size:14px;">${esc(r.titulo)}</strong>
+                    <span style="font-size:11px;font-weight:700;color:${c};background:${c}22;border-radius:20px;padding:3px 10px;">${esc(a.status)}</span>
+                    <span style="margin-left:auto;font-size:12px;color:var(--text-muted);">${fmtDate(a.at)}</span>
+                </div>
+                <div style="color:var(--text-primary);font-size:13px;line-height:1.55;">${esc(r.desc)}</div>
+                <div style="color:#8ab4f8;font-size:13px;line-height:1.55;margin-top:6px;"><strong>O que fazer:</strong> ${esc(r.acao)}</div>
+                ${(a.cliente || a.items) ? `<div style="margin-top:10px;padding:8px 10px;background:rgba(255,255,255,.02);border:1px solid var(--glass-border);border-radius:8px;font-size:12px;">
+                    ${a.cliente ? `<div style="color:var(--text-primary);">👤 <strong>${esc(a.cliente)}</strong>${wa ? ` · <a href="https://wa.me/55${wa}" target="_blank" style="color:#25D366;">WhatsApp</a>` : ''}</div>` : ''}
+                    ${a.items ? `<div style="color:var(--text-secondary);margin-top:3px;">🛍️ ${esc(a.items)}</div>` : ''}
+                </div>` : ''}
+                <div style="display:flex;flex-wrap:wrap;gap:14px;margin-top:12px;font-size:11px;color:var(--text-muted);">
+                    ${a.orderId ? `<span>Pedido <strong style="color:var(--text-secondary)">#${esc(String(a.orderId).slice(0, 8))}</strong></span>` : ''}
+                    ${a.amount != null ? `<span>Valor <strong style="color:var(--text-secondary)">${fmtBRL(a.amount)}</strong></span>` : ''}
+                    ${a.installments > 0 ? `<span>${a.installments}x</span>` : ''}
+                    ${a.paymentId ? `<span>ID MP ${esc(a.paymentId)}</span>` : ''}
+                    ${a.statusDetail ? `<span style="font-family:monospace;">${esc(a.statusDetail)}</span>` : ''}
+                </div>
+            </div>`;
+        }).join('');
+    }
+    async function loadPayAttempts() {
+        payCache = await api('GET', '/api/admin/payment-attempts');
+        renderPayStats(payCache); renderPayFilters(payCache); renderPayCards(payCache);
+    }
+    $('refresh-payerrors').addEventListener('click', () => loadPayAttempts().then(() => toast('Atualizado')));
+    $('clear-payerrors').addEventListener('click', async () => {
+        if (!await confirmDialog('Limpar todo o histórico de tentativas de pagamento?')) return;
+        await api('DELETE', '/api/admin/payment-attempts?id=all');
+        toast('Histórico limpo'); loadPayAttempts(); loadDash();
+    });
+
+    /* ---- Demonstração no GitHub Pages ---- */
+    function enterDemo() {
+        DEMO = true; demoDB = null;
+        sessionStorage.setItem('bolla_admin_demo', '1');
+        document.body.classList.add('is-demo');
+        showPanel();
+    }
+    if (STATIC_HOST) {
+        const card = document.querySelector('.login-card');
+        const note = document.createElement('div');
+        note.className = 'demo-note';
+        note.innerHTML = `<i class="fa-solid fa-circle-info"></i>
+            <p>Esta é a versão estática do site (GitHub Pages), sem servidor — o login real e os pedidos de verdade ficam na versão hospedada no Render.</p>
+            <button type="button" class="premium-btn premium-btn-gold" id="demo-btn"><i class="fa-solid fa-play"></i> Ver painel de demonstração</button>`;
+        card.appendChild(note);
+        $('demo-btn').addEventListener('click', enterDemo);
+        const pill = document.querySelector('.ag-status-pill');
+        if (pill) pill.innerHTML = '<span class="ag-status-dot"></span> Demonstração · dados de exemplo';
+        if (DEMO) { document.body.classList.add('is-demo'); showPanel(); }
+    }
+
+    /* ---- Sessão existente ---- */
+    if (token && !DEMO) {
+        api('GET', '/api/admin/overview').then(showPanel).catch(() => logout());
+    }
+})();
+</script>
+</body>
+</html>
