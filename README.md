@@ -13,7 +13,7 @@ Biodescartável, reutilizável e única como uma impressão digital.
 ![Sem dependências](https://img.shields.io/badge/depend%C3%AAncias-zero-74c08e)
 ![Mercado Pago](https://img.shields.io/badge/pagamento-Mercado_Pago-266b3f)
 
-### 👉 [**Acessar o site**](https://cauamigueldev.github.io/bolladinho1/) · [**Seja revendedor**](https://cauamigueldev.github.io/bolladinho1/revendedor.html)
+### 👉 [**Acessar o site**](https://cauamigueldev.github.io/bolladinho1/) · [**Seja revendedor**](https://cauamigueldev.github.io/bolladinho1/revendedor.html) · [**Painel (demo)**](https://cauamigueldev.github.io/bolladinho1/admin.html)
 
 </div>
 
@@ -23,7 +23,7 @@ Biodescartável, reutilizável e única como uma impressão digital.
 
 | Versão | Link | O que funciona |
 |---|---|---|
-| **Vitrine** (GitHub Pages) | **https://cauamigueldev.github.io/bolladinho1/** | Site inteiro navegável, produtos, depoimentos, página de revendedor (formulário envia por e-mail). O carrinho **finaliza o pedido pelo WhatsApp** da loja. Atualiza sozinho a cada push na `main`. |
+| **Vitrine** (GitHub Pages) | **https://cauamigueldev.github.io/bolladinho1/** | Site inteiro navegável, produtos, depoimentos, página de revendedor (formulário envia por e-mail). O carrinho **finaliza o pedido pelo WhatsApp** da loja e o [painel admin](https://cauamigueldev.github.io/bolladinho1/admin.html) abre em **modo demonstração** (dados de exemplo, nada é salvo). Atualiza sozinho a cada push na `main`. |
 | **Loja completa** (Render) | clique em **Deploy to Render** acima | Tudo da vitrine **+** checkout com Mercado Pago (PIX e cartão), cálculo de frete (SuperFrete), estoque, avaliações moderadas e o painel admin em `/admin`. |
 
 > O GitHub Pages só hospeda arquivos estáticos, por isso a versão de lá não tem o servidor de

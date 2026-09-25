@@ -256,7 +256,7 @@
                                 <button class="premium-btn premium-btn-gold" data-jump="orders"><i class="fa-solid fa-receipt"></i> Ver pedidos</button>
                                 <button class="premium-btn" data-jump="products"><i class="fa-solid fa-box"></i> Estoque</button>
                                 <button class="premium-btn" data-jump="comments"><i class="fa-solid fa-comments"></i> Moderar</button>
-                                <a class="premium-btn" href="/" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Ver site</a>
+                                <a class="premium-btn" href="./" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Ver site</a>
                             </div>
                         </div>
                         <div class="goal-card" id="goal-card">
@@ -486,7 +486,75 @@
         }
     });
 
+    /* ---- Modo demonstração (GitHub Pages: não há servidor) ----
+       Tudo roda em memória com pedidos de exemplo gerados aqui mesmo.
+       Nada é salvo e nada sai do navegador. */
+    const STATIC_HOST = /\.github\.io$/.test(location.hostname);
+    let DEMO = STATIC_HOST && sessionStorage.getItem('bolla_admin_demo') === '1';
+    let demoDB = null;
+    function buildDemo() {
+        let seed = 11; const rnd = () => (seed = seed * 16807 % 2147483647) / 2147483647;
+        const P = [['pequena', 'Caixa Pequena', 5], ['media', 'Caixa Média', 9.9], ['grande', 'Caixa Grande', 20]];
+        const C = [['Brasília', 'DF'], ['Goiânia', 'GO'], ['São Paulo', 'SP'], ['Belo Horizonte', 'MG'], ['Rio de Janeiro', 'RJ'], ['Curitiba', 'PR']];
+        const S = ['pago', 'pago', 'pago', 'enviado', 'entregue', 'aguardando_pagamento', 'cancelado'];
+        const N = ['Ana', 'Bruno', 'Carla', 'Diego', 'Elisa', 'Felipe', 'Gabi', 'Heitor', 'Iara', 'João', 'Lia', 'Marcos'];
+        const orders = [];
+        for (let i = 0; i < 80; i++) {
+            const d = new Date(Date.now() - Math.floor(rnd() * 60 * 864e5)); d.setHours(8 + Math.floor(rnd() * 14), Math.floor(rnd() * 60));
+            const items = []; const n = 1 + Math.floor(rnd() * 2);
+            for (let k = 0; k < n; k++) { const p = P[Math.floor(rnd() * 3)]; items.push({ id: p[0], name: p[1], price: p[2], qty: 1 + Math.floor(rnd() * 3) }); }
+            const c = C[Math.floor(rnd() * C.length)], nome = N[Math.floor(rnd() * N.length)] + ' ' + String.fromCharCode(65 + Math.floor(rnd() * 20)) + '.';
+            orders.push({ id: 'demo-' + i, createdAt: d.toISOString(), status: S[Math.floor(rnd() * S.length)], paymentMethod: rnd() > 0.45 ? 'pix' : 'cartao',
+                customer: { nome, cidade: c[0], uf: c[1], whatsapp: '(61) 90000-0000', email: 'cliente@exemplo.com', cpf: '000.000.000-00', rua: 'Rua Exemplo', numero: '100', bairro: 'Centro', cep: '70000-000' },
+                items, total: +items.reduce((s, x) => s + x.price * x.qty, 0).toFixed(2) });
+        }
+        orders.sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+        return {
+            orders,
+            products: [
+                { id: 'pequena', name: 'Caixa Pequena', desc: 'Ideal para quem quer experimentar a diferença.', price: 5, stock: 64, active: true, popular: false },
+                { id: 'media', name: 'Caixa Média', desc: 'O tamanho perfeito para o seu ritual diário.', price: 9.9, stock: 8, active: true, popular: true },
+                { id: 'grande', name: 'Caixa Grande', desc: 'Maior custo-benefício. Para uso prolongado.', price: 20, stock: 31, active: true, popular: false }
+            ],
+            comments: [
+                { id: 'd1', name: 'Lucas M.', city: 'Brasília - DF', rating: 5, approved: true, date: new Date(Date.now() - 9 * 864e5).toISOString(), text: 'O acabamento é impecável e o toque do bambu é muito melhor que qualquer piteira de vidro que já usei.' },
+                { id: 'd2', name: 'Ana P.', city: 'Goiânia - GO', rating: 5, approved: true, date: new Date(Date.now() - 6 * 864e5).toISOString(), text: 'Além de linda, é sustentável. A fumaça fica mais fresca e não altera o sabor em nada.' },
+                { id: 'd3', name: 'Visitante', city: 'Curitiba - PR', rating: 4, approved: false, date: new Date(Date.now() - 1 * 864e5).toISOString(), text: 'Chegou rápido, gostei bastante. (avaliação de exemplo aguardando moderação)' }
+            ],
+            leads: [{ id: 'l1', nome: 'Loja Exemplo', empresa: 'Tabacaria Central', endereco: 'Brasília / DF', telefone: '(61) 90000-0000', status: 'novo', createdAt: new Date(Date.now() - 2 * 864e5).toISOString() }],
+            attempts: []
+        };
+    }
+    function demoApi(method, path, body) {
+        const db = demoDB || (demoDB = buildDemo());
+        const url = new URL(path, location.href), route = url.pathname, id = url.searchParams.get('id');
+        const PAIDS = new Set(['pago', 'enviado', 'entregue']);
+        if (method === 'GET') {
+            if (route.endsWith('/overview')) return {
+                totalOrders: db.orders.length, paidOrders: db.orders.filter(o => PAIDS.has(o.status)).length,
+                paymentErrors: db.attempts.length, awaitingPayment: db.orders.filter(o => o.status === 'aguardando_pagamento').length,
+                pendingComments: db.comments.filter(c => !c.approved).length,
+                lowStock: db.products.filter(p => p.active && p.stock <= 10).map(p => ({ name: p.name, stock: p.stock })),
+                resellerLeads: db.leads.length, newLeads: db.leads.filter(l => l.status === 'novo').length,
+                recentOrders: db.orders.slice(-10).reverse()
+            };
+            if (route.endsWith('/orders')) return JSON.parse(JSON.stringify(db.orders));
+            if (route.endsWith('/products')) return JSON.parse(JSON.stringify(db.products));
+            if (route.endsWith('/comments')) return JSON.parse(JSON.stringify(db.comments));
+            if (route.endsWith('/reseller-leads')) return JSON.parse(JSON.stringify(db.leads));
+            if (route.endsWith('/payment-attempts') || route.endsWith('/payment-errors')) return [];
+            return {};
+        }
+        const coll = route.endsWith('/orders') ? db.orders : route.endsWith('/comments') ? db.comments : route.endsWith('/reseller-leads') ? db.leads : null;
+        if (method === 'PUT' && route.endsWith('/products')) db.products = JSON.parse(JSON.stringify(body));
+        else if (method === 'PUT' && coll && body) { const it = coll.find(x => x.id === body.id); if (it) Object.assign(it, body); }
+        else if (method === 'DELETE' && coll && id) coll.splice(coll.findIndex(x => x.id === id) >>> 0, 1);
+        else if (method === 'DELETE' && route.endsWith('/payment-attempts')) db.attempts = [];
+        return { ok: true };
+    }
+
     async function api(method, path, body) {
+        if (DEMO) return demoApi(method, path, body);
         const res = await fetch(path, {
             method,
             headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
@@ -498,6 +566,8 @@
 
     function logout() {
         token = ''; sessionStorage.removeItem('bolla_admin_token');
+        DEMO = false; sessionStorage.removeItem('bolla_admin_demo');
+        document.body.classList.remove('is-demo');
         $('panel-view').style.display = 'none';
         $('login-view').style.display = 'flex';
     }
@@ -1267,8 +1337,29 @@
         toast('Histórico limpo'); loadPayAttempts(); loadDash();
     });
 
+    /* ---- Demonstração no GitHub Pages ---- */
+    function enterDemo() {
+        DEMO = true; demoDB = null;
+        sessionStorage.setItem('bolla_admin_demo', '1');
+        document.body.classList.add('is-demo');
+        showPanel();
+    }
+    if (STATIC_HOST) {
+        const card = document.querySelector('.login-card');
+        const note = document.createElement('div');
+        note.className = 'demo-note';
+        note.innerHTML = `<i class="fa-solid fa-circle-info"></i>
+            <p>Esta é a versão estática do site (GitHub Pages), sem servidor — o login real e os pedidos de verdade ficam na versão hospedada no Render.</p>
+            <button type="button" class="premium-btn premium-btn-gold" id="demo-btn"><i class="fa-solid fa-play"></i> Ver painel de demonstração</button>`;
+        card.appendChild(note);
+        $('demo-btn').addEventListener('click', enterDemo);
+        const pill = document.querySelector('.ag-status-pill');
+        if (pill) pill.innerHTML = '<span class="ag-status-dot"></span> Demonstração · dados de exemplo';
+        if (DEMO) { document.body.classList.add('is-demo'); showPanel(); }
+    }
+
     /* ---- Sessão existente ---- */
-    if (token) {
+    if (token && !DEMO) {
         api('GET', '/api/admin/overview').then(showPanel).catch(() => logout());
     }
 })();
