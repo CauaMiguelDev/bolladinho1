@@ -249,9 +249,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     function closeCheckout() { if (checkoutOverlay) checkoutOverlay.classList.remove('active'); }
 
+    // Versão estática (GitHub Pages): não há servidor para pagamento/frete,
+    // então o pedido segue pelo WhatsApp da loja com o carrinho já escrito.
+    const STATIC_HOST = /\.github\.io$/.test(location.hostname);
+    if (STATIC_HOST && checkoutBtn) checkoutBtn.innerHTML = '<i class="fa-brands fa-whatsapp"></i> Finalizar pelo WhatsApp';
+    function checkoutViaWhatsApp() {
+        const lines = cart.map(i => `• ${i.qty}x ${i.name} — ${formatBRL(i.price * i.qty)}`);
+        const msg = `Olá! Quero fazer um pedido Bolladinho:\n\n${lines.join('\n')}\n\nTotal: ${formatBRL(cartTotal())} + frete\n\nMeu CEP é: `;
+        window.open(`https://wa.me/5561995636229?text=${encodeURIComponent(msg)}`, '_blank', 'noopener');
+    }
+
     if (checkoutBtn) {
         checkoutBtn.addEventListener('click', () => {
             if (cart.length === 0) { alert('Seu carrinho está vazio!'); return; }
+            if (STATIC_HOST) return checkoutViaWhatsApp();
             openCheckout();
         });
     }

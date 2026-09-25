@@ -1,0 +1,37 @@
+# Publica a vitrine estática no GitHub Pages a cada push na main.
+# A versão estática não tem servidor: o carrinho finaliza pelo WhatsApp.
+# O site completo (checkout Mercado Pago, frete, painel) roda no Render — ver README.
+name: Publicar vitrine (GitHub Pages)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Montar site estático
+        run: |
+          mkdir -p _site
+          cp index.html revendedor.html style.css enhance.css enhance.js script.js _site/
+          cp -r img assets _site/
+          touch _site/.nojekyll
+      - name: Publicar na branch gh-pages
+        run: |
+          cd _site
+          git init -q -b gh-pages
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -qm "Publica vitrine a partir de ${GITHUB_SHA::7}"
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" gh-pages
