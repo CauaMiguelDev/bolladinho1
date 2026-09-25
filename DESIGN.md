@@ -211,7 +211,7 @@ Uma mata noturna iluminada por uma única fresta de luz: cinco verdes e neutros 
 
 **A Regra do Chão Verde.** Nenhuma superfície do storefront é um bloco branco ou cinza claro sólido. Superfícies claras existem só como vidro translúcido sobre o verde. Um card branco neste sistema lê como um erro de carregamento.
 
-**A Regra da Fronteira.** As cores de status (`#00E676`, `#FFD600`, `#FF1744`) e a paleta platina pertencem ao painel. Elas não atravessam para a vitrine, e o verde/ouro não atravessa para o painel.
+**A Regra da Fronteira (revista em 21/08/2026).** A fronteira caiu: o painel passou a usar a mesma paleta da vitrine — verde do bambuzal, ouro do hero, bambu como cor de apoio — e a mesma tipografia (Playfair Display nos títulos, Outfit na interface). A paleta platina e os status de neon (`#00E676`, `#FFD600`, `#FF1744`) foram aposentados; o retorno de estado no painel usa os mesmos tons da vitrine: `#79B98C` (ok), `#fec81d` (espera) e `#E4705E` (erro). O que continua valendo é a direção inversa: nada nasce no painel e desce para a loja sem passar por esta folha.
 
 ## Typography
 
