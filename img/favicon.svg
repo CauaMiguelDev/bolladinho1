@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#33844f"/>
+      <stop offset=".55" stop-color="#1c5330"/>
+      <stop offset="1" stop-color="#0a2213"/>
+    </linearGradient>
+    <linearGradient id="leaf" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#74c08e"/>
+      <stop offset="1" stop-color="#dcf1e2"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="url(#bg)"/>
+  <rect x="1" y="1" width="62" height="62" rx="15" fill="none" stroke="#a9dcb7" stroke-opacity=".28" stroke-width="2"/>
+  <!-- folha de bambu -->
+  <path d="M13 51 C 15 30, 30 15, 52 12 C 51 34, 37 49, 13 51 Z" fill="url(#leaf)"/>
+  <!-- nervura central -->
+  <path d="M16 48 C 26 39, 36 28, 47 16" fill="none" stroke="#1c5330" stroke-width="2.4" stroke-linecap="round"/>
+</svg>
