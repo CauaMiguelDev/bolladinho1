@@ -1,0 +1,4148 @@
+:root {
+    /* Color Palette */
+    --color-bg: #0c2e17; /* Green page background */
+    --color-bg-light: #133d1f;
+    --color-bg-deep: #09180f; /* mais escuro que o fundo: navbar sólida sobre o hero */
+    --color-primary: #345e43;
+    --color-primary-light: #4A7A5B;
+    --color-secondary: #D4C3A3; /* Bamboo/Beige */
+    --color-gold: #fec81d; /* Dourado do hero Ironhill */
+    --color-text: #E8F0EA;
+    --color-text-muted: #A3B5AA;
+    
+    /* Typography */
+    --font-heading: 'Playfair Display', serif;
+    --font-body: 'Outfit', sans-serif;
+    
+    /* Transitions */
+    --transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+    /* ---------------------------------------------------------------
+       ESCALA DO SISTEMA (Fase 0 do redesign)
+       Tokens NOVOS apenas. Nenhum token acima foi alterado, e o hero
+       (.hero*, bloco HERO IRONHILL) não consome nenhum destes valores.
+       --------------------------------------------------------------- */
+
+    /* Espaçamento — passo 4px, uma escala só para todo o storefront */
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.5rem;
+    --space-6: 2rem;
+    --space-7: 2.5rem;
+    --space-8: 3.5rem;
+    --space-9: 5rem;
+    --space-section: clamp(4.5rem, 9vw, 7rem);
+
+    /* Tipografia — fluida, mesma escala em todas as seções */
+    --text-xs: 0.78rem;
+    --text-sm: 0.9rem;
+    --text-base: 1rem;
+    --text-md: 1.0625rem;
+    --text-lg: clamp(1.125rem, 1.6vw, 1.25rem);
+    /* Subiu de clamp(1.35rem, 2.4vw, 1.6rem): contra um corpo de
+       1.0625rem, o título de card ficava só 27% maior — mesma família
+       de tamanho, sem dominância. Agora abre para ~1.45–1.7x. */
+    --text-title: clamp(1.5rem, 2.8vw, 1.85rem);
+    --text-headline: clamp(1.9rem, 4.4vw, 2.75rem);
+    --text-display: clamp(2.4rem, 6vw, 3.5rem);
+    --tracking-caps: 0.26em;
+
+    /* Ícones. A régua tipográfica é de TEXTO; glifo de ícone tem outra
+       relação com o corpo e vinha solto em 0.85/1.1/1.3/1.35/1.4rem
+       espalhados — o que também fazia a análise de hierarquia ler seis
+       tamanhos quase iguais numa seção que na verdade tem três. */
+    --icon-xs: 0.85rem;
+    --icon-sm: 1.1rem;
+    --icon-md: 1.3rem;
+    --icon-lg: 1.4rem;
+
+    /* Raios — 4 degraus, nada de 15/30px avulsos */
+    --radius-input: 12px;
+    --radius-sm: 14px;
+    --radius-card: 20px;
+    --radius-pill: 100px;
+
+    /* Sombras — sempre offset-x zero e blur alto (Regra da Sombra sem Contorno) */
+    --shadow-rest: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    --shadow-lift: 0 26px 60px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    --shadow-hero-card: 0 34px 80px rgba(0, 0, 0, 0.55);
+
+    /* Materiais da marca */
+    --glass-bg: linear-gradient(155deg, rgba(46, 78, 54, 0.30), rgba(15, 40, 23, 0.42));
+    --glass-border: rgba(212, 195, 163, 0.14);
+    --glass-border-hover: rgba(212, 195, 163, 0.34);
+
+    /* Foco visível — valor já prescrito no DESIGN.md */
+    --focus-ring: 0 0 0 3px rgba(74, 122, 91, 0.55), 0 0 0 5px rgba(254, 200, 29, 0.35);
+
+    /* Retorno ao cliente (vitrine).
+       A vitrine estava usando var(--feedback-ok), var(--feedback-error) e var(--feedback-warn) — verde e
+       vermelho de banco de imagens, e a "Regra da Fronteira" do
+       DESIGN.md proíbe a paleta de status do painel atravessar para a
+       loja. Estes três pertencem ao bambuzal: folha nova para
+       confirmação, o próprio ouro da marca para espera, e um vermelho
+       de terra (não de neon) para erro. */
+    --feedback-ok: #79B98C;
+    --feedback-warn: var(--color-gold);
+    --feedback-error: #E4705E;
+}
+
+/* ---------------------------------------------------------------
+   FOCO DE TECLADO (Fase 0)
+   Antes: nenhum :focus-visible no arquivo inteiro e outline:none nos
+   inputs — quem navega por teclado não via nada. Agora todo elemento
+   interativo tem anel visível em duas camadas (verde + ouro), que
+   sobrevive tanto no verde escuro quanto sobre vidro claro.
+   --------------------------------------------------------------- */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    box-shadow: var(--focus-ring);
+    border-radius: var(--radius-input);
+}
+
+/* Campos já arredondados mantêm o próprio raio no anel */
+.btn:focus-visible {
+    border-radius: 50px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* O atributo [hidden] só vale `display: none` pela folha do navegador,
+   então QUALQUER regra nossa com display explícito o derrota em
+   silêncio. Era o que acontecia com a nota do PIX: o JS fazia
+   `payNoteBox.hidden = true` ao escolher Cartão, mas
+   `.pay-method-note { display: flex }` mantinha a instrução do PIX na
+   tela junto do formulário de cartão. Guarda única para todos os
+   elementos que o JS esconde por atributo. */
+[hidden] {
+    display: none !important;
+}
+
+html {
+    scroll-behavior: smooth;
+    font-size: 16px;
+}
+
+body {
+    font-family: var(--font-body);
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    overflow-x: hidden;
+    line-height: 1.6;
+}
+
+h1, h2, h3, h4, .badge {
+    font-family: var(--font-heading);
+    font-weight: 600;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+    transition: var(--transition);
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+/* --- Utilities --- */
+.glass {
+    background: linear-gradient(155deg, rgba(46, 78, 54, 0.30), rgba(15, 40, 23, 0.42));
+    backdrop-filter: blur(16px) saturate(1.25);
+    -webkit-backdrop-filter: blur(16px) saturate(1.25);
+    border: 1px solid rgba(212, 195, 163, 0.14);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    border: none;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 150%;
+    height: 150%;
+    background: rgba(255,255,255,0.1);
+    transform: translate(-50%, -50%) rotate(45deg) translateY(100%);
+    transition: transform 0.6s ease;
+}
+
+.btn:hover::before {
+    transform: translate(-50%, -50%) rotate(45deg) translateY(0);
+}
+
+.btn-primary {
+    background-color: var(--color-primary);
+    color: var(--color-text);
+}
+
+.btn-primary:hover {
+    background-color: var(--color-primary-light);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(52, 94, 67, 0.4);
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid var(--color-secondary);
+    color: var(--color-secondary);
+}
+
+.btn-outline:hover {
+    background: var(--color-secondary);
+    color: var(--color-bg);
+}
+
+.btn-sm {
+    padding: 0.6rem 1.5rem;
+    border-radius: var(--radius-pill);
+    font-weight: 500;
+    font-size: var(--text-sm);
+    transition: var(--transition);
+}
+
+.btn-large {
+    padding: 1.2rem 2.5rem;
+    font-size: var(--text-lg);
+}
+
+/* Animations */
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(52, 94, 67, 0.7); }
+    70% { box-shadow: 0 0 0 15px rgba(52, 94, 67, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(52, 94, 67, 0); }
+}
+
+.pulse {
+    animation: pulse 2s infinite;
+}
+
+.pulse-strong {
+    animation: pulse 1.5s infinite;
+}
+
+/* Scroll reveal classes */
+.reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    filter: blur(4px);
+    transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+                filter 0.9s ease;
+    will-change: opacity, transform;
+}
+
+.reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+}
+
+.delay-1 { transition-delay: 0.2s; }
+.delay-2 { transition-delay: 0.4s; }
+.delay-3 { transition-delay: 0.6s; }
+
+/* --- Navbar --- */
+.navbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    padding: 1.5rem 0;
+    background: transparent;
+    pointer-events: none; /* transparente não bloqueia o hero; só o botão é clicável */
+    transition: background .4s ease, border-color .4s ease;
+}
+
+/* A caixa de menu dourada aparece SEMPRE no canto superior do hero */
+.navbar .menu-toggle { pointer-events: auto; }
+
+/* No topo (antes de rolar): só o botão — logo e ícones escondidos */
+.navbar:not(.scrolled) .logo,
+.navbar:not(.scrolled) .social-icons {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .4s ease;
+}
+
+.navbar.scrolled {
+    pointer-events: auto;
+    /* Sólida quando aparece (não transparente) */
+    background: color-mix(in srgb, var(--color-bg-deep) 97%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(212, 195, 163, 0.12);
+}
+
+.nav-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-secondary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.nav-links {
+    display: flex;
+    list-style: none;
+    gap: 2rem;
+}
+
+.nav-links a {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--color-text);
+    position: relative;
+}
+
+.nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--color-gold);
+    transition: var(--transition);
+}
+
+.nav-links a:hover::after {
+    width: 100%;
+}
+
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* --- Hero Section --- */
+.hero {
+    position: relative;
+    height: 100vh;
+    min-height: 600px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    background-color: #000; /* Keep hero on original black */
+    isolation: isolate; /* cria stacking context: camadas z-index negativo ficam sobre o fundo preto, não atrás dele */
+}
+
+.parallax-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 105%; /* Reduced parallax height to zoom out a bit */
+    background-size: cover;
+    background-position: center;
+    z-index: -3;
+    transform: translateZ(0); /* Hardware accel */
+    will-change: transform;
+}
+
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.4) 100%);
+    z-index: -2;
+}
+
+.hero-content {
+    max-width: 700px;
+    /* Alinha o texto à esquerda (mesma margem do logo/seções) em vez de centralizar */
+    margin-left: max(0px, calc((100vw - 1200px) / 2));
+    margin-right: auto;
+}
+
+.badge {
+    display: inline-block;
+    padding: 0.4rem 1rem;
+    background: rgba(212, 195, 163, 0.1);
+    color: var(--color-secondary);
+    border: 1px solid rgba(212, 195, 163, 0.3);
+    border-radius: var(--radius-pill);
+    font-size: var(--text-sm);
+    margin-bottom: 1.5rem;
+}
+
+.hero h1 {
+    font-size: clamp(2.6rem, 5vw, 4.5rem);
+    line-height: 1.12;
+    margin-bottom: 1.5rem;
+    color: #fff;
+    text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.hero h1 em {
+    color: var(--color-secondary);
+    font-style: italic;
+}
+
+.hero .subtitle {
+    font-size: 1.15rem;
+    line-height: 1.7;
+    color: var(--color-text-muted);
+    margin-bottom: 2.5rem;
+    max-width: 520px;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 1rem;
+}
+
+/* --- Common Sections --- */
+section {
+    padding: 6rem 0;
+}
+
+/* O eyebrow (inline-flex) e o h2 (inline-block) eram os dois de nível
+   inline dentro de um container text-align:center — caíam na MESMA
+   linha, com a cápsula dourada colada à esquerda do título e o
+   sublinhado fora de eixo. Coluna de flex resolve: cada um no seu
+   lugar, e os filhos são blocificados automaticamente. */
+.section-title {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: var(--space-8);
+}
+
+.section-title h2 {
+    display: block;
+    font-size: var(--text-headline);
+    line-height: 1.15;
+    color: var(--color-secondary);
+    margin-bottom: var(--space-4);
+    position: relative;
+}
+
+/* Nó de bambu: fio de fibra interrompido no centro por um ponto de
+   ouro — a "luz filtrada" do sistema, em vez da barra de gradiente
+   genérica que havia aqui. */
+.section-title h2::after {
+    content: '';
+    display: block;
+    width: 148px;
+    height: 6px;
+    margin: var(--space-5) auto 0;
+    background:
+        radial-gradient(circle at 50% 50%, var(--color-gold) 0 2px, transparent 2.5px),
+        linear-gradient(90deg,
+            transparent 0%,
+            rgba(212, 195, 163, 0.42) 14%,
+            rgba(212, 195, 163, 0.42) 42%,
+            transparent 42%,
+            transparent 58%,
+            rgba(212, 195, 163, 0.42) 58%,
+            rgba(212, 195, 163, 0.42) 86%,
+            transparent 100%);
+    background-repeat: no-repeat;
+    background-size: 100% 100%, 100% 1px;
+    background-position: center center, center center;
+}
+
+.section-title p {
+    color: var(--color-text-muted);
+    max-width: 58ch;
+    margin: 0 auto;
+    font-size: var(--text-lg);
+}
+
+/* --- Info Section --- */
+.info {
+    position: relative;
+    background: linear-gradient(to bottom, var(--color-bg), var(--color-bg-light));
+}
+
+.benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+    gap: var(--space-5);
+    margin-bottom: var(--space-8);
+}
+
+/* Card de benefício — regra ÚNICA (a versão que existia aqui e a do
+   bloco "REALCE VISUAL" no fim do arquivo brigavam por !important).
+   Alinhamento à esquerda: três cards centralizados idênticos é o
+   padrão mais genérico que existe; a leitura à esquerda com o selo
+   no alto dá hierarquia real (selo → nome → explicação). */
+.benefit-card {
+    position: relative;
+    padding: var(--space-7);
+    border-radius: var(--radius-card);
+    border: 1px solid var(--glass-border);
+    text-align: left;
+    overflow: hidden;
+    transition: transform 0.5s var(--ease-lux),
+                box-shadow 0.5s var(--ease-lux),
+                border-color 0.4s ease;
+}
+
+/* Fibra de bambu: dois feixes de fios verticais com períodos primos
+   entre si (9px e 14px). A irregularidade do batimento é o que faz
+   ler como fibra e não como listra de tecido — um único período
+   regular vira veludo cotelê. Custa 0 KB e nenhuma imagem. */
+.benefit-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+        repeating-linear-gradient(90deg,
+            rgba(212, 195, 163, 0.022) 0 1px,
+            transparent 1px 9px),
+        repeating-linear-gradient(90deg,
+            rgba(212, 195, 163, 0.014) 0 1px,
+            transparent 1px 14px);
+}
+
+.benefit-card > * {
+    position: relative;
+}
+
+.benefit-card:hover {
+    transform: translateY(-8px);
+    border-color: var(--glass-border-hover);
+    box-shadow: var(--shadow-lift);
+}
+
+/* Antes: div sem dimensão com um gradiente radial de fundo — renderizava
+   como uma BARRA retangular atravessando o card, não como um ícone. */
+.benefit-card .icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    margin-bottom: var(--space-5);
+    border-radius: 50%;
+    font-size: var(--icon-lg);
+    color: var(--color-secondary);
+    background: radial-gradient(circle at 32% 28%, rgba(74, 122, 91, 0.9), rgba(52, 94, 67, 0.45));
+    border: 1px solid rgba(212, 195, 163, 0.22);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.14);
+    /* easing exponencial: o elástico que estava aqui destoava do
+       --ease-lux usado no resto do sistema */
+    transition: border-color 0.4s var(--ease-lux), box-shadow 0.4s var(--ease-lux);
+}
+
+.benefit-card:hover .icon {
+    border-color: rgba(254, 200, 29, 0.4);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.14),
+                0 0 0 5px rgba(254, 200, 29, 0.07);
+}
+
+/* Playfair em corpo maior fecha melhor com o rastro levemente
+   negativo — na escala anterior o ajuste não fazia diferença. */
+.benefit-card h3 {
+    font-size: var(--text-title);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin-bottom: var(--space-3);
+    color: var(--color-secondary);
+}
+
+.benefit-card p {
+    color: var(--color-text-muted);
+    font-size: var(--text-md);
+    line-height: 1.6;
+    max-width: 34ch;
+}
+
+/* Faixa de diferenciais — era Playfair itálico branco sobre verde
+   chapado, que é exatamente o clichê "eco genérico" que o DESIGN.md
+   manda evitar. Agora é uma régua de rótulos em caixa alta com o
+   rastro largo da marca, separados por nós de bambu. */
+.diferenciais-banner {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: var(--space-4) var(--space-6);
+    padding: var(--space-5) var(--space-6);
+    border-radius: var(--radius-card);
+    /* não tem a classe .glass no HTML, então o material vem daqui */
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.dif-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: var(--tracking-caps);
+    text-indent: var(--tracking-caps);
+    text-transform: uppercase;
+    color: var(--color-text);
+}
+
+.dif-item i {
+    color: var(--color-gold);
+    font-size: var(--icon-xs);
+    text-indent: 0;
+}
+
+/* --- Visual Demo Section --- */
+.visual-demo {
+    background: var(--color-bg-light);
+    overflow: hidden;
+}
+
+.demo-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-9);
+    align-items: center;
+}
+
+/* isolation cria o contexto de empilhamento que faltava: a moldura
+   deslocada usava z-index:-1 num wrapper sem contexto próprio, então
+   escapava para TRÁS do fundo da seção em vez de ficar atrás da foto. */
+.demo-image-wrapper {
+    position: relative;
+    isolation: isolate;
+}
+
+.image-frame {
+    position: relative;
+    z-index: 1;
+    border-radius: var(--radius-card);
+    overflow: hidden;
+    box-shadow: var(--shadow-hero-card);
+    aspect-ratio: 1/1;
+}
+
+.demo-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* removida a animação `breathing` (scale 1→1.15, 15s, infinite):
+       movimento ocioso permanente competindo com o hero, que é o
+       único lugar do site onde movimento contínuo se justifica. */
+}
+
+/* Moldura deslocada: fio de bambu em vez de borda verde de 2px —
+   a mesma translucidez das outras superfícies do sistema. */
+.demo-image-wrapper::after {
+    content: '';
+    position: absolute;
+    z-index: 0;
+    bottom: -18px;
+    right: -18px;
+    width: 100%;
+    height: 100%;
+    border: 1px solid rgba(212, 195, 163, 0.28);
+    border-radius: var(--radius-card);
+}
+
+.demo-content h2 {
+    font-size: var(--text-headline);
+    color: var(--color-secondary);
+    margin-bottom: var(--space-5);
+    line-height: 1.15;
+}
+
+.demo-content p {
+    color: var(--color-text-muted);
+    font-size: var(--text-lg);
+    max-width: 52ch;
+    margin-bottom: var(--space-6);
+}
+
+.feature-list {
+    list-style: none;
+    display: grid;
+    gap: var(--space-3);
+}
+
+/* Era flex, e o <i>, o <strong> e o texto viravam TRÊS itens lado a
+   lado — "Polimento Premium:" numa coluna, a descrição noutra, tudo
+   desalinhado. Grid não resolve (todo elemento filho vira item
+   próprio). A resposta é o recuo pendente clássico: o bloco flui como
+   texto normal, o ícone ocupa uma caixa de largura fixa e o
+   text-indent negativo puxa só a primeira linha de volta até ele.
+   Sem posicionamento absoluto e sem offset vertical mágico — o ícone
+   fica na linha de base do texto sozinho. */
+.feature-list li {
+    display: block;
+    padding: var(--space-4) var(--space-5);
+    padding-left: calc(var(--space-5) + 1.75rem);
+    text-indent: -1.75rem;
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(212, 195, 163, 0.1);
+    font-size: var(--text-md);
+    color: var(--color-text-muted);
+}
+
+.feature-list i {
+    display: inline-block;
+    width: 1.75rem;
+    text-indent: 0;
+    color: var(--color-gold);
+    font-size: var(--icon-xs);
+}
+
+.feature-list strong {
+    color: var(--color-secondary);
+    font-weight: 600;
+}
+
+/* --- Social Proof --- */
+.social-proof {
+    background: linear-gradient(to bottom, var(--color-bg-light), var(--color-bg));
+}
+
+/* 250px de mínimo criava QUATRO colunas estreitas: o depoimento
+   quebrava em ~4 palavras por linha. 340px força três colunas e
+   devolve uma medida de leitura legível (~45 caracteres). */
+.testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+    gap: var(--space-5);
+    /* stretch (padrão): cards da mesma linha terminam na mesma altura e
+       a assinatura encosta na base, em vez de barra irregular embaixo */
+    align-items: stretch;
+}
+
+.testimonial-card {
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-7);
+    border-radius: var(--radius-card);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.5s var(--ease-lux),
+                box-shadow 0.5s var(--ease-lux),
+                border-color 0.4s ease;
+}
+
+.testimonial-card:hover {
+    transform: translateY(-8px);
+    border-color: var(--glass-border-hover);
+    box-shadow: var(--shadow-lift);
+}
+
+/* A aspa era 6rem no canto superior esquerdo, colidindo com as
+   estrelas. Vira marca d'água grande no canto inferior direito,
+   atrás do conteúdo — textura, não elemento. */
+.testimonial-card::before {
+    content: '\201C';
+    font-family: var(--font-heading);
+    font-size: 11rem;
+    position: absolute;
+    right: -0.5rem;
+    bottom: -5.5rem;
+    color: rgba(212, 195, 163, 0.07);
+    line-height: 1;
+    pointer-events: none;
+}
+
+.testimonial-card > * {
+    position: relative;
+}
+
+/* #FFD700 é um amarelo de estoque, não o Ouro de Resina da marca */
+.stars {
+    color: var(--color-gold);
+    margin-bottom: var(--space-4);
+    font-size: var(--icon-xs);
+    letter-spacing: 0.1em;
+}
+
+.quote {
+    font-size: var(--text-md);
+    line-height: 1.65;
+    font-style: normal;
+    color: var(--color-text);
+    margin-bottom: var(--space-5);
+    flex-grow: 1;
+}
+
+/* Assinatura: inicial em bambu como âncora visual, nome e cidade em
+   níveis diferentes. Antes era uma linha só ("Nome — Cidade") em
+   Playfair, que quebrava em duas e não tinha hierarquia nenhuma. */
+.author {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding-top: var(--space-4);
+    border-top: 1px solid rgba(212, 195, 163, 0.12);
+}
+
+.author-initial {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-family: var(--font-heading);
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--color-secondary);
+    background: radial-gradient(circle at 32% 28%, rgba(74, 122, 91, 0.85), rgba(52, 94, 67, 0.4));
+    border: 1px solid rgba(212, 195, 163, 0.22);
+}
+
+.author-meta {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.3;
+    min-width: 0;
+}
+
+.author-name {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    color: var(--color-secondary);
+}
+
+.author-city {
+    font-size: var(--text-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+}
+
+/* --- Final CTA --- */
+.final-cta {
+    position: relative;
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    overflow: hidden;
+}
+
+.cta-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(9, 18, 9, 0.7);
+    backdrop-filter: blur(5px);
+    z-index: -1;
+}
+
+.cta-content {
+    max-width: 1100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.cta-content h2 {
+    font-size: var(--text-display);
+    line-height: 1.1;
+    color: #fff;
+    margin-bottom: var(--space-4);
+}
+
+.cta-content p {
+    font-size: var(--text-lg);
+    margin-bottom: var(--space-7);
+    color: var(--color-text-muted);
+}
+
+.pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-6);
+    width: 100%;
+    margin: var(--space-8) 0 var(--space-7);
+}
+
+/* NOTA: a vitrine com foto de produto está projetada mas NÃO aplicada.
+   Os arquivos img/sucata_*.png, descritos no PRODUCT.md como "fotos de
+   caixa", são na verdade fotos de um ferro-velho com carros batidos —
+   não têm nada a ver com o produto. Assim que houver foto real das três
+   caixas, o card volta a abrir com a imagem (ver relatório da Fase 4). */
+.pricing-card {
+    padding: var(--space-8) var(--space-5) var(--space-6);
+    border-radius: var(--radius-card);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    text-align: center;
+    transition: transform 0.5s var(--ease-lux),
+                box-shadow 0.5s var(--ease-lux),
+                border-color 0.4s ease;
+}
+
+.pricing-card:hover {
+    transform: translateY(-10px);
+    border-color: var(--glass-border-hover);
+    box-shadow: var(--shadow-hero-card);
+}
+
+.pricing-card h3 {
+    font-size: var(--text-title);
+    line-height: 1.2;
+    color: var(--color-secondary);
+    margin-bottom: var(--space-2);
+}
+
+.pricing-desc {
+    font-size: var(--text-sm);
+    line-height: 1.5;
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-5);
+    flex-grow: 1;
+}
+
+/* Preço: R$, inteiro e centavos na mesma linha de base.
+   Antes o dígito era um nó de texto solto (item de flex anônimo) que
+   herdava line-height 1.6 do body: a caixa de linha de 4rem virava
+   6.4rem e afundava o número, enquanto .currency e .cents ficavam
+   presos no topo por align-items:flex-start + margin-top fixo — o
+   preço saía como "R$  ,00" numa linha e "5" solto embaixo.
+   align-items:baseline resolve pela métrica da própria fonte, sem
+   número mágico, e os satélites em em acompanham o inteiro em
+   qualquer breakpoint. */
+.price-amount {
+    font-size: 4rem;
+    font-weight: 700;
+    font-family: var(--font-heading);
+    line-height: 1;
+    color: #fff;
+    margin-bottom: var(--space-5);
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+}
+
+.price-amount .currency,
+.price-amount .cents {
+    font-size: 0.375em; /* = 1.5rem quando o inteiro está em 4rem */
+    line-height: 1;
+    color: var(--color-secondary);
+}
+
+.price-amount .currency {
+    margin-right: 0.25em;
+}
+
+.pricing-card .btn {
+    width: 100%;
+}
+
+.pricing-card.popular {
+    transform: scale(1.05);
+    background: rgba(30, 50, 35, 0.5);
+    border: 1px solid var(--color-primary);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+    z-index: 10;
+}
+
+.pricing-card.popular:hover {
+    transform: scale(1.05) translateY(-5px);
+}
+
+.popular-badge {
+    position: absolute;
+    top: -15px;
+    background: var(--color-primary);
+    color: #fff;
+    padding: 0.5rem 1.5rem;
+    border-radius: 30px;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+/* Os dois !important daqui existiam só para vencer `.cta-content p`,
+   que é mais específico. Subir a especificidade do seletor resolve o
+   mesmo problema sem a marreta. */
+.cta-content .secure-text {
+    margin-top: var(--space-5);
+    font-size: var(--text-sm);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--color-text);
+}
+
+.secure-text i {
+    color: var(--feedback-ok);
+}
+
+/* --- Footer --- */
+.footer {
+    background: #050a06;
+    padding: var(--space-9) 0 0;
+    border-top: 1px solid rgba(212, 195, 163, 0.1);
+}
+
+.footer-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: var(--space-7) var(--space-6);
+    margin-bottom: var(--space-8);
+}
+
+.footer-brand .logo {
+    font-size: 1.6rem;
+    margin-bottom: var(--space-4);
+}
+
+.footer-brand p {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    max-width: 34ch;
+}
+
+/* Rótulo de coluna em caixa alta com o rastro da marca. Playfair 1.2rem
+   fazia cada título de coluna competir com os títulos de seção da
+   página — num rodapé o rótulo orienta, não anuncia. */
+.footer h4 {
+    font-family: var(--font-body);
+    color: var(--color-secondary);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: var(--tracking-caps);
+    text-indent: var(--tracking-caps);
+    text-transform: uppercase;
+    margin-bottom: var(--space-5);
+}
+
+.footer-links ul {
+    list-style: none;
+}
+
+.footer-links li {
+    margin-bottom: var(--space-1);
+}
+
+/* inline-block + padding vertical dá altura de toque de ~40px num
+   link que, como texto puro de 0.9rem, tinha 23px de alvo */
+.footer-links a,
+.footer-contact a {
+    display: inline-block;
+    position: relative;
+    padding: var(--space-3) 0;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    text-decoration: none;
+}
+
+/* Mesmo sublinhado dourado que cresce da esquerda usado na navegação —
+   o rodapé passa a falar a mesma língua de interação do topo.
+   O hover antigo era `padding-left: 5px`, que empurrava o layout a
+   cada passagem do cursor. */
+.footer-links a::after,
+.footer-contact a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 2px;
+    width: 100%;
+    height: 1px;
+    background: var(--color-gold);
+    /* scaleX em vez de animar `width`: width dispara layout a cada
+       quadro; transform roda no compositor */
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 0.35s var(--ease-lux);
+}
+
+.footer-links a:hover,
+.footer-contact a:hover {
+    color: var(--color-secondary);
+}
+
+.footer-links a:hover::after,
+.footer-contact a:hover::after,
+.footer-links a:focus-visible::after,
+.footer-contact a:focus-visible::after {
+    transform: scaleX(1);
+}
+
+.footer-contact p {
+    margin-bottom: var(--space-3);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.footer-contact p i {
+    color: var(--color-secondary);
+    opacity: 0.7;
+}
+
+.social-icons {
+    display: flex;
+    gap: var(--space-3);
+}
+
+.social-icons a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(212, 195, 163, 0.14);
+    color: var(--color-secondary);
+    transition: transform 0.4s var(--ease-lux), border-color 0.3s ease, background 0.3s ease;
+}
+
+.social-icons a:hover {
+    background: rgba(52, 94, 67, 0.55);
+    border-color: rgba(254, 200, 29, 0.35);
+    color: #fff;
+    transform: translateY(-3px);
+}
+
+.footer-bottom {
+    text-align: center;
+    padding: var(--space-5) 0;
+    background: rgba(0, 0, 0, 0.22);
+    border-top: 1px solid rgba(212, 195, 163, 0.07);
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+    position: relative;
+}
+
+/* Acesso administrativo discreto (2 cliques: 1º arma, 2º entra) */
+.admin-access {
+    position: absolute;
+    right: 12px;
+    bottom: 10px;
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(212, 195, 163, 0.10);
+    border: 1px solid rgba(212, 195, 163, 0.25);
+    color: rgba(212, 195, 163, 0.55);
+    font-size: var(--icon-xs);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: all 0.3s ease;
+}
+.admin-access:hover {
+    color: var(--color-secondary);
+    border-color: rgba(212, 195, 163, 0.5);
+    background: rgba(212, 195, 163, 0.16);
+}
+.admin-access.armed {
+    background: var(--color-gold);
+    border-color: var(--color-gold);
+    color: #0c2e17;
+    box-shadow: 0 0 12px rgba(254, 200, 29, 0.7);
+    transform: scale(1.1);
+}
+
+@media (max-width: 768px) {
+    /* No celular: dentro do fluxo, centralizado e com alvo de toque maior */
+    .admin-access {
+        position: static;
+        margin: 1.1rem auto 0;
+        width: 42px;
+        height: 42px;
+        font-size: 0.95rem;
+    }
+}
+
+/* --- Moving Particles --- */
+/* As folhas só aparecem depois que o usuário passa do hero (controlado via JS) */
+#particles-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 50;
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 1s ease;
+}
+
+#particles-container.particles-visible {
+    opacity: 1;
+}
+
+.particle {
+    position: absolute;
+    background: rgba(212, 195, 163, 0.4);
+    border-radius: 50%;
+    filter: blur(1px);
+    animation: float 20s infinite linear;
+}
+
+@keyframes float {
+    0% { transform: translateY(100vh) translateX(0) rotate(0); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(-10vh) translateX(100px) rotate(360deg); opacity: 0; }
+}
+
+/* --- Media Queries --- */
+@media (max-width: 992px) {
+    .pricing-card.popular {
+        transform: scale(1);
+    }
+    .pricing-card.popular:hover {
+        transform: translateY(-5px);
+    }
+    .demo-grid {
+        grid-template-columns: 1fr;
+    }
+    .demo-image-wrapper {
+        margin-bottom: 2rem;
+    }
+    .footer-content {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    section {
+        padding: 4rem 0;
+    }
+    .container {
+        padding: 0 1.25rem;
+    }
+    .section-title {
+        margin-bottom: 2.5rem;
+    }
+    .pricing-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        margin: 3rem 0;
+    }
+    .pricing-card {
+        padding: 2.5rem 1.5rem;
+    }
+    .hide-mobile {
+        display: none !important;
+    }
+    .hero {
+        min-height: 100svh;
+    }
+    .hero h1 {
+        font-size: 2.4rem;
+    }
+    .section-title h2 {
+        font-size: 2rem;
+    }
+    .demo-content h2 {
+        font-size: 2.2rem;
+    }
+    .diferenciais-banner {
+        gap: 1rem 1.5rem;
+        padding: 1.5rem;
+    }
+    .dif-item {
+        font-size: 1rem;
+    }
+    .payment-methods-strip {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.8rem 1.2rem;
+        padding: 1rem 1.2rem;
+        border-radius: 20px;
+    }
+    .footer-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero h1 {
+        font-size: 2rem;
+    }
+    .section-title h2 {
+        font-size: 1.75rem;
+    }
+    .demo-content h2 {
+        font-size: 1.9rem;
+    }
+    .cta-content h2 {
+        font-size: 2rem;
+    }
+    .price-amount {
+        font-size: 3rem;
+    }
+    .benefit-card,
+    .testimonial-card {
+        padding: 1.8rem 1.4rem;
+    }
+    .btn {
+        padding: 0.9rem 1.6rem;
+        font-size: 0.95rem;
+    }
+    .btn-large {
+        padding: 1rem 2rem;
+    }
+}
+
+/* --- Cart Modal --- */
+.cart-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+    z-index: 2000;
+    display: flex;
+    justify-content: flex-end;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.cart-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.cart-modal {
+    width: 100%;
+    max-width: 420px;
+    height: 100vh;
+    background: var(--color-bg);
+    border-left: 1px solid var(--glass-border);
+    box-shadow: -30px 0 60px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 0.5s var(--ease-lux);
+}
+
+.cart-overlay.active .cart-modal {
+    transform: translateX(0);
+}
+
+.cart-header {
+    padding: var(--space-5) var(--space-6);
+    border-bottom: 1px solid rgba(212, 195, 163, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.cart-header h2 {
+    font-size: var(--text-title);
+    color: var(--color-secondary);
+}
+
+/* era um <button> sem dimensão, só font-size — alvo de toque de ~24px */
+.close-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    margin-right: -0.5rem;
+    background: transparent;
+    border: none;
+    border-radius: 50%;
+    color: var(--color-text-muted);
+    font-size: var(--icon-md);
+    cursor: pointer;
+    transition: color 0.3s ease, background 0.3s ease;
+}
+
+.close-btn:hover {
+    color: var(--color-text);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.cart-items {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-4);
+    background: rgba(255, 255, 255, 0.03);
+    padding: var(--space-4);
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(212, 195, 163, 0.1);
+}
+
+.cart-item-info h4 {
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: var(--space-1);
+}
+
+.cart-item-price {
+    color: var(--color-secondary);
+    font-weight: 600;
+    font-size: var(--text-sm);
+}
+
+.cart-item-controls {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+}
+
+/* Eram 25x25px — o controle mais tocado do carrinho, num site onde o
+   público é majoritariamente mobile, com metade do alvo mínimo. */
+.cart-item-controls button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(212, 195, 163, 0.12);
+    color: var(--color-text);
+    border-radius: 50%;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.cart-item-controls button:hover {
+    background: var(--color-primary);
+    border-color: var(--color-primary-light);
+}
+
+.cart-item-qty {
+    font-weight: 700;
+    min-width: 28px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+
+.cart-footer {
+    padding: var(--space-6);
+    border-top: 1px solid rgba(212, 195, 163, 0.1);
+    background: rgba(9, 18, 9, 0.95);
+}
+
+.cart-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: var(--space-5);
+    font-size: var(--text-title);
+    font-family: var(--font-heading);
+    color: var(--color-secondary);
+}
+
+.cart-empty-msg {
+    text-align: center;
+    color: var(--color-text-muted);
+    margin-top: var(--space-6);
+}
+
+.cart-secure-note {
+    text-align: center;
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    margin-top: var(--space-4);
+}
+
+.cart-secure-note i {
+    color: var(--feedback-ok);
+    margin-right: 0.3rem;
+}
+
+/* --- Contador do carrinho --- */
+.cart-icon-wrapper {
+    position: relative;
+}
+
+/* O contador era vermelho — herdado de um #E74C3C que virou
+   --feedback-error na tokenização. Ter itens no carrinho não é erro,
+   é o estado que a loja MAIS quer sinalizar: vai de ouro, a cor que o
+   sistema usa para "olhe aqui". Raio de 12px numa pílula de 18px
+   deixava o selo quase quadrado; agora é cápsula. */
+.cart-count {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    min-width: 19px;
+    height: 19px;
+    padding: 0 5px;
+    background: var(--color-gold);
+    color: var(--color-bg);
+    font-size: 0.7rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    border-radius: var(--radius-pill);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-body);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+}
+
+/* --- Menu Mobile (Hamburger) --- */
+.menu-toggle {
+    display: none;
+    background: transparent;
+    border: none;
+    color: var(--color-secondary);
+    font-size: var(--icon-lg);
+    cursor: pointer;
+    padding: 0.3rem;
+}
+
+@media (max-width: 768px) {
+    .menu-toggle {
+        display: block;
+    }
+}
+
+/* Removida daqui a SEGUNDA implementação do painel de menu (largura,
+   fundo, transform e z-index:-1 próprios, só abaixo de 768px). O
+   projeto usa o painel deslizante em QUALQUER largura, definido no
+   bloco NAV IRONHILL no fim do arquivo; manter as duas versões
+   significava dois menus concorrendo pela mesma classe, com
+   z-index conflitante entre elas. */
+
+/* --- Folhas de bambu caindo --- */
+.leaf {
+    position: absolute;
+    top: -30px;
+    animation: leaf-fall linear infinite;
+    will-change: transform;
+}
+
+.leaf svg {
+    display: block;
+    animation: leaf-sway var(--sway-duration, 3s) ease-in-out infinite alternate;
+}
+
+@keyframes leaf-fall {
+    0% {
+        transform: translateY(-5vh) translateX(0) rotate(0deg);
+        opacity: 0;
+    }
+    8% { opacity: 1; }
+    92% { opacity: 1; }
+    100% {
+        transform: translateY(105vh) translateX(var(--drift, 60px)) rotate(340deg);
+        opacity: 0;
+    }
+}
+
+@keyframes leaf-sway {
+    0% { transform: rotate(-35deg) translateX(-12px); }
+    100% { transform: rotate(30deg) translateX(12px); }
+}
+
+/* --- Bambus decorativos no fundo --- */
+.bamboo-decor {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    color: var(--color-primary-light);
+    opacity: 0.09;
+}
+
+.bamboo-decor svg {
+    position: absolute;
+    top: 0;
+    height: 100vh;
+    width: 130px;
+}
+
+.bamboo-left { left: -20px; }
+.bamboo-right { right: -20px; }
+
+main, .footer {
+    position: relative;
+    z-index: 1;
+}
+
+@media (max-width: 992px) {
+    .bamboo-decor { opacity: 0.05; }
+    .bamboo-decor svg { width: 80px; }
+}
+
+/* --- Hero: efeito Ken Burns + trust strip --- */
+.kenburns-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    animation: kenburns 24s ease-in-out infinite alternate;
+    will-change: transform;
+}
+
+@keyframes kenburns {
+    0% { transform: scale(1) translateX(0); }
+    100% { transform: scale(1.12) translateX(-1.5%); }
+}
+
+/* Hero com spotlight: zoom único de entrada no lugar do kenburns infinito,
+   para a imagem base ficar alinhada com a camada de reveal (estática) */
+.kenburns-bg.hero-zoom-once {
+    animation: heroZoomOnce 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes heroZoomOnce {
+    0% { transform: scale(1.12); }
+    100% { transform: scale(1); }
+}
+
+.hero-reveal-layer {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    z-index: -1;
+    pointer-events: none;
+    visibility: hidden;
+}
+
+.hero-overlay {
+    background:
+        linear-gradient(to right, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.35) 55%, rgba(0, 0, 0, 0) 100%),
+        linear-gradient(to top, var(--color-bg) 0%, transparent 22%);
+}
+
+.hero-trust {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(212, 195, 163, 0.2);
+}
+
+.hero-trust span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    letter-spacing: 0.5px;
+}
+
+.hero-trust i {
+    color: var(--color-secondary);
+}
+
+@media (max-width: 768px) {
+    .hero-trust {
+        justify-content: center;
+        gap: 1rem;
+        font-size: var(--text-xs);
+    }
+}
+
+/* --- Faixa de métodos de pagamento ---
+   É um sinal de confiança, não um controle: os ícones não são
+   clicáveis, então perderam o hover que os levantava e trocava a cor
+   (movimento que prometia interação inexistente). O rótulo entrou no
+   rastro largo da marca — estava em 1px, contra o mínimo de 0.26em
+   que o DESIGN.md exige de todo texto em caixa alta. */
+.payment-methods-strip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin-top: var(--space-6);
+    padding: var(--space-3) var(--space-6);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-pill);
+}
+
+.payment-methods-strip .pm-label {
+    font-size: var(--text-xs);
+    font-weight: 700;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-caps);
+    text-indent: var(--tracking-caps);
+    padding-right: var(--space-2);
+    border-right: 1px solid rgba(212, 195, 163, 0.16);
+}
+
+.payment-methods-strip i {
+    font-size: 1.5rem;
+    color: var(--color-secondary);
+    opacity: 0.75;
+}
+
+/* --- Checkout Modal --- */
+.checkout-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(8px);
+    z-index: 3000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.checkout-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.checkout-modal {
+    width: 100%;
+    max-width: 980px;
+    max-height: 92vh;
+    overflow-y: auto;
+    background: var(--color-bg-light);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-card);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
+    transform: translateY(30px) scale(0.97);
+    transition: transform 0.5s var(--ease-lux);
+}
+
+.checkout-overlay.active .checkout-modal {
+    transform: translateY(0) scale(1);
+}
+
+.checkout-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: var(--space-5) var(--space-6);
+    border-bottom: 1px solid rgba(212, 195, 163, 0.1);
+    position: sticky;
+    top: 0;
+    background: var(--color-bg-light);
+    z-index: 2;
+}
+
+.checkout-header h2 {
+    font-size: var(--text-title);
+    color: var(--color-secondary);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.checkout-title p {
+    margin-top: var(--space-1);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+}
+
+/* Layout em duas colunas: formulário + resumo */
+.checkout-columns {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: var(--space-6);
+    padding: var(--space-5) var(--space-6) var(--space-6);
+    align-items: start;
+}
+
+/* Cabeçalho de etapa em caixa alta com o rastro da marca — era um
+   texto em peso 700 sem tratamento, indistinguível de um rótulo de
+   campo logo abaixo dele. */
+.co-section {
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    font-weight: 700;
+    letter-spacing: var(--tracking-caps);
+    text-indent: var(--tracking-caps);
+    text-transform: uppercase;
+    color: var(--color-secondary);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin: var(--space-7) 0 var(--space-4);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid rgba(212, 195, 163, 0.15);
+}
+
+.co-section:first-child {
+    margin-top: 0;
+}
+
+.co-section i {
+    color: var(--color-gold);
+    text-indent: 0;
+}
+
+.req {
+    color: var(--color-gold);
+}
+
+.label-opt {
+    color: var(--color-text-muted);
+    font-weight: 400;
+}
+
+@keyframes step-in {
+    from { opacity: 0; transform: translateX(15px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.checkout-form .form-group {
+    margin-bottom: var(--space-4);
+}
+
+.checkout-form .form-group label {
+    display: block;
+    margin-bottom: var(--space-2);
+    color: var(--color-secondary);
+    font-weight: 500;
+    font-size: var(--text-sm);
+}
+
+/* 16px é o mínimo que evita o zoom automático do iOS ao focar um
+   campo — abaixo disso o Safari dá zoom e desalinha o checkout
+   inteiro no celular, que é onde a maior parte das compras acontece. */
+.checkout-form .form-group input {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    min-height: 48px;
+    border-radius: var(--radius-input);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(0, 0, 0, 0.3);
+    color: #fff;
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.checkout-form .form-group input:focus {
+    outline: none;
+    border-color: var(--color-primary-light);
+}
+
+.checkout-form .form-group input::placeholder {
+    color: rgba(255, 255, 255, 0.35);
+}
+
+.field-hint {
+    display: block;
+    margin-top: var(--space-2);
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    line-height: 1.4;
+}
+
+.city-uf {
+    display: flex;
+    gap: var(--space-3);
+}
+
+.city-uf input:first-child {
+    flex: 2.5;
+}
+
+.city-uf input:last-child {
+    flex: 1;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+/* Forma de entrega */
+.shipping-hint {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
+    border: 1px dashed rgba(212, 195, 163, 0.35);
+    border-radius: var(--radius-input);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+}
+
+.shipping-hint i {
+    color: var(--color-secondary);
+}
+
+.shipping-hint strong {
+    color: var(--color-secondary);
+}
+
+/* Cards de opção (entrega e pagamento) */
+.option-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
+    border: 1px solid rgba(212, 195, 163, 0.15);
+    border-radius: var(--radius-input);
+    background: rgba(255, 255, 255, 0.03);
+    cursor: pointer;
+    transition: var(--transition);
+    animation: step-in 0.35s ease;
+}
+
+.option-card:hover {
+    border-color: rgba(212, 195, 163, 0.4);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.option-card.selected {
+    border-color: var(--color-primary-light);
+    background: rgba(52, 94, 67, 0.18);
+    box-shadow: 0 0 0 1px var(--color-primary-light);
+}
+
+.option-card input[type="radio"] {
+    accent-color: var(--color-primary-light);
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+.option-card > i {
+    font-size: var(--icon-md);
+    color: var(--color-secondary);
+}
+
+.option-card .option-info {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.3;
+}
+
+.option-card .option-info strong {
+    color: var(--color-text);
+    font-size: var(--text-base);
+}
+
+.option-card .option-info small {
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+}
+
+.option-card .option-price {
+    margin-left: auto;
+    font-weight: 700;
+    color: var(--feedback-ok);
+    font-size: var(--text-sm);
+}
+
+/* ===== Formas de entrega (SuperFrete + locais) — cards estilo transportadora ===== */
+.shipping-loading {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+}
+.shipping-loading i { color: var(--color-secondary); }
+
+.shipping-options {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.ship-card {
+    --c: var(--color-secondary);
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-4);
+    border: 1px solid rgba(212, 195, 163, 0.15);
+    border-radius: var(--radius-input);
+    background: rgba(255, 255, 255, 0.03);
+    cursor: pointer;
+    transition: var(--transition);
+    animation: step-in 0.35s ease;
+}
+.ship-card:hover {
+    border-color: color-mix(in srgb, var(--c) 55%, transparent);
+    background: rgba(255, 255, 255, 0.05);
+}
+.ship-card.selected {
+    border-color: var(--c);
+    background: color-mix(in srgb, var(--c) 12%, transparent);
+    box-shadow: 0 0 0 1px var(--c), 0 8px 22px -14px var(--c);
+}
+.ship-card input[type="radio"] { display: none; }
+
+.ship-radio {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid rgba(212, 195, 163, 0.4);
+    display: grid;
+    place-items: center;
+    transition: var(--transition);
+}
+.ship-card.selected .ship-radio {
+    border-color: var(--c);
+}
+.ship-card.selected .ship-radio::after {
+    content: "";
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--c);
+}
+
+.ship-ico {
+    flex-shrink: 0;
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    font-size: 1.25rem;
+    color: var(--c);
+    background: color-mix(in srgb, var(--c) 18%, transparent);
+}
+
+.ship-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+    line-height: 1.25;
+}
+.ship-name {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    color: var(--color-text);
+    font-weight: 700;
+    font-size: var(--text-base);
+}
+.ship-badge {
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 999px;
+    color: var(--c);
+    background: color-mix(in srgb, var(--c) 16%, transparent);
+    border: 1px solid color-mix(in srgb, var(--c) 40%, transparent);
+}
+.ship-sub {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+}
+.ship-sub i { font-size: 0.75rem; }
+
+.ship-price {
+    margin-left: auto;
+    padding-left: var(--space-3);
+    text-align: right;
+    font-weight: 800;
+    font-size: var(--text-base);
+    color: var(--color-text);
+    white-space: nowrap;
+}
+.ship-price.free { color: var(--feedback-ok); }
+.ship-price.tbd { color: var(--color-secondary); }
+
+/* alvo de toque: o card inteiro é o rótulo do rádio */
+.option-card {
+    min-height: 56px;
+}
+
+.pay-methods {
+    display: flex;
+    gap: 0.8rem;
+    margin-bottom: 1.2rem;
+}
+
+.pay-methods .option-card {
+    flex: 1;
+}
+
+.pay-method-note {
+    display: flex;
+    gap: 0.8rem;
+    align-items: flex-start;
+    padding: 1.1rem 1.3rem;
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(212, 195, 163, 0.12);
+    border-radius: var(--radius-input);
+}
+
+.pay-method-note i {
+    font-size: 1.4rem;
+    color: var(--feedback-ok);
+    margin-top: 2px;
+}
+
+.pay-method-note p {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    line-height: 1.5;
+}
+
+/* ---------------- Cartão de crédito (checkout transparente) ----------------
+   EXCEÇÃO DELIBERADA AO SISTEMA. Daqui até o fim do bloco, o cartão é o
+   desenho de um OBJETO FÍSICO, não uma superfície de interface: o chip
+   tem 46x34px com raio de 7px porque um chip real é assim, os rótulos
+   "TITULAR"/"VALIDADE" são minúsculos porque num cartão são, e o número
+   é gravado em monoespaçada. Puxar esses valores para a régua de texto
+   e para o raio mínimo de 10px do sistema faria a ilustração parar de
+   parecer um cartão. O detector marca esses valores como deriva; são
+   falsos positivos e ficam como estão de propósito.
+
+   Foram removidas daqui CINCO animações infinitas que rodavam ao mesmo
+   tempo (flutuação, brilho varrendo, brilho do chip, ondas de
+   aproximação e brilho da bandeira). Sobrou a camada holográfica, que
+   é lenta e é o que faz ler como cartão. O realce reativo ao digitar
+   cada campo continua — esse é retorno útil, não enfeite. */
+#credit-card-form {
+    animation: step-in 0.35s ease;
+}
+
+.card-preview-wrap {
+    perspective: 1000px;
+    margin-bottom: 1.4rem;
+    /* Flutua no WRAPPER (não no .animated-card) para não conflitar com o flip 3D */
+    animation: cardFloat 5s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+    .card-preview-wrap { animation: none; }
+}
+
+/* Flutuar suave e contínuo do cartão (não interfere no flip do .animated-card) */
+@keyframes cardFloat {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-7px); }
+}
+
+.animated-card {
+    position: relative;
+    width: 100%;
+    max-width: 340px;
+    margin: 0 auto;
+    aspect-ratio: 1.586 / 1;
+    transform-style: preserve-3d;
+    transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.animated-card.flipped {
+    transform: rotateY(180deg);
+}
+
+/* Reconhecimento da bandeira: brilho varre o cartão + reflexo no chip + glow — uma vez */
+.animated-card.recognized .card-front::after { animation: cardSheenOnce 0.9s ease-out; }
+.animated-card.recognized .card-chip::after { animation: chipShineOnce 0.9s ease-out 0.08s; }
+.animated-card.recognized .card-face { animation: cardGlow 0.9s ease-out; }
+@keyframes cardSheenOnce { 0% { left: -40%; opacity: 0; } 15% { opacity: 0.9; } 100% { left: 130%; opacity: 0; } }
+@keyframes chipShineOnce { 0% { left: -60%; opacity: 0; } 20% { opacity: 1; } 100% { left: 130%; opacity: 0; } }
+@keyframes cardGlow {
+    0%   { box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5); }
+    40%  { box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 255, 255, 0.22); }
+    100% { box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5); }
+}
+
+.card-face {
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-sm);
+    padding: 1.3rem 1.4rem;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    display: flex;
+    flex-direction: column;
+    color: #fff;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
+    /* --card-bg é definido via JS conforme o banco/bandeira; senão usa o tema padrão */
+    background: var(--card-bg,
+        radial-gradient(120% 140% at 0% 0%, rgba(74, 122, 91, 0.55), transparent 55%) ,
+        linear-gradient(135deg, #16281b 0%, #0c150e 100%));
+    border: 1px solid rgba(212, 195, 163, 0.18);
+    overflow: hidden;
+    transition: background 0.55s ease, box-shadow 0.4s ease;
+}
+
+/* Nome do banco emissor (aparece ao reconhecer o BIN) */
+.card-issuer {
+    position: absolute;
+    top: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.92);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    opacity: 0;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    pointer-events: none;
+    white-space: nowrap;
+}
+.card-issuer.show { opacity: 1; }
+
+/* Pulso na bandeira ao reconhecer o cartão. A animação FICA — é o
+   retorno de que o número foi identificado — mas com o easing
+   exponencial do sistema no lugar do elástico. */
+.brand-pop { animation: brandPop 0.4s var(--ease-lux); }
+@keyframes brandPop { 0% { transform: scale(0.6); opacity: 0.4; } 100% { transform: scale(1); opacity: 1; } }
+
+/* Brilho diagonal que varre o cartão de tempos em tempos */
+.card-face::after {
+    content: '';
+    position: absolute;
+    top: -60%;
+    left: -30%;
+    width: 45%;
+    height: 220%;
+    background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.28), transparent);
+    transform: rotate(8deg);
+    pointer-events: none;
+    filter: blur(2px);
+    /* removido: cardSheen 5.5s infinite — brilho varria o cartão a cada 5,5s, para sempre */
+    opacity: 0;
+}
+
+@keyframes cardSheen {
+    0%, 100% { left: -40%; opacity: 0; }
+    12%      { opacity: 1; }
+    45%      { left: 130%; opacity: 0; }
+    45.01%, 100% { left: 130%; }
+}
+
+/* Camada holográfica sutil girando por baixo do conteúdo */
+.card-front::before {
+    content: '';
+    position: absolute;
+    inset: -40%;
+    background: conic-gradient(from 0deg,
+        rgba(255, 255, 255, 0) 0deg,
+        rgba(255, 255, 255, 0.10) 60deg,
+        rgba(255, 215, 120, 0.10) 130deg,
+        rgba(255, 255, 255, 0) 200deg,
+        rgba(255, 255, 255, 0.08) 300deg,
+        rgba(255, 255, 255, 0) 360deg);
+    mix-blend-mode: screen;
+    pointer-events: none;
+    animation: cardHolo 9s linear infinite;
+    opacity: 0.55;
+}
+
+@keyframes cardHolo {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+.card-front { justify-content: space-between; }
+
+/* O conteúdo fica acima das camadas holográfica/brilho */
+.card-front > * { position: relative; z-index: 2; }
+
+.card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.card-chip {
+    width: 46px;
+    height: 34px;
+    border-radius: 7px;
+    background: linear-gradient(135deg, #f3e3ab 0%, #e6cf8f 40%, #b89a5a 100%);
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.25);
+    position: relative;
+    overflow: hidden;
+}
+
+.card-chip::before {
+    content: '';
+    position: absolute;
+    inset: 6px 8px;
+    border: 1px solid rgba(0, 0, 0, 0.28);
+    border-radius: 3px;
+}
+
+/* Reflexo que percorre o chip */
+.card-chip::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -60%;
+    width: 45%;
+    height: 100%;
+    background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.85), transparent);
+    /* removido: chipShine 5.5s infinite */
+    opacity: 0;
+}
+
+@keyframes chipShine {
+    0%, 100% { left: -60%; }
+    16%      { left: 130%; }
+    16.01%, 100% { left: 130%; }
+}
+
+/* Ondas de aproximação (contactless) pulsando */
+.card-contactless {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    margin-left: 10px;
+    margin-right: auto;
+}
+
+.card-contactless i {
+    display: block;
+    width: 6px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.85);
+    border-left: none;
+    border-radius: 0 12px 12px 0;
+    opacity: 0.35;
+    /* removido: contactlessPulse 1.8s infinite — o mais insistente dos seis */
+}
+
+.card-contactless i:nth-child(1) { height: 8px;  animation-delay: 0s; }
+.card-contactless i:nth-child(2) { height: 14px; animation-delay: 0.2s; }
+.card-contactless i:nth-child(3) { height: 20px; animation-delay: 0.4s; }
+
+@keyframes contactlessPulse {
+    0%, 100% { opacity: 0.3; }
+    50%      { opacity: 1; }
+}
+
+.card-brand {
+    font-size: 1.6rem;
+    line-height: 1;
+    color: var(--color-secondary);
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.card-brand .visa { font-style: italic; font-family: Georgia, serif; color: #f7f7f7; }
+.card-brand .mc { position: relative; display: inline-flex; }
+.card-brand .mc span { width: 24px; height: 24px; border-radius: 50%; display: inline-block; }
+.card-brand .mc span:first-child { background: #eb001b; }
+.card-brand .mc span:last-child { background: #f79e1b; margin-left: -11px; mix-blend-mode: screen; }
+.card-brand .elo { font-weight: 800; color: #fff; font-size: 1.1rem; }
+.card-brand .amex { font-weight: 800; color: #4fb6e0; font-size: var(--text-base); }
+.card-brand .hiper { font-weight: 800; color: #fff; font-size: var(--text-base); font-style: italic; }
+.card-brand .diners { font-weight: 800; color: #fff; font-size: var(--text-base); letter-spacing: 0.5px; }
+
+.card-number {
+    font-family: 'Outfit', monospace;
+    font-size: 1.35rem;
+    letter-spacing: 2px;
+    color: #fff;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    word-spacing: 4px;
+    transition: text-shadow 0.3s ease, transform 0.3s ease;
+}
+
+/* Realce enquanto o cliente digita o número / nome / validade */
+.card-number.active,
+.card-field-value.active {
+    text-shadow: 0 0 12px rgba(255, 255, 255, 0.7), 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+.card-number.active { transform: scale(1.02); }
+
+.card-brand { transition: transform 0.3s ease; }
+/* removido: brandGlow 3s infinite na bandeira do cartão */
+
+@keyframes brandGlow {
+    0%, 100% { filter: drop-shadow(0 0 0 rgba(255, 255, 255, 0)); }
+    50%      { filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.4)); }
+}
+
+.card-bottom {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.card-field { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+
+.card-field-label {
+    font-size: 0.6rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: rgba(232, 240, 234, 0.55);
+}
+
+.card-field-value {
+    font-size: var(--text-sm);
+    text-transform: uppercase;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 170px;
+}
+
+.card-back { transform: rotateY(180deg); padding-top: 1.6rem; }
+
+.card-stripe {
+    height: 40px;
+    margin: 0 -1.4rem 1.1rem;
+    background: #050906;
+}
+
+.card-cvv-row {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+}
+
+.card-cvv {
+    background: #e8e8e8;
+    color: #111;
+    font-family: monospace;
+    letter-spacing: 2px;
+    padding: 5px 12px;
+    border-radius: 5px;
+    min-width: 70px;
+    text-align: right;
+}
+
+.card-back-brand {
+    margin-top: auto;
+    font-size: 0.7rem;
+    color: var(--color-secondary);
+    letter-spacing: 0.5px;
+    text-align: right;
+}
+
+/* Select de parcelamento (mesma pegada dos inputs do checkout) */
+.checkout-form .form-group select {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    border-radius: var(--radius-input);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.3);
+    color: #fff;
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    transition: border-color 0.3s ease;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='%23D4C3A3' stroke-width='2' viewBox='0 0 24 24'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    padding-right: 2.5rem;
+    cursor: pointer;
+}
+
+.checkout-form .form-group select:focus {
+    outline: none;
+    border-color: var(--color-primary-light);
+}
+
+.checkout-form .form-group select option {
+    background: var(--color-bg-light);
+    color: #fff;
+}
+
+/* Resumo do pedido (coluna lateral) */
+.checkout-summary {
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(212, 195, 163, 0.12);
+    border-radius: var(--radius-sm);
+    padding: 1.5rem;
+    position: sticky;
+    top: 1rem;
+}
+
+.checkout-summary h3 {
+    font-size: var(--text-title);
+    color: var(--color-secondary);
+    margin-bottom: 1.2rem;
+}
+
+.summary-item {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 0.7rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.summary-item-icon {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    border-radius: var(--radius-input);
+    background: var(--color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: var(--icon-sm);
+}
+
+.summary-item-info {
+    flex: 1;
+    line-height: 1.35;
+}
+
+.summary-item-info strong {
+    display: block;
+    font-size: var(--text-sm);
+    color: var(--color-text);
+}
+
+.summary-item-info small {
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+}
+
+.summary-item-price {
+    font-weight: 700;
+    color: var(--color-secondary);
+    font-size: var(--text-sm);
+    white-space: nowrap;
+}
+
+.btn-success {
+    background: #2f9e44;
+    color: #fff;
+    margin-top: 1.2rem;
+}
+
+.btn-success:hover {
+    background: #37b24d;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(47, 158, 68, 0.35);
+}
+
+.summary-secure {
+    margin-top: 0.9rem;
+    text-align: center;
+    font-size: var(--text-xs);
+    color: var(--feedback-ok);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+}
+
+.summary-badges {
+    display: flex;
+    justify-content: center;
+    gap: 0.9rem;
+    margin-top: 0.8rem;
+    padding-top: 0.8rem;
+    border-top: 1px dashed rgba(212, 195, 163, 0.15);
+}
+
+.summary-badges i {
+    font-size: 1.5rem;
+    color: var(--color-secondary);
+    opacity: 0.8;
+}
+
+.summary-trust {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.summary-trust span {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.68rem;
+    color: var(--color-text-muted);
+    text-align: center;
+    flex: 1;
+}
+
+.summary-trust i {
+    font-size: var(--text-base);
+    color: var(--feedback-ok);
+}
+
+.form-row {
+    display: flex;
+    gap: 1rem;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+.cep-status {
+    display: block;
+    margin-top: var(--space-2);
+    font-size: var(--text-xs);
+    line-height: 1.4;
+    color: var(--color-text-muted);
+}
+
+.btn-block {
+    width: 100%;
+}
+
+/* Resumo do pedido (o card externo é o .checkout-summary) */
+.order-summary {
+    margin-bottom: 0.5rem;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.3rem 0;
+    font-size: var(--text-base);
+    color: var(--color-text);
+}
+
+.summary-shipping {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    border-top: 1px dashed rgba(212, 195, 163, 0.15);
+    margin-top: 0.5rem;
+    padding-top: 0.6rem;
+}
+
+.summary-total {
+    font-family: var(--font-heading);
+    font-size: var(--text-title);
+    color: var(--color-secondary);
+    font-weight: 700;
+    border-top: 1px solid rgba(212, 195, 163, 0.2);
+    margin-top: 0.5rem;
+    padding-top: 0.7rem;
+}
+
+/* --- Notificação de compra (prova social) --- */
+.purchase-toast {
+    position: fixed;
+    bottom: var(--space-5);
+    left: var(--space-5);
+    z-index: 1500;
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-5);
+    background: var(--glass-bg);
+    -webkit-backdrop-filter: blur(16px) saturate(1.25);
+    backdrop-filter: blur(16px) saturate(1.25);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-lift);
+    transform: translateX(-120%);
+    transition: transform 0.5s var(--ease-lux);
+    max-width: 340px;
+}
+
+.purchase-toast.show {
+    transform: translateX(0);
+}
+
+/* selo circular no mesmo material dos ícones de benefício e depoimento */
+.purchase-toast .toast-icon {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 32% 28%, rgba(74, 122, 91, 0.9), rgba(52, 94, 67, 0.45));
+    border: 1px solid rgba(212, 195, 163, 0.22);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-secondary);
+    font-size: var(--icon-sm);
+}
+
+.purchase-toast .toast-text {
+    font-size: var(--text-sm);
+    line-height: 1.45;
+    color: var(--color-text);
+}
+
+.purchase-toast .toast-text strong {
+    color: var(--color-secondary);
+}
+
+.purchase-toast .toast-time {
+    display: block;
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    margin-top: var(--space-1);
+}
+
+/* --- Estoque e botão desabilitado ---
+   Era um salmão #E8A87C que não existia em lugar nenhum do sistema, e
+   pior: servia às DUAS mensagens opostas do mesmo elemento. "Restam
+   apenas 8 unidades!" é urgência e merece destaque; "Sem estoque no
+   momento" é indisponibilidade e não pode chamar atenção para um
+   produto que ninguém pode comprar. */
+.stock-note {
+    display: block;
+    margin-top: var(--space-3);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--feedback-warn);
+    min-height: 1em;
+}
+
+.stock-note.is-out {
+    font-weight: 400;
+    letter-spacing: normal;
+    color: var(--color-text-muted);
+}
+
+.btn-disabled {
+    opacity: 0.45;
+    pointer-events: none;
+    filter: grayscale(0.6);
+}
+
+/* --- Banner de retorno do pagamento --- */
+/* Este banner diz ao cliente se o pagamento dele passou. É a
+   mensagem mais importante que o site emite — e a única que costuma
+   ser lida em estado de ansiedade. Fica logo abaixo da navegação. */
+.payment-banner {
+    position: fixed;
+    top: calc(var(--space-9) + var(--space-4));
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2500;
+    width: min(92vw, 520px);
+}
+
+.payment-banner-inner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-5);
+    border-radius: var(--radius-sm);
+    background: var(--glass-bg);
+    -webkit-backdrop-filter: blur(16px) saturate(1.25);
+    backdrop-filter: blur(16px) saturate(1.25);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-lift);
+    color: var(--color-text);
+    animation: banner-in 0.5s var(--ease-lux);
+}
+
+@keyframes banner-in {
+    from { opacity: 0; transform: translateY(-15px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Cor sozinha não pode carregar o estado (WCAG 1.4.1), mas aqui ela
+   não carrega: cada estado já vem com um ÍCONE diferente — relógio,
+   x, spinner — e o título diz o resultado por escrito. Cheguei a
+   somar uma faixa colorida na borda esquerda e voltei atrás: é
+   redundante com o ícone e é o acento lateral que o detector marca
+   como tique de interface gerada. */
+.payment-banner-inner > i { font-size: var(--icon-lg); }
+.payment-banner-inner.pb-ok > i { color: var(--feedback-ok); }
+.payment-banner-inner.pb-wait > i { color: var(--feedback-warn); }
+.payment-banner-inner.pb-fail > i { color: var(--feedback-error); }
+
+.payment-banner-inner strong { color: var(--color-secondary); }
+.payment-banner-inner span { font-size: var(--text-sm); color: var(--color-text-muted); }
+
+/* era padding 0.3rem sem dimensão — alvo de toque de ~22px */
+.payment-banner-inner button {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    background: transparent;
+    border: none;
+    border-radius: 50%;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    font-size: var(--text-base);
+    transition: color 0.3s ease, background 0.3s ease;
+}
+
+.payment-banner-inner button:hover {
+    color: var(--color-text);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+/* --- CEP: estados de validação ---
+   O estado neutro era itálico e os estados de resultado não — a dica
+   mudava de forma no meio da interação. Agora os três são iguais e só
+   a cor muda. */
+.cep-status.cep-ok { color: var(--feedback-ok); }
+.cep-status.cep-error { color: var(--feedback-error); }
+
+/* --- Formulário de avaliação --- */
+.review-cta {
+    text-align: center;
+    margin-top: 3rem;
+}
+
+.review-form {
+    display: none;
+    max-width: 560px;
+    margin: 1.5rem auto 0;
+    padding: 2rem;
+    border-radius: 20px;
+    text-align: left;
+}
+
+.review-form.open {
+    display: block;
+    animation: step-in 0.35s ease;
+}
+
+.review-form h3 {
+    color: var(--color-secondary);
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+/* alvo de toque de 44px por estrela e o dourado da marca no lugar
+   do #FFD700 de estoque */
+.star-picker {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-1);
+    font-size: 1.6rem;
+    color: var(--color-gold);
+    margin-bottom: var(--space-5);
+    cursor: pointer;
+}
+
+.star-picker i {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+}
+
+/* Rótulo real acima do campo. Antes a única identificação era o
+   placeholder — que some no primeiro caractere digitado e não é
+   associado ao campo para leitor de tela. */
+.review-form label {
+    display: block;
+    margin-bottom: var(--space-2);
+    color: var(--color-secondary);
+    font-size: var(--text-sm);
+    font-weight: 500;
+}
+
+.review-form .req {
+    color: var(--color-gold);
+}
+
+.review-form input,
+.review-form textarea {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    min-height: 48px;
+    border-radius: var(--radius-input);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(0, 0, 0, 0.3);
+    color: #fff;
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    resize: vertical;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* a troca de borda de 1px continua, mas agora acompanhada do anel —
+   1px de borda sozinho não atende contraste de foco */
+.review-form input:focus-visible,
+.review-form textarea:focus-visible {
+    border-color: var(--color-primary-light);
+    box-shadow: var(--focus-ring);
+}
+
+.review-form input::placeholder,
+.review-form textarea::placeholder {
+    color: rgba(255, 255, 255, 0.35);
+}
+
+.review-form .form-group {
+    margin-bottom: var(--space-4);
+}
+
+.review-feedback {
+    margin-top: var(--space-3);
+    font-size: var(--text-sm);
+    text-align: center;
+    /* reserva a linha antes de haver mensagem: sem isso o botão pula
+       para baixo no instante em que o retorno aparece */
+    min-height: 1.4em;
+}
+
+.review-feedback.ok { color: var(--feedback-ok); }
+.review-feedback.err { color: var(--feedback-error); }
+
+.review-note {
+    display: block;
+    text-align: center;
+    margin-top: 0.6rem;
+    color: var(--color-text-muted);
+    font-size: 0.78rem;
+}
+
+.no-comments {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: var(--color-text-muted);
+    font-style: italic;
+}
+
+/* --- Responsividade: modais e componentes definidos acima ---
+   (precisa vir depois dos estilos base para vencer a cascata) */
+@media (max-width: 900px) {
+    .checkout-columns {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    .checkout-summary {
+        position: static;
+    }
+}
+
+@media (max-width: 768px) {
+    .checkout-overlay {
+        padding: 0.5rem;
+    }
+    .checkout-modal {
+        max-height: 96vh;
+        border-radius: 16px;
+    }
+    .checkout-header,
+    .checkout-columns {
+        padding-left: 1.25rem;
+        padding-right: 1.25rem;
+    }
+    .checkout-form .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+    .pay-methods {
+        flex-direction: column;
+        gap: 0.6rem;
+    }
+    .purchase-toast {
+        left: 1rem;
+        right: 1rem;
+        max-width: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .cart-modal {
+        max-width: 100%;
+    }
+    .summary-trust {
+        flex-wrap: wrap;
+    }
+}
+
+/* --- Acessibilidade: reduzir movimento --- */
+/* --- Lenis (smooth scroll) --- */
+html.lenis,
+html.lenis body {
+    height: auto;
+}
+
+.lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+    overflow: hidden;
+}
+
+.lenis.lenis-smooth iframe {
+    pointer-events: none;
+}
+
+/* ================= HERO IRONHILL (réplica) ================= */
+@font-face {
+    font-family: PPWoodland;
+    font-display: swap;
+    src: url("assets/fonts/PPWoodland-Ultralight.woff2") format("woff2");
+    font-weight: 200;
+    font-style: normal;
+}
+@font-face {
+    font-family: PPWoodland;
+    font-display: swap;
+    src: url("assets/fonts/PPWoodland-Bold.woff2") format("woff2");
+    font-weight: 700;
+    font-style: normal;
+}
+
+/* Reset do .hero antigo (spotlight/kenburns) para o layout do Ironhill com Névoa e Mouse 3D */
+.hero {
+    position: relative;
+    display: block;
+    height: auto;
+    min-height: 0;
+    padding: 0; /* anula o padding genérico de section (6rem) que criava faixa escura no topo */
+    background: #09120b;
+    color: #fec81d;
+    overflow: hidden;
+    perspective: 1200px;
+    isolation: isolate;
+}
+
+.hero__row {
+    width: 100%;
+    height: 185vh;
+    position: relative;
+}
+
+.hero__bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    will-change: translate;
+}
+
+/* Camadas de Névoa Atmosférica em Movimento */
+.hero__vignette {
+    position: absolute;
+    inset: 0;
+    z-index: 7;
+    pointer-events: none;
+    background:
+        radial-gradient(120% 100% at 50% 45%, transparent 45%, rgba(4,9,6,0.45) 78%, rgba(3,7,5,0.85) 100%),
+        linear-gradient(180deg, transparent 0%, transparent 62%, rgba(4,9,6,0.85) 100%);
+}
+
+.hero__twigs {
+    position: absolute;
+    inset: 0;
+    z-index: 8;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    will-change: translate;
+}
+
+.hero__twig {
+    position: absolute;
+    z-index: 8;
+    will-change: transform, translate;
+}
+
+.hero__twig--left {
+    width: 700px;
+    max-width: 55vw;
+    bottom: 20%;
+    left: 0;
+}
+
+.hero__twig--right {
+    width: 800px;
+    max-width: 60vw;
+    bottom: 10%;
+    right: 0;
+}
+
+.hero__conteiner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    will-change: transform;
+}
+
+.hero__top {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    height: 100vh;
+    z-index: 10;
+    gap: 0.6rem;
+    will-change: translate;
+}
+
+.hero__top .intro-eyebrow {
+    font-family: "GT America Trial", "Outfit", sans-serif;
+    text-transform: uppercase;
+    font-size: clamp(0.72rem, 1.2vw, 0.95rem);
+    font-weight: 600;
+    letter-spacing: 0.42em;
+    color: #fec81d;
+    margin: 0;
+    text-indent: 0.42em;
+    opacity: 0.9;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+
+.hero__top h1 {
+    font-family: "PPWoodland", "Cormorant Garamond", serif;
+    font-size: clamp(48px, 14.5vw, 240px);
+    font-weight: 200;
+    line-height: 0.88;
+    letter-spacing: 0.04em;
+    margin: 0;
+    color: #fec81d;
+    text-shadow: 0 4px 45px rgba(254, 200, 29, 0.28), 0 2px 4px rgba(0, 0, 0, 0.7);
+    max-width: 100%;
+}
+
+.hero__top .intro-description {
+    font-family: "GT America Trial", "Outfit", sans-serif;
+    text-transform: uppercase;
+    font-size: clamp(0.68rem, 1.1vw, 0.88rem);
+    font-weight: 500;
+    letter-spacing: 0.35em;
+    color: #fec81d;
+    margin: 0;
+    text-indent: 0.35em;
+    opacity: 0.85;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+
+.hero__content {
+    position: absolute;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    height: 125vh;
+    z-index: 10;
+    padding: 0 15px;
+}
+
+.hero__content h2 {
+    font-family: "PPWoodland", serif;
+    font-size: clamp(24px, 4vw, 48px);
+    text-transform: uppercase;
+    font-weight: 200;
+    color: #0f0f0f;
+    max-width: 1400px;
+    margin: 0;
+}
+
+.hero-canvas {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+/* Indicador de Scroll */
+.hero__scroll-indicator {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    font-family: "GT America Trial", sans-serif;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: rgba(254, 200, 29, 0.85);
+}
+
+.hero__scroll-indicator .line {
+    width: 1px;
+    height: 40px;
+    background: rgba(254, 200, 29, 0.25);
+    position: relative;
+    overflow: hidden;
+}
+
+.hero__scroll-indicator .line-inner {
+    width: 100%;
+    height: 50%;
+    background: #fec81d;
+    position: absolute;
+    top: -50%;
+    animation: scrollLineDrop 2s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+@keyframes scrollLineDrop {
+    0% { top: -50%; }
+    100% { top: 100%; }
+}
+
+/* ================= ANIMAÇÕES DE SCROLL / UI PREMIUM ================= */
+
+/* Reveal variante: entra deslizando da direita ("Fade In Right") */
+.reveal.reveal--right {
+    transform: translateX(60px);
+}
+.reveal.reveal--right.active {
+    transform: translateX(0);
+}
+
+/* Removido daqui:
+   - `.benefit-card { border: 1px solid transparent }`, que vinha DEPOIS
+     da regra do card e anulava a borda de bambu do sistema;
+   - `testimonialFloat`, flutuação contínua e dessincronizada que deixava
+     os cards de depoimento em alturas diferentes o tempo todo, lendo
+     como layout quebrado em vez de intenção.
+   Ambos agora vivem na regra única de cada componente, mais acima. */
+
+/* Precificação: sombra mais pronunciada no card central */
+.pricing-card.popular {
+    box-shadow: 0 28px 60px rgba(0, 0, 0, 0.55),
+                0 0 0 1px rgba(254, 200, 29, 0.28);
+}
+
+/* Botão magnético: reage fisicamente ao ponteiro */
+.pricing-card .btn {
+    will-change: transform;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                background-color 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
+}
+
+/* Acessibilidade: desliga movimento contínuo e garante conteúdo visível */
+/* ================= CHECKOUT: meios de pagamento =================
+   Escolher entre cartão e PIX é a decisão mais importante da tela, e
+   o estado selecionado precisa ser óbvio sem gritar. O ouro marca a
+   escolha (anel + selo), o vidro verde sustenta o card, e o ícone
+   muda de cor sem saltar de escala. */
+.pay-methods .option-card {
+    position: relative;
+    overflow: hidden;
+    min-height: 64px;
+    transition: transform 0.25s var(--ease-lux), border-color 0.25s ease,
+                box-shadow 0.25s ease, background 0.25s ease;
+}
+.pay-methods .option-card > i {
+    /* era easing elástico com scale(1.18): o ícone dava um pinote a
+       cada troca de método */
+    transition: color 0.25s ease;
+}
+.pay-methods .option-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(212, 195, 163, 0.5);
+}
+.pay-methods .option-card.selected {
+    background: linear-gradient(150deg, rgba(52, 94, 67, 0.4), rgba(52, 94, 67, 0.12));
+    border-color: var(--color-gold);
+    box-shadow: 0 0 0 1px rgba(254, 200, 29, 0.45), 0 14px 30px rgba(0, 0, 0, 0.35);
+}
+.pay-methods .option-card.selected > i {
+    color: var(--color-gold);
+}
+/* Selo de "selecionado" */
+.pay-methods .option-card.selected::after {
+    content: '\f00c';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    width: 20px;
+    height: 20px;
+    font-size: 0.68rem;
+    color: var(--color-bg);
+    background: var(--color-gold);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: checkPop 0.28s var(--ease-lux);
+}
+@keyframes checkPop { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+/* Foco dos campos do checkout no mesmo anel do resto do site */
+.checkout-form .form-group input:focus-visible,
+.checkout-form .form-group select:focus-visible {
+    box-shadow: var(--focus-ring);
+    background: rgba(0, 0, 0, 0.45);
+}
+
+/* Botão Finalizar Compra: gradiente + brilho deslizante */
+.btn-success {
+    background: linear-gradient(135deg, var(--color-primary-light), var(--color-primary));
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 24px rgba(52, 94, 67, 0.45);
+    transition: transform 0.2s ease, box-shadow 0.3s ease, filter 0.3s ease;
+}
+.btn-success:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.08);
+    box-shadow: 0 16px 34px rgba(52, 94, 67, 0.55);
+}
+.btn-success::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -120%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.28), transparent);
+    transform: skewX(-20deg);
+    pointer-events: none;
+}
+.btn-success:hover::before { animation: shine 0.9s ease; }
+@keyframes shine { from { left: -120%; } to { left: 130%; } }
+
+/* Selos de segurança no resumo */
+.summary-badges i { transition: transform 0.25s ease, color 0.25s ease; }
+.summary-badges i:hover { transform: translateY(-3px) scale(1.15); color: var(--color-gold); }
+
+/* Cartão animado: leve brilho pulsante e realce ao focar campos */
+.card-preview-wrap { perspective: 1000px; margin: 1.4rem 0; }
+.animated-card:hover { box-shadow: 0 26px 55px rgba(0, 0, 0, 0.6); }
+.card-brand { transition: color 0.3s ease; }
+#credit-card-form { animation: fadeCardIn 0.45s cubic-bezier(0.16, 1, 0.3, 1); }
+@keyframes fadeCardIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+/* Nota do PIX com leve destaque */
+.pay-method-note { transition: border-color 0.3s ease, background 0.3s ease; }
+
+/* Responsividade dos meios de pagamento */
+@media (max-width: 560px) {
+    .pay-methods { flex-direction: column; }
+    .pay-methods .option-card { width: 100%; }
+    .animated-card { max-width: 300px; }
+    .card-number { font-size: 1.15rem !important; letter-spacing: 1px !important; }
+    .checkout-form .form-row { flex-direction: column; gap: 0; }
+}
+
+/* ============================================================
+   ✦ REALCE VISUAL — Bolladinho (fundos, 3D, cards, tipografia)
+   ============================================================ */
+:root{ --gold:var(--color-gold); --bamboo:var(--color-secondary); --ease-lux:cubic-bezier(0.16,1,0.3,1); }
+
+main{ position:relative; }
+/* ritmo vertical vem do token fluido: clamp(4.5rem, 9vw, 7rem).
+   Antes o padding de seção era declarado em três lugares com valores
+   diferentes (6rem, 6.5rem e 4.5rem no mobile), então nenhuma seção
+   respirava igual à outra. */
+.info,.visual-demo,.social-proof,.final-cta{ position:relative; overflow:hidden; padding-top:var(--space-section); padding-bottom:var(--space-section); }
+.info>.container,.visual-demo>.container,.social-proof>.container,.final-cta>.container{ position:relative; z-index:2; }
+
+/* Camada de ambiente + parallax (blobs) */
+.sfx{ position:absolute; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+.sfx-blob{ position:absolute; border-radius:50%; filter:blur(80px); opacity:.55; will-change:transform,translate; animation:sfxFloat 22s ease-in-out infinite; }
+.sfx-blob.g{ background:radial-gradient(circle, rgba(74,122,91,.55), transparent 70%); width:min(48vw,560px); height:min(48vw,560px); }
+.sfx-blob.d{ background:radial-gradient(circle, rgba(212,195,163,.10), transparent 70%); width:min(38vw,440px); height:min(38vw,440px); }
+.sfx-blob.gold{ background:radial-gradient(circle, rgba(254,200,29,.11), transparent 70%); width:min(34vw,400px); height:min(34vw,400px); }
+.sfx-blob.tl{ top:-12%; left:-10%; } .sfx-blob.br{ bottom:-16%; right:-12%; animation-duration:27s; }
+.sfx-blob.tr{ top:-8%; right:-6%; animation-duration:24s; } .sfx-blob.bl{ bottom:-10%; left:-8%; }
+@keyframes sfxFloat{ 0%,100%{ transform:translate(0,0) scale(1); } 50%{ transform:translate(3%,4%) scale(1.08); } }
+
+/* Eyebrow / kicker */
+.eyebrow{ display:inline-flex; align-items:center; gap:.5rem; font-family:var(--font-body); font-size:.7rem; font-weight:700; letter-spacing:.26em; text-transform:uppercase; color:var(--gold); background:rgba(254,200,29,.08); border:1px solid rgba(254,200,29,.22); padding:.4rem .95rem; border-radius:100px; margin-bottom:1.1rem; }
+
+
+/* Visual demo */
+
+
+/* Pricing — removidos daqui:
+   - `overflow:hidden`, que CORTAVA ao meio o selo "Mais Vendida"
+     (posicionado em top:-15px, para fora do card);
+   - a barra de 3px no topo do card (`::after`), acento lateral que o
+     próprio Impeccable sinaliza como o tique mais reconhecível de
+     interface gerada por IA;
+   - a regra de borda/transição duplicada, que agora vive na regra
+     única do componente, mais acima. */
+.pricing-card.popular{ border-color:rgba(254,200,29,.4)!important; box-shadow:0 0 0 1px rgba(254,200,29,.22), 0 34px 80px rgba(0,0,0,.55)!important; }
+.popular-badge{ box-shadow:0 8px 20px rgba(254,200,29,.25); }
+
+/* Botões */
+.btn-primary:hover{ box-shadow:0 14px 34px rgba(52,94,67,.5)!important; }
+
+/* Pagamento */
+/* A faixa de pagamento tinha duas definições concorrentes de fundo,
+   borda, raio e padding, mais um hover dourado que contradizia o
+   hover branco da outra. Regra única agora, mais acima. */
+
+
+/* ============================================================
+   NAV IRONHILL — botão dourado no canto superior + menu deslizante
+   e correção do "Desça para explorar" no rodapé da 1ª tela
+   ============================================================ */
+
+/* Botão de menu: quadrado com borda dourada, sempre visível, no canto superior direito */
+.nav-actions .menu-toggle {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    background: rgba(10, 20, 12, 0.35);
+    border: 1.5px solid var(--color-gold);
+    border-radius: 10px;
+    color: var(--color-gold);
+    font-size: 1.15rem;
+    line-height: 1;
+    cursor: pointer;
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+    transition: var(--transition);
+}
+.nav-actions .menu-toggle:hover {
+    background: rgba(254, 200, 29, 0.12);
+    box-shadow: 0 0 18px rgba(254, 200, 29, 0.28);
+}
+
+/* Mantém a barra acima do painel para o botão continuar clicável ao fechar */
+.nav-actions { position: relative; z-index: 1300; }
+
+/* Links horizontais viram menu deslizante da direita em QUALQUER tamanho */
+/* Painel do menu: era um retângulo escuro chapado. Agora carrega o
+   mesmo material do resto do site — vidro sobre verde, fibra de bambu
+   e uma fresta de luz dourada na borda de entrada. */
+.nav-content .nav-links {
+    display: flex;
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: min(84vw, 340px);
+    height: 100vh;
+    padding: 0 var(--space-6);
+    margin: 0;
+    background:
+        repeating-linear-gradient(90deg,
+            rgba(212, 195, 163, 0.02) 0 1px,
+            transparent 1px 11px),
+        linear-gradient(200deg, rgba(19, 46, 27, 0.97), rgba(7, 16, 10, 0.98));
+    -webkit-backdrop-filter: blur(18px) saturate(1.2);
+    backdrop-filter: blur(18px) saturate(1.2);
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: var(--space-5);
+    transform: translateX(100%);
+    transition: transform 0.5s var(--ease-lux);
+    border-left: 1px solid rgba(254, 200, 29, 0.22);
+    box-shadow: -30px 0 60px rgba(0, 0, 0, 0.5);
+    z-index: 1200;
+    /* A .navbar tem pointer-events:none (p/ não bloquear o hero). O painel PRECISA
+       reativar, senão os cliques atravessam o menu e caem no hero — links não funcionam. */
+    pointer-events: auto;
+}
+
+.nav-content .nav-links.open {
+    transform: translateX(0);
+}
+
+/* Menu aberto: o botão X salta para dentro do canto superior direito do painel
+   (antes ficava solto na navbar, ancorado ao container e descolado da barra) */
+.nav-content .nav-links.open ~ .nav-actions .menu-toggle {
+    position: fixed;
+    top: 18px;
+    right: 18px;
+    z-index: 1300;
+}
+
+.nav-content .nav-links li {
+    width: 100%;
+}
+
+.nav-content .nav-links a {
+    display: flex;
+    align-items: center;
+    position: relative;
+    min-height: 48px;
+    padding: var(--space-2) 0;
+    font-size: 1.35rem;
+    font-family: var(--font-heading);
+    color: var(--color-text);
+}
+
+.nav-content .nav-links a:hover {
+    color: var(--color-secondary);
+}
+
+/* "Desça para explorar": centralizado no rodapé da PRIMEIRA tela (100vh),
+   não no fim de toda a área do hero (185vh) */
+.hero__scroll-indicator {
+    top: calc(100vh - 96px);
+    bottom: auto;
+}
+
+/* ============================================================
+   REVENDEDOR (B2B) — página de parceria
+   Tudo aqui vinha de dois blocos <style> dentro do revendedor.html
+   mais 51 atributos style= inline. Trazido para o sistema: mesmos
+   tokens, mesmos materiais e mesmos componentes da home.
+   ============================================================ */
+
+/* --- Oferta dentro da área clara do hero ---
+   Valores preservados na íntegra: esta região pertence ao hero. */
+.hero__content--offer .reseller-offer {
+    width: 100%;
+    max-width: 1080px;
+    padding: 0 15px;
+    text-align: center;
+}
+.hero__content--offer h2 {
+    font-family: "PPWoodland", serif;
+    font-size: clamp(28px, 4vw, 48px);
+    text-transform: uppercase;
+    font-weight: 200;
+    letter-spacing: 1px;
+    color: #123420;
+    max-width: none;
+    margin: 0 0 0.8rem;
+}
+.reseller-offer__sub {
+    font-family: "GT America Trial", sans-serif;
+    color: #3a5a44;
+    max-width: 560px;
+    margin: 0 auto 3.2rem;
+    font-size: 1rem;
+}
+.hero__content--offer .offer-grid {
+    max-width: 1000px;
+    margin: 0 auto;
+    text-align: left;
+}
+.hero__content--offer .offer-item::after {
+    background: linear-gradient(90deg, rgba(18, 52, 32, 0.22) 0%, transparent 100%);
+}
+.hero__content--offer .offer-item h4 { color: #123420; }
+.hero__content--offer .offer-item p { color: #3a5a44; }
+.hero__content--offer .offer-item .check-icon {
+    background: var(--color-primary);
+    color: #fff;
+}
+
+.offer-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+    gap: var(--space-5);
+}
+.offer-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-4);
+    padding: var(--space-4) 0;
+    position: relative;
+}
+.offer-item::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(212, 195, 163, 0.2) 0%, transparent 100%);
+}
+.offer-item .check-icon {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    background: var(--color-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 0.8rem;
+}
+.offer-item h4 {
+    color: var(--color-secondary);
+    margin-bottom: var(--space-1);
+    font-size: var(--text-base);
+}
+.offer-item p {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+}
+
+/* --- Seção editorial "Por Que Revender" --- */
+.vantagens {
+    position: relative;
+    padding: var(--space-section) 0;
+    overflow: hidden;
+    background: var(--color-bg);
+}
+.vantagens > .container { position: relative; z-index: 1; }
+
+.vantagens__glow {
+    position: absolute;
+    top: -20%;
+    right: -10%;
+    width: 60%;
+    height: 140%;
+    background: radial-gradient(circle, rgba(52, 94, 67, 0.12) 0%, transparent 70%);
+    z-index: 0;
+    pointer-events: none;
+}
+
+.vantagens-editorial {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-9);
+    align-items: center;
+}
+
+/* era Playfair itálico 1.2rem — a mesma cápsula dourada da home
+   unifica a abertura de seção nas duas páginas */
+.vantagens .eyebrow { margin-bottom: var(--space-4); }
+
+.vantagens h2 {
+    font-family: var(--font-heading);
+    font-size: var(--text-display);
+    color: #fff;
+    line-height: 1.1;
+    margin-bottom: var(--space-6);
+}
+.vantagens h2 span { color: var(--color-secondary); }
+
+.vantagens__lead {
+    font-size: var(--text-lg);
+    color: var(--color-text-muted);
+    line-height: 1.75;
+    margin-bottom: var(--space-7);
+    max-width: 52ch;
+}
+.vantagens__lead strong { color: var(--color-text); font-weight: 600; }
+.vantagens__lead .destaque { color: var(--color-secondary); }
+
+.numbered-benefits {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    margin-top: var(--space-6);
+}
+.numbered-item {
+    display: grid;
+    grid-template-columns: 64px 1fr;
+    align-items: start;
+    gap: var(--space-4);
+    padding-bottom: var(--space-5);
+    border-bottom: 1px solid rgba(212, 195, 163, 0.12);
+}
+.numbered-item:last-child { border-bottom: none; padding-bottom: 0; }
+.numbered-item .num {
+    font-family: var(--font-heading);
+    font-size: 2.75rem;
+    font-weight: 700;
+    color: rgba(212, 195, 163, 0.28);
+    line-height: 0.9;
+}
+.numbered-item h4 {
+    font-size: var(--text-md);
+    color: var(--color-text);
+    margin-bottom: var(--space-2);
+    font-weight: 600;
+}
+.numbered-item p {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+}
+
+/* A citação tinha border-left de 3px — o mesmo acento lateral que o
+   detector marca como tique de UI gerada. Vira aspa tipográfica. */
+.vantagens__quote {
+    position: relative;
+    margin-top: var(--space-8);
+    padding-left: var(--space-8);
+    font-family: var(--font-heading);
+    font-style: italic;
+    font-size: var(--text-lg);
+    color: var(--color-secondary);
+    line-height: 1.5;
+}
+.vantagens__quote::before {
+    content: '\201C';
+    position: absolute;
+    left: 0;
+    top: -0.35em;
+    font-size: 4.5rem;
+    line-height: 1;
+    color: rgba(254, 200, 29, 0.35);
+}
+
+.vantagens__media {
+    position: relative;
+    border-radius: var(--radius-card);
+    overflow: hidden;
+    box-shadow: var(--shadow-hero-card);
+    aspect-ratio: 4 / 5;
+}
+.vantagens__media img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+.vantagens__media::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(9, 18, 9, 0.9), transparent 60%);
+}
+.vantagens__caption {
+    position: absolute;
+    z-index: 1;
+    bottom: var(--space-6);
+    left: var(--space-6);
+    right: var(--space-6);
+    font-family: var(--font-heading);
+    color: #fff;
+    font-size: var(--text-title);
+    font-style: italic;
+    line-height: 1.3;
+}
+
+/* Selo flutuante: perdeu o pulse-strong infinito (movimento ocioso) */
+.vantagens__badge {
+    position: absolute;
+    top: 40px;
+    right: -30px;
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-5);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-lift);
+}
+.vantagens__badge-icon {
+    width: 46px;
+    height: 46px;
+    background: var(--color-primary);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+    color: #fff;
+}
+.vantagens__badge-title {
+    font-weight: 700;
+    color: #fff;
+    font-size: var(--text-md);
+    line-height: 1.2;
+}
+.vantagens__badge-sub {
+    color: var(--color-secondary);
+    font-size: var(--text-xs);
+}
+
+/* --- FAQ --- */
+.faq {
+    background: var(--color-bg-light);
+    border-top: 1px solid rgba(212, 195, 163, 0.05);
+    padding: var(--space-section) 0;
+}
+/* 250px de mínimo dava três colunas apertadas com resposta longa;
+   340px devolve medida de leitura, igual aos depoimentos da home */
+.faq-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+    gap: var(--space-6);
+    text-align: left;
+}
+.faq-card {
+    position: relative;
+    padding: var(--space-6);
+    border-radius: var(--radius-card);
+    border: 1px solid var(--glass-border);
+}
+.faq-card .icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    margin-bottom: var(--space-5);
+    border-radius: 50%;
+    font-size: 1.2rem;
+    color: var(--color-secondary);
+    background: radial-gradient(circle at 32% 28%, rgba(74, 122, 91, 0.9), rgba(52, 94, 67, 0.45));
+    border: 1px solid rgba(212, 195, 163, 0.22);
+}
+.faq-card h4 {
+    font-family: var(--font-heading);
+    font-size: var(--text-title);
+    color: var(--color-secondary);
+    margin-bottom: var(--space-3);
+}
+.faq-card p {
+    color: var(--color-text-muted);
+    line-height: 1.65;
+    font-size: var(--text-md);
+}
+.faq-card p strong { color: var(--color-text); }
+
+/* --- CTA + formulário de cadastro --- */
+.cta-form-section {
+    background: var(--color-bg-light);
+    padding: var(--space-section) 0;
+}
+.cta-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-9);
+    align-items: center;
+}
+.cta-form-text h2 {
+    font-size: var(--text-headline);
+    color: #fff;
+    line-height: 1.25;
+    margin-bottom: var(--space-5);
+}
+.cta-form-text h2 strong { color: var(--color-secondary); }
+.cta-form-text > p {
+    color: var(--color-text-muted);
+    font-size: var(--text-md);
+    max-width: 52ch;
+}
+
+/* eram tres <p> soltos separados por <br> */
+.cta-form-perks {
+    list-style: none;
+    display: grid;
+    gap: var(--space-3);
+    margin: var(--space-6) 0;
+}
+.cta-form-perks li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    color: var(--color-secondary);
+    font-size: var(--text-sm);
+}
+.cta-form-perks i {
+    color: var(--color-gold);
+    width: 1.1rem;
+    text-align: center;
+}
+
+.btn-whatsapp {
+    background-color: #25D366;
+    color: #fff;
+}
+.btn-whatsapp:hover {
+    background-color: #1FB959;
+    color: #fff;
+}
+
+.contact-form {
+    background: var(--glass-bg);
+    padding: var(--space-7);
+    border-radius: var(--radius-card);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-rest);
+}
+.contact-form .form-group { margin-bottom: var(--space-4); }
+.contact-form label {
+    display: block;
+    margin-bottom: var(--space-2);
+    color: var(--color-secondary);
+    font-weight: 500;
+    font-size: var(--text-sm);
+}
+.contact-form input {
+    width: 100%;
+    padding: 0.9rem 1rem;
+    min-height: 48px;
+    border-radius: var(--radius-input);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(0, 0, 0, 0.3);
+    color: #fff;
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+/* antes o foco era so a troca de borda de 1px */
+.contact-form input:focus-visible {
+    border-color: var(--color-primary-light);
+    box-shadow: var(--focus-ring);
+}
+.contact-form input::placeholder { color: rgba(255, 255, 255, 0.35); }
+.contact-form .btn { width: 100%; margin-top: var(--space-2); }
+
+@media (max-width: 992px) {
+    .vantagens-editorial { grid-template-columns: 1fr; gap: var(--space-8); }
+    .vantagens__badge { right: 20px; top: -20px; }
+}
+
+@media (max-width: 768px) {
+    .cta-form-grid { grid-template-columns: 1fr; gap: var(--space-7); }
+    .numbered-item { grid-template-columns: 48px 1fr; }
+    .numbered-item .num { font-size: 2.25rem; }
+}
+
+/* ============================================================
+   OVERLAY DE LOGIN DO ADMIN
+   Vinha de um <style> inline no fim do index.html, depois das tags
+   <script> — por isso escapou de todas as buscas anteriores. Tinha
+   OITO tamanhos de fonte entre 0.72rem e 1.4rem (a "hierarquia
+   achatada" que o detector aponta), paleta própria e raios próprios.
+   Aqui na régua do sistema são três tamanhos de texto e um de ícone.
+
+   Foram removidas as regras de `.admin-access-btn`: a classe não
+   existe mais no HTML desde que o botão-folha passou a usar
+   `.admin-access`, a mesma do revendedor.html.
+   ============================================================ */
+#admin-login-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-4);
+    background: rgba(4, 10, 6, 0.72);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+}
+
+#admin-login-overlay.show {
+    display: flex;
+}
+
+.admin-login-card {
+    width: 100%;
+    max-width: 360px;
+    background: linear-gradient(150deg, rgba(30, 50, 35, 0.94), rgba(13, 24, 16, 0.97));
+    border: 1px solid rgba(212, 195, 163, 0.18);
+    border-radius: var(--radius-card);
+    padding: var(--space-7) var(--space-6);
+    box-shadow: var(--shadow-hero-card);
+    text-align: center;
+    font-family: var(--font-body);
+    animation: alpop 0.35s var(--ease-lux) both;
+}
+
+@keyframes alpop {
+    from { opacity: 0; transform: translateY(16px) scale(0.97); }
+    to { opacity: 1; transform: none; }
+}
+
+.admin-login-card .al-ico {
+    width: 54px;
+    height: 54px;
+    margin: 0 auto var(--space-4);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--icon-lg);
+    color: var(--color-bg);
+    background: linear-gradient(135deg, var(--color-secondary), var(--color-gold));
+}
+
+.admin-login-card h3 {
+    font-family: var(--font-heading);
+    color: #fff;
+    font-size: var(--text-title);
+    margin: 0 0 var(--space-2);
+}
+
+.admin-login-card p {
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    margin: 0 0 var(--space-5);
+}
+
+.admin-login-card input {
+    width: 100%;
+    margin-bottom: var(--space-3);
+    padding: 0.8rem 1rem;
+    min-height: 48px;
+    border-radius: var(--radius-input);
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #fff;
+    font-size: var(--text-base);
+    font-family: var(--font-body);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.admin-login-card input:focus-visible {
+    border-color: var(--color-primary-light);
+    box-shadow: var(--focus-ring);
+}
+
+.admin-login-card .al-err {
+    color: var(--feedback-error);
+    font-size: var(--text-sm);
+    min-height: 1.4em;
+    margin-bottom: var(--space-2);
+}
+
+.admin-login-card .al-btn {
+    width: 100%;
+    padding: 0.85rem;
+    min-height: 48px;
+    border: none;
+    border-radius: var(--radius-input);
+    background: var(--color-primary);
+    color: #fff;
+    font-weight: 600;
+    font-size: var(--text-base);
+    cursor: pointer;
+    transition: background 0.25s ease;
+    font-family: var(--font-body);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+}
+
+.admin-login-card .al-btn:hover {
+    background: var(--color-primary-light);
+}
+
+.admin-login-card .al-btn:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
+
+.admin-login-card .al-cancel {
+    background: transparent;
+    border: none;
+    color: var(--color-text-muted);
+    font-size: var(--text-sm);
+    min-height: 44px;
+    padding: 0 var(--space-4);
+    margin-top: var(--space-2);
+    cursor: pointer;
+}
+
+.admin-login-card .al-cancel:hover {
+    color: var(--color-text);
+}
+
+/* ===== "Por que escolher o Bambu" dentro da animação do hero (onde estava a frase) ===== */
+/* Ancorado em top:104vh — logo abaixo do título (100vh), NUNCA sobrepõe, altura livre */
+#beneficios.hero__content {
+    position: absolute;
+    top: 104vh;
+    bottom: auto;
+    left: 0;
+    width: 100%;
+    height: auto;
+    z-index: 10;
+    padding: 0 15px;
+    display: flex;
+    justify-content: center;
+    /* Só aparece quando o dissolve vira creme (JS controla via progresso do scroll) */
+    opacity: 0;
+    transition: opacity .6s ease;
+}
+/* Hero mais alto p/ o bloco de benefícios caber inteiro (sem cortar o banner) */
+.hero__row { height: 210vh; }
+.hero__content .container { width: 100%; max-width: 1200px; }
+.hero__content .section-title h2 { color: #123420; text-transform: none; }
+.hero__content .section-title p { color: #3a5a44; }
+.hero__content .benefit-card {
+    background: rgba(255, 255, 255, 0.62);
+    border: 1px solid rgba(18, 52, 32, 0.14);
+    box-shadow: 0 12px 30px rgba(18, 52, 32, 0.08);
+}
+.hero__content .benefit-card::before { display: none; } /* fibra escura não faz sentido sobre creme */
+.hero__content .benefit-card h3 { color: #123420; }
+.hero__content .benefit-card p { color: #3a5a44; }
+.hero__content .benefit-card .icon { color: #ebf5df; }
+.hero__content .diferenciais-banner { background: rgba(18, 52, 32, 0.06); border-color: rgba(18, 52, 32, 0.12); }
+.hero__content .dif-item { color: #123420; }
+
+/* Mobile: cards empilham (bloco alto) — dá mais folga vertical ao hero p/ caberem no dissolve */
+@media (max-width: 900px) {
+    .hero__row { height: 300vh; }
+    #beneficios.hero__content { top: 110vh; }
+}
