@@ -3,8 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="img/favicon.png">
-    <title>Bolladinho | A primeira piteira de fibras naturais do mercado!</title>
+    <link rel="icon" type="image/svg+xml" href="img/favicon.svg">
+    <link rel="icon" type="image/png" sizes="64x64" href="img/favicon.png">
+    <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+    <meta name="theme-color" content="#0c2e17">
+    <title>BolladinhoSmoking</title>
     <meta name="description" content="Direto da Natureza para Você. A primeira piteira de fibras naturais do mercado. Biodescartáveis e Reutilizáveis, feitas de bambu selecionado. Sustentabilidade, estilo e exclusividade.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -75,10 +78,6 @@
     <main>
         <!-- Hero Ironhill: névoa em movimento + efeito mouse 3D sway/tilt + dissolve (Three.js) + parallax galhos -->
         <section class="hero" id="home">
-            <div class="hero__twigs" data-sway="16">
-                <img class="hero__twig hero__twig--left" src="img/mask-1.webp" alt="">
-                <img class="hero__twig hero__twig--right" src="img/mask-2.webp" alt="">
-            </div>
 
             <div class="hero__vignette"></div>
 
@@ -86,6 +85,11 @@
                 <img class="hero__bg" src="img/hero-bg.webp" alt="" data-sway="14" />
                 <canvas class="hero-canvas"></canvas>
                 <div class="hero__conteiner">
+                    <!-- galhos na mesma camada do título, logo abaixo dele: o nome nunca fica coberto -->
+                    <div class="hero__twigs" data-sway="16">
+                        <img class="hero__twig hero__twig--left" src="img/mask-1.webp" alt="">
+                        <img class="hero__twig hero__twig--right" src="img/mask-2.webp" alt="">
+                    </div>
                     <div class="hero__top" data-sway="14">
                         <p class="intro-eyebrow">SUBA NO</p>
                         <h1>BOLLADINHO</h1>
@@ -169,6 +173,7 @@
                         <div class="price-amount">
                             <span class="currency">R$</span>5<span class="cents">,00</span>
                         </div>
+                        <span class="price-per">por caixa · frete para todo o Brasil</span>
                         <a href="#" class="btn btn-outline add-to-cart-btn" data-name="Caixa Pequena" data-price="5.00"><i class="fa-solid fa-cart-shopping"></i> Comprar Agora</a>
                         <small class="stock-note"></small>
                     </div>
@@ -180,6 +185,7 @@
                         <div class="price-amount">
                             <span class="currency">R$</span>9<span class="cents">,90</span>
                         </div>
+                        <span class="price-per">por caixa · frete para todo o Brasil</span>
                         <a href="#" class="btn btn-primary add-to-cart-btn" data-name="Caixa Média" data-price="9.90"><i class="fa-solid fa-cart-shopping"></i> Comprar Agora</a>
                         <small class="stock-note"></small>
                     </div>
@@ -190,6 +196,7 @@
                         <div class="price-amount">
                             <span class="currency">R$</span>20<span class="cents">,00</span>
                         </div>
+                        <span class="price-per">por caixa · frete para todo o Brasil</span>
                         <a href="#" class="btn btn-outline add-to-cart-btn" data-name="Caixa Grande" data-price="20.00"><i class="fa-solid fa-cart-shopping"></i> Comprar Agora</a>
                         <small class="stock-note"></small>
                     </div>
